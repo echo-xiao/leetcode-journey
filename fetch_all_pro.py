@@ -20,7 +20,7 @@ client = OpenAI(api_key=os.getenv('CHATGPT_TOKEN'))
 LC_SESSION = os.getenv('LEETCODE_SESSION')
 LC_CSRF = os.getenv('LEETCODE_CSRFTOKEN')
 
-TEST_MODE = True  # 测试模式
+TEST_MODE = False  # 测试模式
 TEST_LIMIT = 10
 
 HEADERS = {
