@@ -38,7 +38,7 @@ print(f"Debug - OpenAI Key: {'已找到' if OPENAI_KEY else '未找到'}")
 print(f"----------------\n")
 
 # ================= 配置区 =================
-TEST_MODE = True  # ⭐ True: 仅测试 10 题; False: 全量同步 364+ 题
+TEST_MODE = False  # ⭐ True: 仅测试 10 题; False: 全量同步 364+ 题
 TEST_LIMIT = 10
 BASE_URL_EN = "https://leetcode.com"
 BASE_URL_CN = "https://leetcode.cn"
