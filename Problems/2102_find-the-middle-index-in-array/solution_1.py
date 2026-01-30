@@ -1,0 +1,13 @@
+class Solution:
+    def findMiddleIndex(self, nums: List[int]) -> int:
+        n = len(nums)
+        arr = [0] * (n+1)
+
+        for i in range(0, n):
+            arr[i+1] = arr[i] + nums[i]
+
+        for j in range(0, n):
+            if arr[j] == arr[n] - arr[j+1]:
+                return j
+        return -1
+        
