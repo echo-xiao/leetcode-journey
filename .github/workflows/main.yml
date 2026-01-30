@@ -1,0 +1,40 @@
+name: Select LeetCode Problem
+on:
+  # 1. 允许快捷指令手动触发并传参
+  workflow_dispatch:
+    inputs:
+      category:
+        description: 'LeetCode Tag'
+        required: true
+        default: 'Array'
+
+  # 2. 每天凌晨自动运行（更新 tags.json）
+  schedule:
+    # 国际标准时间 (UTC) 10:00，约等于加州时间 (PST) 凌晨 02:00
+    - cron: '0 10 * * *'
+
+jobs:
+  select_and_update:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write # 赋予推送权限
+    steps:
+      - uses: actions/checkout@v3
+      
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.x'
+
+      - name: Pick Problem
+        # 这里会将快捷指令传来的标签传给 Python 脚本
+        run: python pick_problem.py "${{ github.event.inputs.category || 'Array' }}"
+
+      - name: Commit and Push
+        run: |
+          git config --local user.email "actions@github.com"
+          git config --local user.name "GitHub Actions"
+          # 同时锁定结果文件和自动生成的标签列表
+          git add result.txt summary.json
+          # 安全检查：只有在内容发生变化时才执行推送，避免报错
+          git diff --quiet && git diff --staged --quiet || (git commit -m "Update result and tags" && git push)

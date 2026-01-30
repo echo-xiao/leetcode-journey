@@ -1,0 +1,42 @@
+name: Ultimate LeetCode Sync
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '0 8 * * *'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    # 🌟 修复 403 错误的关键：明确授予写权限
+    permissions:
+      contents: write
+      
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+
+      - name: Install Dependencies
+        run: pip install requests openai tqdm
+
+      - name: Run Ultimate Sync
+        env:
+          LEETCODE_SESSION: ${{ secrets.LEETCODE_SESSION }}
+          LEETCODE_CSRFTOKEN: ${{ secrets.LEETCODE_CSRFTOKEN }}
+
+
+
+          CHATGPT_TOKEN: ${{ secrets.CHATGPT_TOKEN }}
+        run: python fetch_all_pro.py
+
+      - name: Commit and Push Changes
+        run: |
+          git config --global user.name 'echo-xiao'
+          git config --global user.email 'echoxiao666@gmail.com'
+          git add .
+          git commit -m "Complete sync of 364+ problems with AI review" || exit 0
+          git push
