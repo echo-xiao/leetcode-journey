@@ -6,231 +6,179 @@ from openai import OpenAI
 from tqdm import tqdm
 from dotenv import load_dotenv
 
-# 1. 加载环境变量
+# 1. 初始化配置
 load_dotenv()
-
-print(f"--- 环境检查 ---")
-print(f"Debug - Session: {os.getenv('LEETCODE_SESSION')[:15] if os.getenv('LEETCODE_SESSION') else 'None'}...")
-print(f"Debug - CSRF: {os.getenv('LEETCODE_CSRFTOKEN')}")
-print(f"Debug - OpenAI Key: {'已找到' if os.getenv('CHATGPT_TOKEN') else '未找到'}")
-print(f"----------------\n")
-
-# ================= 配置区 =================
-client = OpenAI(api_key=os.getenv('CHATGPT_TOKEN'))
 LC_SESSION = os.getenv('LEETCODE_SESSION')
 LC_CSRF = os.getenv('LEETCODE_CSRFTOKEN')
+OPENAI_KEY = os.getenv('CHATGPT_TOKEN')
 
-TEST_MODE = False  # 测试模式
-TEST_LIMIT = 10
+# 验证环境变量
+print(f"--- 环境检查 ---")
+print(f"Debug - Session: {LC_SESSION[:10] if LC_SESSION else 'None'}...")
+print(f"Debug - OpenAI: {'Ready' if OPENAI_KEY else 'Missing'}")
+print(f"----------------\n")
+
+client = OpenAI(api_key=OPENAI_KEY)
+
+# ================= 配置区 =================
+# ⭐⭐⭐ 全量开关在这里 ⭐⭐⭐
+TEST_MODE = True    # True: 只运行 10 题测试; False: 运行全量 364+ 题
+TEST_LIMIT = 10     # 测试模式下的题目数量
+
+BASE_URL_EN = "https://leetcode.com"
+BASE_URL_CN = "https://leetcode.cn"
 
 HEADERS = {
     'Cookie': f'LEETCODE_SESSION={LC_SESSION}; csrftoken={LC_CSRF}',
     'x-csrftoken': LC_CSRF,
-    'Referer': 'https://leetcode.com',
+    'Referer': BASE_URL_EN,
     'Content-Type': 'application/json',
     'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/121.0.0.0 Safari/537.36'
 }
 
+# ================= 核心逻辑：分页获取所有题目 =================
 
-# ================= 功能函数 =================
+def get_total_ac_count():
+    """获取用户 AC 题目的真实总数"""
+    query = "query userStatus { userProgress { numAccepted { count } } }"
+    try:
+        resp = requests.post(f"{BASE_URL_EN}/graphql", json={'query': query}, headers=HEADERS)
+        return resp.json()['data']['userProgress']['numAccepted'][0]['count']
+    except: return 0
 
-def get_ac_questions_list(limit=2000):
-    """获取所有已通过题目的基础信息 (修复了 offset 参数错误)"""
-    url = "https://leetcode.com/graphql"
-    # 将之前的 offset 更改为 skip
+def get_all_ac_questions():
+    """优雅进阶法：分页抓取所有题目索引"""
+    total = get_total_ac_count()
+    print(f"📊 检测到已通过题目总数: {total}")
+    
+    questions = []
+    page_size = 100
     query = """
-    query problemsetQuestionList($categorySlug: String, $limit: Int, $skip: Int, $filters: QuestionListFilterInput) {
-      problemsetQuestionList: questionList(
-        categorySlug: $categorySlug
-        limit: $limit
-        skip: $skip
-        filters: $filters
-      ) {
-        questions: data {
-          questionId
-          titleSlug
-        }
+    query problemsetQuestionList($limit: Int, $skip: Int, $filters: QuestionListFilterInput) {
+      problemsetQuestionList: questionList(limit: $limit, skip: $skip, filters: $filters) {
+        questions: data { questionId titleSlug }
       }
     }
     """
-    variables = {
-        "categorySlug": "",
-        "skip": 0,
-        "limit": limit,
-        "filters": {"status": "AC"}
-    }
-    try:
-        resp = requests.post(url, json={'query': query, 'variables': variables}, headers=HEADERS)
-        resp.raise_for_status()
-        data = resp.json().get('data', {}).get('problemsetQuestionList', {}).get('questions', [])
-        return data
-    except Exception as e:
-        print(f"❌ 获取题目列表失败: {e}")
-        if hasattr(e, 'response') and e.response is not None:
-            print(f"服务器详情: {e.response.text}")
-        return []
+    for skip in range(0, total, page_size):
+        vars = {"limit": page_size, "skip": skip, "filters": {"status": "AC"}}
+        try:
+            resp = requests.post(f"{BASE_URL_EN}/graphql", json={'query': query, 'variables': vars}, headers=HEADERS)
+            questions.extend(resp.json()['data']['problemsetQuestionList']['questions'])
+            time.sleep(0.5)
+        except: break
+    return questions
 
+# ================= 核心逻辑：全量代码抓取 =================
 
-def get_problem_metadata(slug):
-    """获取题目标签、难度等元数据"""
-    query = """
-    query singleQuestion($titleSlug: String!) {
-        question(titleSlug: $titleSlug) {
-            questionId
-            topicTags { name translatedName }
-            difficulty
-        }
-    }
-    """
-    try:
-        resp = requests.post("https://leetcode.com/graphql",
-                             json={'query': query, 'variables': {'titleSlug': slug}},
-                             headers=HEADERS).json()
-        q = resp.get('data', {}).get('question', {})
-        tags = [t['translatedName'] or t['name'] for t in q.get('topicTags', [])]
-        return tags, q.get('difficulty', 'Unknown'), q.get('questionId')
-    except:
-        return [], "Unknown", None
-
-
-def get_all_ac_submissions(slug):
-    """获取 AC 提交记录列表"""
-    query = """
+def get_all_accepted_codes(slug):
+    """抓取该题目下【所有】AC 提交记录的代码"""
+    list_query = """
     query submissionList($questionSlug: String!, $offset: Int, $limit: Int) {
-        submissionList(questionSlug: $questionSlug, offset: $offset, limit: $limit) {
-            submissions { id statusDisplay lang }
-        }
+      submissionList(questionSlug: $questionSlug, offset: $offset, limit: $limit) {
+        submissions { id statusDisplay lang timestamp }
+      }
     }
     """
-    params = {'query': query, 'variables': {'offset': 0, 'limit': 10, 'questionSlug': slug}}
-    try:
-        resp = requests.post("https://leetcode.com/graphql", json=params, headers=HEADERS).json()
-        subs = resp.get('data', {}).get('submissionList', {}).get('submissions', [])
-        return [s for s in subs if s['statusDisplay'] == 'Accepted']
-    except:
-        return []
-
-
-def get_submission_code(sub_id):
-    """提取源代码"""
-    query = """
+    detail_query = """
     query submissionDetails($submissionId: Int!) {
-        submissionDetails(submissionId: $submissionId) { code }
+      submissionDetails(submissionId: $submissionId) { code }
     }
     """
+    all_ac_records = []
     try:
-        resp = requests.post("https://leetcode.com/graphql",
-                             json={'query': query, 'variables': {'submissionId': int(sub_id)}},
+        resp = requests.post(f"{BASE_URL_EN}/graphql", 
+                             json={'query': list_query, 'variables': {'questionSlug': slug, 'offset': 0, 'limit': 100}}, 
                              headers=HEADERS).json()
-        return resp.get('data', {}).get('submissionDetails', {}).get('code', "")
-    except:
-        return ""
+        subs = resp['data']['submissionList']['submissions']
+        ac_subs = [s for s in subs if s['statusDisplay'] == 'Accepted']
+        
+        for sub in ac_subs:
+            detail = requests.post(f"{BASE_URL_EN}/graphql", 
+                                   json={'query': detail_query, 'variables': {'submissionId': int(sub['id'])}}, 
+                                   headers=HEADERS).json()
+            all_ac_records.append({
+                "code": detail['data']['submissionDetails']['code'],
+                "lang": sub['lang'],
+                "id": sub['id']
+            })
+            time.sleep(0.2)
+        return all_ac_records
+    except: return []
 
+# ================= 辅助功能 =================
 
-def get_problem_cn(slug):
-    """获取中文题目描述"""
-    query = """
-    query translatedConfig($titleSlug: String!) {
-        question(titleSlug: $titleSlug) { translatedTitle translatedContent }
-    }
-    """
+def get_problem_details(slug):
+    """获取元数据与中文描述"""
+    q_meta = "query singleQuestion($titleSlug: String!) { question(titleSlug: $titleSlug) { questionId difficulty topicTags { name translatedName } } }"
+    q_cn = "query translatedConfig($titleSlug: String!) { question(titleSlug: $titleSlug) { translatedTitle translatedContent } }"
     try:
-        resp = requests.post("https://leetcode.cn/graphql",
-                             json={'query': query, 'variables': {'titleSlug': slug}}).json()
-        return resp.get('data', {}).get('question')
-    except:
-        return None
-
+        meta = requests.post(f"{BASE_URL_EN}/graphql", json={'query': q_meta, 'variables': {'titleSlug': slug}}, headers=HEADERS).json()['data']['question']
+        cn = requests.post(f"{BASE_URL_CN}/graphql", json={'query': q_cn, 'variables': {'titleSlug': slug}}).json()['data']['question']
+        return meta, cn
+    except: return None, None
 
 def ai_analyze(title, code):
     """GPT-4o 深度复盘"""
+    # 遵循一句话本质的要求
     prompt = (
-        f"请分析算法题《{title}》的实现逻辑。\n"
-        f"要求：\n1. 一句话直击本质：用一句话总结该算法的核心逻辑。\n"
-        f"2. 提供简洁的中文实现思路描述。\n"
-        f"3. 总结AC版本所有的通用解决方式/逻辑的中文伪代码。\n"
-        f"4. 使用 LaTeX 格式给出时间复杂度和空间复杂度，例如 $O(n)$。\n\n"
-        f"代码如下：\n{code}"
+        f"分析算法题《{title}》的核心逻辑。\n"
+        f"1. 一句话直击本质：用一句话总结该算法的核心逻辑。\n"
+        f"2. 中文实现思路：描述解法步骤。\n"
+        f"3. 伪代码：总结AC版本所有的通用解决方式/逻辑的中文伪代码。\n"
+        f"4. 复杂度：使用 LaTeX 格式（如 $O(n)$）给出时间和空间复杂度。"
     )
     try:
-        response = client.chat.completions.create(
-            model="gpt-4o",
-            messages=[
-                {"role": "system", "content": "你是一个严谨的算法专家。"},
-                {"role": "user", "content": prompt}
-            ],
-            temperature=0.2
-        )
-        return response.choices[0].message.content
-    except Exception as e:
-        return f"AI 复盘生成失败: {e}"
+        res = client.chat.completions.create(model="gpt-4o", messages=[{"role": "user", "content": prompt}], temperature=0.2)
+        return res.choices[0].message.content
+    except: return "AI 分析生成失败"
 
-
-# ================= 主程序 =================
+# ================= 主循环 =================
 
 def main():
-    print("🚀 开始运行 LeetCode 同步程序...")
-    all_questions = get_ac_questions_list()
+    if not os.path.exists("Problems"): os.makedirs("Problems")
+    questions = get_all_ac_questions()
 
-    if not all_questions:
-        print("❌ 未获取到任何已通过题目，请检查 Session 和 CSRFToken。")
-        return
-
+    # ⭐ 测试模式切片
     if TEST_MODE:
         print(f"🧪 测试模式开启：仅处理前 {TEST_LIMIT} 题")
-        all_questions = all_questions[:TEST_LIMIT]
-
-    print(f"🎯 待处理题目: {len(all_questions)} 题")
-
-    if not os.path.exists("Problems"):
-        os.makedirs("Problems")
-
-    metadata_list = []
-    for q_basic in tqdm(all_questions, desc="📦 处理中"):
-        slug = q_basic['titleSlug']
-        try:
-            tags, difficulty, q_id = get_problem_metadata(slug)
-            prob_cn = get_problem_cn(slug)
-            title = (prob_cn['translatedTitle'] if prob_cn else slug) or slug
-
-            folder_name = f"{q_id}_{slug}" if q_id else slug
-            folder_path = f"Problems/{folder_name}"
-
-            if os.path.exists(f"{folder_path}/README_CN.md") and not TEST_MODE:
-                continue
-
-            os.makedirs(folder_path, exist_ok=True)
-            ac_subs = get_all_ac_submissions(slug)
-
-            if ac_subs:
-                latest_sub = ac_subs[0]
-                code = get_submission_code(latest_sub['id'])
-                ext = {"python": "py", "python3": "py", "java": "java", "cpp": "cpp"}.get(latest_sub['lang'], "txt")
-
-                with open(f"{folder_path}/solution.{ext}", 'w', encoding='utf-8') as f:
-                    f.write(code)
-
-                analysis = ai_analyze(title, code)
-
-                with open(f"{folder_path}/README_CN.md", 'w', encoding='utf-8') as f:
-                    tag_str = " ".join([f"`{t}`" for t in tags])
-                    f.write(f"# {q_id}. {title}\n\n")
-                    f.write(f"**难度**: {difficulty} | **标签**: {tag_str}\n\n")
-                    f.write(f"## 题目描述\n\n{prob_cn['translatedContent'] if prob_cn else '暂无描述'}\n\n---\n")
-                    f.write(f"## 解题思路与复盘\n\n{analysis}")
-
-            metadata_list.append({"id": q_id, "title": title, "slug": slug, "difficulty": difficulty})
+        questions = questions[:TEST_LIMIT]
+    
+    for q in tqdm(questions, desc="🚀 同步中"):
+        slug = q['titleSlug']
+        meta, cn = get_problem_details(slug)
+        if not meta: continue
+        
+        q_id = meta['questionId']
+        folder = f"Problems/{q_id}_{slug}"
+        
+        # 断点续传逻辑
+        if os.path.exists(f"{folder}/README_CN.md") and not TEST_MODE: 
+            continue
+        
+        os.makedirs(folder, exist_ok=True)
+        ac_records = get_all_accepted_codes(slug)
+        
+        if ac_records:
+            # 保存所有 AC 代码
+            for i, rec in enumerate(ac_records):
+                ext = {"python": "py", "python3": "py", "java": "java", "cpp": "cpp"}.get(rec['lang'], "txt")
+                with open(f"{folder}/solution_{i+1}.{ext}", 'w', encoding='utf-8') as f:
+                    f.write(rec['code'])
+            
+            # 使用最新的一份代码进行 AI 分析
+            analysis = ai_analyze(cn['translatedTitle'] if cn else slug, ac_records[0]['code'])
+            
+            with open(f"{folder}/README_CN.md", 'w', encoding='utf-8') as f:
+                tags = " ".join([f"`{t['translatedName'] or t['name']}`" for t in meta['topicTags']])
+                f.write(f"# {q_id}. {cn['translatedTitle'] if cn else slug}\n\n")
+                f.write(f"**难度**: {meta['difficulty']} | **标签**: {tags}\n\n")
+                f.write(f"## 题目描述\n\n{cn['translatedContent'] if cn else '暂无描述'}\n\n---\n")
+                f.write(f"## 解解思路与复盘\n\n{analysis}")
+            
             time.sleep(1)
 
-        except Exception as e:
-            print(f"\n❌ 处理题目 {slug} 时出错: {e}")
-            continue
-
-    with open("summary.json", "w", encoding="utf-8") as f:
-        json.dump(metadata_list, f, ensure_ascii=False, indent=2)
-
-    print("\n✅ 同步完成！")
-
+    print(f"\n✅ {'测试' if TEST_MODE else '全量'}同步完成！")
 
 if __name__ == "__main__":
     main()
