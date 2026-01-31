@@ -205,15 +205,78 @@ def ai_analyze_all_versions(title, codes_dict):
         return f"AI 复盘生成失败: {e}"
 
 
+def classify_question(tags, title):
+    """
+    根据标签和标题，将题目归类到你提供的 12 大类中
+    返回: (大类名称, 小类建议)
+    """
+    tag_set = set(tags)
+
+    # 映射配置 (大类关键字 -> 对应的 LeetCode 标签或关键字)
+    mapping = {
+        "1. 滑动窗口与双指针": ["Sliding Window", "Two Pointers", "双指针", "滑动窗口"],
+        "2. 二分算法": ["Binary Search", "二分查找"],
+        "3. 单调栈": ["Monotonic Stack", "单调栈"],
+        "4. 网格图": ["Matrix", "Grid", "矩阵"],
+        "5. 位运算": ["Bit Manipulation", "位运算"],
+        "6. 图论算法": ["Graph", "Topological Sort", "Shortest Path", "Minimum Spanning Tree", "图", "拓扑排序"],
+        "7. 动态规划": ["Dynamic Programming", "背包问题", "状态压缩", "动态规划"],
+        "8. 常用数据结构": ["Stack", "Queue", "Heap (Priority Queue)", "Trie", "Union Find", "Fenwick Tree",
+                            "Segment Tree", "Prefix Sum", "堆", "并查集", "前缀和"],
+        "9. 数学算法": ["Math", "Number Theory", "Combinatorics", "Geometry", "数学", "数论", "组合数学"],
+        "10. 贪心与思维": ["Greedy", "Brainteaser", "贪心", "脑筋急转弯"],
+        "11. 链表、树与回溯": ["Linked List", "Tree", "Binary Tree", "Backtracking", "Depth-First Search",
+                              "Breadth-First Search", "回溯", "二叉树", "深度优先搜索"],
+        "12. 字符串": ["String", "String Matching", "字符串", "KMP"]
+    }
+
+    # 优先级匹配
+    for main_cat, keywords in mapping.items():
+        if any(k.lower() in [t.lower() for t in tags] for k in keywords):
+            # 简单取第一个匹配的标签作为小类，或根据子类逻辑细化
+            sub_cat = tags[0] if tags else "通用"
+            return main_cat, sub_cat
+
+    return "13. 其他", "未分类"
 
 # ================= 主程序 =================
+def classify_question(tags, title):
+    """
+    核心分类逻辑：基于 LeetCode 标签将题目映射至 12 大类体系
+    """
+    tag_set = {t.lower() for t in tags}
+
+    # 映射配置：大类名称 -> 匹配的 LeetCode 英文标签或关键字
+    mapping = {
+        "1. 滑动窗口与双指针": ["sliding window", "two pointers", "双指针", "滑动窗口"],
+        "2. 二分算法": ["binary search", "二分查找", "二分"],
+        "3. 单调栈": ["monotonic stack", "单调栈", "单调队列"],
+        "4. 网格图": ["matrix", "grid", "矩阵"],
+        "5. 位运算": ["bit manipulation", "位运算"],
+        "6. 图论算法": ["graph", "topological sort", "shortest path", "minimum spanning tree", "图", "拓扑排序"],
+        "7. 动态规划": ["dynamic programming", "backpack", "memoization", "动态规划"],
+        "8. 常用数据结构": ["stack", "queue", "heap", "priority queue", "trie", "union find", "fenwick tree",
+                            "segment tree", "prefix sum", "hash table", "堆", "并查集", "前缀和"],
+        "9. 数学算法": ["math", "number theory", "combinatorics", "geometry", "probability", "数学", "数论",
+                        "组合数学"],
+        "10. 贪心与思维": ["greedy", "brainteaser", "constructive", "贪心", "脑筋急转弯"],
+        "11. 链表、树与回溯": ["linked list", "tree", "binary tree", "backtracking", "dfs", "bfs", "depth-first search",
+                              "breadth-first search", "链表", "二叉树", "回溯"],
+        "12. 字符串": ["string", "string matching", "kmp", "ac automaton", "字符串"]
+    }
+
+    for main_cat, keywords in mapping.items():
+        if any(k in tag_set for k in keywords):
+            # 取第一个原始标签作为小类，若无则设为 General
+            sub_cat = tags[0] if tags else "General"
+            return main_cat, sub_cat
+
+    return "13. 其他", "未分类"
+
 
 def main():
     print("🚀 开始运行 LeetCode 同步程序...")
-
-    # --- 修改这里：传入上面定义好的 session ---
     all_questions = get_all_ac_questions(session)
-    # ---------------------------------------
 
     if not all_questions:
         print("❌ 未获取到题目，请检查配置。")
@@ -223,55 +286,78 @@ def main():
         print(f"🧪 测试模式开启：仅处理前 {TEST_LIMIT} 题")
         all_questions = all_questions[:TEST_LIMIT]
 
-    if not os.path.exists("Problems"): os.makedirs("Problems")
+    if not os.path.exists("Problems"):
+        os.makedirs("Problems")
+
+    # 用于生成 summary.json 的汇总列表
+    summary_data = []
 
     for q_basic in tqdm(all_questions, desc="📦 深度同步中"):
         slug = q_basic['titleSlug']
         try:
             q_id, difficulty, tags, prob_cn = get_problem_details(slug)
-            title = (prob_cn['translatedTitle'] if prob_cn else slug) or slug
+            cn_title = (prob_cn['translatedTitle'] if prob_cn else slug) or slug
             folder = f"Problems/{q_id}_{slug}"
 
+            # 1. 自动分类
+            main_cat, sub_cat = classify_question(tags, cn_title)
+
+            # 2. 收集 JSON 数据 (包含 6 个核心字段)
+            summary_data.append({
+                "id": q_id,
+                "title_cn": cn_title,
+                "title_en": slug,
+                "difficulty": difficulty,
+                "category_main": main_cat,
+                "category_sub": sub_cat,
+                "tags": tags
+            })
+
             # 断点续传
-            if os.path.exists(f"{folder}/README_CN.md") and not TEST_MODE: continue
+            if os.path.exists(f"{folder}/README_CN.md") and not TEST_MODE:
+                continue
 
             os.makedirs(folder, exist_ok=True)
             ac_subs = get_all_ac_submissions(slug)
-
             if not ac_subs: continue
 
             all_codes = {}
             for i, sub in enumerate(ac_subs):
                 code = get_submission_code(sub['id'])
                 if not code: continue
-
                 lang = sub['lang']
                 ext = {"python": "py", "python3": "py", "java": "java", "cpp": "cpp", "javascript": "js"}.get(lang,
                                                                                                               "txt")
 
-                # 保存所有历史版本：solution_1.py, solution_2.py...
                 with open(f"{folder}/solution_{i + 1}.{ext}", 'w', encoding='utf-8') as f:
                     f.write(code)
-
                 all_codes[f"{sub['id']}_{lang}"] = code
 
-            # AI 对所有版本进行综合复盘
-            analysis = ai_analyze_all_versions(title, all_codes)
+            # AI 综合分析
+            analysis = ai_analyze_all_versions(cn_title, all_codes)
 
+            # 3. 写入 Markdown，同时标注分类
             with open(f"{folder}/README_CN.md", 'w', encoding='utf-8') as f:
                 tag_str = " ".join([f"`{t}`" for t in tags])
-                f.write(f"# {q_id}. {title}\n\n")
+                f.write(f"# {q_id}. {cn_title}\n\n")
                 f.write(f"**难度**: {difficulty} | **标签**: {tag_str}\n\n")
+                f.write(f"**归类**: {main_cat} > {sub_cat}\n\n")
                 f.write(f"## 题目描述\n\n{prob_cn['translatedContent'] if prob_cn else '暂无描述'}\n\n---\n")
                 f.write(f"## 解题思路与复盘\n\n{analysis}")
 
-            time.sleep(1)
+            time.sleep(0.5)
 
         except Exception as e:
             print(f"\n❌ 处理 {slug} 出错: {e}")
             continue
 
-    print("\n✅ 同步完成！已更新所有历史 AC 记录。")
+    # 4. 持久化 summary.json
+    with open("summary.json", "w", encoding="utf-8") as f:
+        json.dump(summary_data, f, ensure_ascii=False, indent=4)
+
+    print(f"\n✅ 同步完成！summary.json 已更新，共计 {len(summary_data)} 题。")
+
+
 
 
 if __name__ == "__main__":
