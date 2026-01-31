@@ -1,58 +1,74 @@
 import sys, json, random, os, re, html
 
 def smart_clean_text(text):
-    """清理所有 [NBSP]、美元符号和 HTML 噪音"""
+    """最强清理：强制剔除 [NBSP]、美元符号、HTML 标签"""
     if not text: return ""
+    # 1. 解码并替换特殊空格
     text = html.unescape(text)
-    # 物理清理特殊空格和 LaTeX 符号
-    text = text.replace('\u00a0', ' ').replace('[NBSP]', ' ').replace('$', '')
-    # 移除 HTML 标签和图片
+    text = text.replace('\u00a0', ' ').replace('[NBSP]', ' ')
+    
+    # 2. 移除 LaTeX 符号 $ (直接物理移除)
+    text = text.replace('$', '')
+    
+    # 3. 移除图片和 HTML 标签
     text = re.sub(r'!\[.*?\]\(.*?\)', '', text)
     text = re.sub(r'</?[a-zA-Z][^>]*>', '', text)
-    # 移除 Markdown 装饰符
+    
+    # 4. 移除 Markdown 装饰符 (如 **加粗**)
     text = re.sub(r'(\*\*|__|\*|_|~~|`|#+)', '', text)
-    return text.strip()
+    
+    # 5. 压缩空行
+    return re.sub(r'\n{3,}', '\n\n', text).strip()
 
 def select_problem(raw_input):
-    # 强制校验：如果没传参，直接输出错误，不再默认 Array
-    if not raw_input or raw_input.strip() == "":
-        with open('result.txt', 'w', encoding='utf-8') as f:
-            f.write("❌ 错误：GitHub Action 未接收到分类参数，请检查 Shortcuts 的 Payload 配置。")
-        return
-
     data_file = 'summary.json'
+    if not os.path.exists(data_file):
+        print("Error: summary.json not found"); return
+
     with open(data_file, 'r', encoding='utf-8') as f:
         problems = json.load(f)
+
+    # --- 智能匹配逻辑 ---
+    # 过滤掉输入和 JSON 分类中的数字、空格、点号，只比对文字
+    def normalize(s):
+        return re.sub(r'[\d\.\s]', '', s).lower()
+
+    target = normalize(raw_input)
     
-    # 智能匹配：从 "4. 网格图" 提取 "网格图"
-    keyword = raw_input.split('.')[-1].strip()
-    
+    # 在 summary.json 中匹配 category_main 或 tags
     matches = [
         p for p in problems 
-        if keyword.lower() in p.get('category_main', '').lower() or 
-           any(keyword.lower() in t.lower() for t in p.get('tags', []))
+        if target in normalize(p.get('category_main', '')) or 
+           any(target in normalize(t) for t in p.get('tags', []))
     ]
     
     if not matches:
-        with open('result.txt', 'w', encoding='utf-8') as f:
-            f.write(f"🔍 匹配失败：在库中找不到分类 [{keyword}]。参数原文: {raw_input}")
+        # 调试：如果匹配失败，把库里前两个分类写进结果，帮你排查
+        sample = [p.get('category_main') for p in problems[:2]]
+        error_msg = f"🔍 匹配失败\n输入内容: {raw_input}\n转换关键字: {target}\n库中首个分类: {sample}"
+        with open('result.txt', 'w', encoding='utf-8') as f: f.write(error_msg)
         return
 
     p = random.choice(matches)
+    # 路径拼接：Problems/{id}_{title_en}/README_CN.md
     path = f"Problems/{p['id']}_{p['title_en']}/README_CN.md"
     
     if os.path.exists(path):
         with open(path, 'r', encoding='utf-8') as f_md:
-            content = smart_clean_text(f_md.read())
-            result = f"【复习：#{p['id']} {p['title_cn']}】\n分类：{p['category_main']}\n"
+            raw_content = f_md.read()
+            # 执行深度清洗
+            content = smart_clean_text(raw_content)
+            
+            result = f"【复习：#{p['id']} {p['title_cn']}】\n"
+            result += f"难度：{p['difficulty']} | 归类：{p['category_main']}\n"
             result += "═" * 15 + "\n\n" + content
     else:
-        result = f"❌ 文件缺失: {path}"
+        result = f"❌ 找到题目但文件缺失: {path}"
 
     with open('result.txt', 'w', encoding='utf-8') as f:
         f.write(result)
 
 if __name__ == "__main__":
-    # 接收参数
+    # 接收来自 Shortcuts -> GitHub Action 的参数
     val = sys.argv[1] if len(sys.argv) > 1 else ""
     select_problem(val)
