@@ -1,5 +1,9 @@
 import sys, json, random, os, re, html
 
+# 在 select_problem 函数第一行添加
+with open('debug_input.txt', 'w', encoding='utf-8') as f:
+    f.write(f"Received input: {raw_input}")
+
 def smart_clean_text(text):
     """最强清理：强制剔除 [NBSP]、美元符号、HTML 标签"""
     if not text: return ""
@@ -33,14 +37,18 @@ def select_problem(raw_input):
     def normalize(s):
         return re.sub(r'[\d\.\s]', '', s).lower()
 
+    # 修改匹配部分的代码
     target = normalize(raw_input)
     
-    # 在 summary.json 中匹配 category_main 或 tags
-    matches = [
-        p for p in problems 
-        if target in normalize(p.get('category_main', '')) or 
-           any(target in normalize(t) for t in p.get('tags', []))
-    ]
+    matches = []
+    for p in problems:
+        category_name = normalize(p.get('category_main', ''))
+        tags = [normalize(t) for t in p.get('tags', [])]
+        
+        # 只要 target 包含分类名，或者分类名包含 target，就视为匹配
+        if (target in category_name or category_name in target or 
+            any(target in t or t in target for t in tags)):
+            matches.append(p)
     
     if not matches:
         # 调试：如果匹配失败，把库里前两个分类写进结果，帮你排查
