@@ -2113,6 +2113,20 @@
         ]
     },
     {
+        "id": "547",
+        "title_cn": "省份数量",
+        "title_en": "number-of-provinces",
+        "difficulty": "Medium",
+        "category_main": "11. 链表、树与回溯",
+        "category_sub": "Depth-First Search",
+        "tags": [
+            "Depth-First Search",
+            "Breadth-First Search",
+            "Union-Find",
+            "Graph Theory"
+        ]
+    },
+    {
         "id": "774",
         "title_cn": "N 叉树的最大深度",
         "title_en": "maximum-depth-of-n-ary-tree",
