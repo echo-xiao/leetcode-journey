@@ -2365,13 +2365,16 @@
         "title_cn": "不同岛屿的数量",
         "title_en": "number-of-distinct-islands",
         "difficulty": "Medium",
-        "category_main": "8. 常用数据结构",
-        "category_sub": "Hash Table",
+        "category_main": "4. 网格图",
+        "category_sub": "Array",
         "tags": [
+            "Array",
             "Hash Table",
             "Depth-First Search",
             "Breadth-First Search",
             "Union-Find",
+            "Sorting",
+            "Matrix",
             "Hash Function"
         ]
     },
@@ -2466,13 +2469,16 @@
         "title_cn": "不同岛屿的数量 II",
         "title_en": "number-of-distinct-islands-ii",
         "difficulty": "Hard",
-        "category_main": "8. 常用数据结构",
-        "category_sub": "Hash Table",
+        "category_main": "4. 网格图",
+        "category_sub": "Array",
         "tags": [
+            "Array",
             "Hash Table",
             "Depth-First Search",
             "Breadth-First Search",
             "Union-Find",
+            "Sorting",
+            "Matrix",
             "Hash Function"
         ]
     },
