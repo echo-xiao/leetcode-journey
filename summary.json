@@ -3408,6 +3408,20 @@
         ]
     },
     {
+        "id": "1706",
+        "title_cn": "连接所有点的最小费用",
+        "title_en": "min-cost-to-connect-all-points",
+        "difficulty": "Medium",
+        "category_main": "6. 图论算法",
+        "category_sub": "Array",
+        "tags": [
+            "Array",
+            "Union-Find",
+            "Graph Theory",
+            "Minimum Spanning Tree"
+        ]
+    },
+    {
         "id": "1693",
         "title_cn": "所有奇数长度子数组的和",
         "title_en": "sum-of-all-odd-length-subarrays",
