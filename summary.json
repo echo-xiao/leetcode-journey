@@ -3310,6 +3310,20 @@
         ]
     },
     {
+        "id": "1558",
+        "title_cn": "课程表 IV",
+        "title_en": "course-schedule-iv",
+        "difficulty": "Medium",
+        "category_main": "6. 图论算法",
+        "category_sub": "Depth-First Search",
+        "tags": [
+            "Depth-First Search",
+            "Breadth-First Search",
+            "Graph Theory",
+            "Topological Sort"
+        ]
+    },
+    {
         "id": "1574",
         "title_cn": "数组中两元素的最大乘积",
         "title_en": "maximum-product-of-two-elements-in-an-array",
