@@ -1,13 +1,19 @@
 name: Ultimate LeetCode Sync
 on:
   workflow_dispatch:
+    inputs:
+      patch_only:
+        description: '仅修复描述为None的题目（不重新生成AI分析）'
+        required: false
+        default: 'false'
+        type: choice
+        options: ['false', 'true']
   schedule:
     - cron: '0 8 * * *'
 
 jobs:
   build:
     runs-on: ubuntu-latest
-    # 🌟 修复 403 错误的关键：明确授予写权限
     permissions:
       contents: write
       
@@ -27,10 +33,8 @@ jobs:
         env:
           LEETCODE_SESSION: ${{ secrets.LEETCODE_SESSION }}
           LEETCODE_CSRFTOKEN: ${{ secrets.LEETCODE_CSRFTOKEN }}
-
-
-
           CHATGPT_TOKEN: ${{ secrets.CHATGPT_TOKEN }}
+          PATCH_MODE: ${{ github.event.inputs.patch_only || 'false' }}
         run: python fetch_all_pro.py
 
       - name: Commit and Push Changes
