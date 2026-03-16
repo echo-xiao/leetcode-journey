@@ -342,12 +342,26 @@ def main():
             analysis = ai_analyze_all_versions(cn_title, all_codes)
 
             # 3. 写入 Markdown，同时标注分类
-            with open(f"{folder}/README_CN.md", 'w', encoding='utf-8') as f:
+            # 如果已有 README 且描述不为空，保留原有描述
+            existing_desc = None
+            readme_path = f"{folder}/README_CN.md"
+            if os.path.exists(readme_path):
+                with open(readme_path, 'r', encoding='utf-8') as f_existing:
+                    existing_content = f_existing.read()
+                import re as _re
+                m = _re.search(r'## 题目描述\n\n(.+?)\n\n---', existing_content, _re.DOTALL)
+                if m and m.group(1).strip() not in ('None', '暂无描述', ''):
+                    existing_desc = m.group(1).strip()
+
+            new_desc = prob_cn.get('translatedContent') if prob_cn and prob_cn.get('translatedContent') else None
+            description = new_desc or existing_desc or '暂无描述'
+
+            with open(readme_path, 'w', encoding='utf-8') as f:
                 tag_str = " ".join([f"`{t}`" for t in tags])
                 f.write(f"# {q_id}. {cn_title}\n\n")
                 f.write(f"**难度**: {difficulty} | **标签**: {tag_str}\n\n")
                 f.write(f"**归类**: {main_cat} > {sub_cat}\n\n")
-                f.write(f"## 题目描述\n\n{prob_cn.get('translatedContent') if prob_cn and prob_cn.get('translatedContent') else '暂无描述'}\n\n---\n")
+                f.write(f"## 题目描述\n\n{description}\n\n---\n")
                 f.write(f"## 解题思路与复盘\n\n{analysis}")
 
             time.sleep(0.5)
