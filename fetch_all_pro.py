@@ -40,6 +40,7 @@ print(f"----------------\n")
 # ================= 配置区 =================
 TEST_MODE = False  # ⭐ True: 仅测试 10 题; False: 全量同步 364+ 题
 TEST_LIMIT = 10
+PATCH_MODE = os.getenv('PATCH_MODE', 'false').lower() == 'true'  # 仅修复描述为 None 的题目
 BASE_URL_EN = "https://leetcode.com"
 BASE_URL_CN = "https://leetcode.cn"
 
@@ -379,7 +380,71 @@ def main():
 
 
 
+def patch_none_descriptions():
+    """仅修复 README 中描述为 None 的题目，不重新生成 AI 分析"""
+    print("🔧 补丁模式：仅修复描述为 None 的题目...")
+    fixed, failed = [], []
+
+    for folder in sorted(os.listdir("Problems")):
+        readme_path = f"Problems/{folder}/README_CN.md"
+        if not os.path.exists(readme_path):
+            continue
+        with open(readme_path, "r", encoding="utf-8") as f:
+            content = f.read()
+        if "题目描述\n\nNone" not in content:
+            continue
+
+        parts = folder.split("_", 1)
+        if len(parts) < 2:
+            continue
+        slug = parts[1]
+        print(f"  修复: {folder} ...", end=" ", flush=True)
+
+        # 先试 leetcode.cn（中文）
+        desc = None
+        try:
+            q_cn = "query q($s: String!) { question(titleSlug: $s) { translatedContent } }"
+            r = requests.post(f"{BASE_URL_CN}/graphql",
+                              json={"query": q_cn, "variables": {"titleSlug": slug}},
+                              timeout=10).json()
+            desc = r.get("data", {}).get("question", {}).get("translatedContent")
+        except:
+            pass
+
+        # 再试 leetcode.com（认证）
+        if not desc:
+            try:
+                q_en = "query q($s: String!) { question(titleSlug: $s) { translatedContent content } }"
+                r = session.post(f"{BASE_URL_EN}/graphql",
+                                 json={"query": q_en, "variables": {"titleSlug": slug}},
+                                 timeout=10).json()
+                q = r.get("data", {}).get("question", {})
+                desc = q.get("translatedContent") or q.get("content")
+            except:
+                pass
+
+        if desc:
+            import re as _re
+            updated = _re.sub(r'(## 题目描述\n\n)None(\n\n---)', r'\g<1>' + desc + r'\2', content)
+            with open(readme_path, "w", encoding="utf-8") as f:
+                f.write(updated)
+            print("✓")
+            fixed.append(folder)
+        else:
+            print("✗")
+            failed.append(folder)
+        time.sleep(0.3)
+
+    print(f"\n✅ 补丁完成：修复 {len(fixed)} 道，失败 {len(failed)} 道")
+    if failed:
+        print("失败题目：", failed)
+
+
 if __name__ == "__main__":
-    main()
+    if PATCH_MODE:
+        patch_none_descriptions()
+    else:
+        main()
+
 
 
