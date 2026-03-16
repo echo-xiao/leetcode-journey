@@ -342,7 +342,7 @@ def main():
                 f.write(f"# {q_id}. {cn_title}\n\n")
                 f.write(f"**难度**: {difficulty} | **标签**: {tag_str}\n\n")
                 f.write(f"**归类**: {main_cat} > {sub_cat}\n\n")
-                f.write(f"## 题目描述\n\n{prob_cn['translatedContent'] if prob_cn else '暂无描述'}\n\n---\n")
+                f.write(f"## 题目描述\n\n{prob_cn.get('translatedContent') if prob_cn and prob_cn.get('translatedContent') else '暂无描述'}\n\n---\n")
                 f.write(f"## 解题思路与复盘\n\n{analysis}")
 
             time.sleep(0.5)
@@ -362,3 +362,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+
