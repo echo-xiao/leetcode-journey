@@ -411,10 +411,10 @@ def patch_none_descriptions():
         except:
             pass
 
-        # 再试 leetcode.com（认证，抓英文描述）
+        # 再试 leetcode.com（认证，抓英文描述，再用 GPT 翻译）
         if not desc:
             try:
-                q_en = "query q($s: String!) { question(titleSlug: $s) { content } }"
+                q_en = "query q($titleSlug: String!) { question(titleSlug: $titleSlug) { content } }"
                 r = session.post(f"{BASE_URL_EN}/graphql",
                                  json={"query": q_en, "variables": {"titleSlug": slug}},
                                  timeout=10)
@@ -422,7 +422,20 @@ def patch_none_descriptions():
                 if "errors" in data:
                     print(f"[API error: {data['errors'][0].get('message','')}]", end=" ", flush=True)
                 q = data.get("data", {}).get("question", {})
-                desc = q.get("content") if q else None
+                en_content = q.get("content") if q else None
+                if en_content:
+                    try:
+                        resp = client.chat.completions.create(
+                            model="gpt-4o-mini",
+                            messages=[
+                                {"role": "system", "content": "将以下 LeetCode 题目描述（HTML格式）翻译成中文，保留HTML标签，只输出翻译结果。"},
+                                {"role": "user", "content": en_content}
+                            ],
+                            temperature=0.2
+                        )
+                        desc = resp.choices[0].message.content
+                    except:
+                        desc = en_content  # GPT 失败就用英文
             except Exception as e:
                 print(f"[ex: {e}]", end=" ", flush=True)
 
