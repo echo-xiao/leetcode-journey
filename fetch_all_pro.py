@@ -411,17 +411,20 @@ def patch_none_descriptions():
         except:
             pass
 
-        # 再试 leetcode.com（认证）
+        # 再试 leetcode.com（认证，抓英文描述）
         if not desc:
             try:
-                q_en = "query q($s: String!) { question(titleSlug: $s) { translatedContent content } }"
+                q_en = "query q($s: String!) { question(titleSlug: $s) { content } }"
                 r = session.post(f"{BASE_URL_EN}/graphql",
                                  json={"query": q_en, "variables": {"titleSlug": slug}},
-                                 timeout=10).json()
-                q = r.get("data", {}).get("question", {})
-                desc = q.get("translatedContent") or q.get("content")
-            except:
-                pass
+                                 timeout=10)
+                data = r.json()
+                if "errors" in data:
+                    print(f"[API error: {data['errors'][0].get('message','')}]", end=" ", flush=True)
+                q = data.get("data", {}).get("question", {})
+                desc = q.get("content") if q else None
+            except Exception as e:
+                print(f"[ex: {e}]", end=" ", flush=True)
 
         if desc:
             import re as _re
