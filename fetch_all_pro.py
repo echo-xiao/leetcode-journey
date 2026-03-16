@@ -118,7 +118,7 @@ def get_problem_details(slug):
     q_meta = """
     query singleQuestion($titleSlug: String!) {
       question(titleSlug: $titleSlug) {
-        questionId difficulty
+        questionId difficulty content
         topicTags { name translatedName }
       }
     }
@@ -132,10 +132,15 @@ def get_problem_details(slug):
         meta = \
         session.post(f"{BASE_URL_EN}/graphql", json={'query': q_meta, 'variables': {'titleSlug': slug}}).json()['data'][
             'question']
-        # 中文站不需要身份验证，直接请求
+        # 先尝试从中文站获取
         cn = \
         requests.post(f"{BASE_URL_CN}/graphql", json={'query': q_cn, 'variables': {'titleSlug': slug}}).json()['data'][
             'question']
+        # 如果中文站没有返回描述，用英文站的 content 补充
+        if not cn or not cn.get('translatedContent'):
+            if cn is None:
+                cn = {}
+            cn['translatedContent'] = meta.get('content')
         tags = [t['translatedName'] or t['name'] for t in meta.get('topicTags', [])]
         return meta['questionId'], meta['difficulty'], tags, cn
     except:
@@ -362,4 +367,5 @@ def main():
 
 if __name__ == "__main__":
     main()
+
 
