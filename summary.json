@@ -1868,6 +1868,19 @@
         ]
     },
     {
+        "id": "433",
+        "title_cn": "最小基因变化",
+        "title_en": "minimum-genetic-mutation",
+        "difficulty": "Medium",
+        "category_main": "8. 常用数据结构",
+        "category_sub": "Hash Table",
+        "tags": [
+            "Hash Table",
+            "String",
+            "Breadth-First Search"
+        ]
+    },
+    {
         "id": "436",
         "title_cn": "寻找右区间",
         "title_en": "find-right-interval",
@@ -3190,6 +3203,21 @@
         ]
     },
     {
+        "id": "1436",
+        "title_cn": "获取你好友已观看的视频",
+        "title_en": "get-watched-videos-by-your-friends",
+        "difficulty": "Medium",
+        "category_main": "8. 常用数据结构",
+        "category_sub": "Array",
+        "tags": [
+            "Array",
+            "Hash Table",
+            "Breadth-First Search",
+            "Graph Theory",
+            "Sorting"
+        ]
+    },
+    {
         "id": "1448",
         "title_cn": "6 和 9 组成的最大数字",
         "title_en": "maximum-69-number",
@@ -4154,6 +4182,20 @@
         ]
     },
     {
+        "id": "2582",
+        "title_cn": "两个城市间路径的最小分数",
+        "title_en": "minimum-score-of-a-path-between-two-cities",
+        "difficulty": "Medium",
+        "category_main": "11. 链表、树与回溯",
+        "category_sub": "Depth-First Search",
+        "tags": [
+            "Depth-First Search",
+            "Breadth-First Search",
+            "Union-Find",
+            "Graph Theory"
+        ]
+    },
+    {
         "id": "2585",
         "title_cn": "删除每行中的最大值",
         "title_en": "delete-greatest-value-in-each-row",
@@ -4506,6 +4548,19 @@
         ]
     },
     {
+        "id": "3271",
+        "title_cn": "按距离统计房屋对数目 I",
+        "title_en": "count-the-number-of-houses-at-a-certain-distance-i",
+        "difficulty": "Medium",
+        "category_main": "8. 常用数据结构",
+        "category_sub": "Breadth-First Search",
+        "tags": [
+            "Breadth-First Search",
+            "Graph Theory",
+            "Prefix Sum"
+        ]
+    },
+    {
         "id": "3311",
         "title_cn": "边界上的蚂蚁",
         "title_en": "ant-on-the-boundary",
@@ -4642,6 +4697,19 @@
         "tags": [
             "String",
             "Greedy"
+        ]
+    },
+    {
+        "id": "3517",
+        "title_cn": "新增道路查询后的最短距离 I",
+        "title_en": "shortest-distance-after-road-addition-queries-i",
+        "difficulty": "Medium",
+        "category_main": "11. 链表、树与回溯",
+        "category_sub": "Array",
+        "tags": [
+            "Array",
+            "Breadth-First Search",
+            "Graph Theory"
         ]
     },
     {
