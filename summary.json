@@ -1305,18 +1305,13 @@
         ]
     },
     {
-        "id": "235",
-        "title_cn": "二叉搜索树的最近公共祖先",
+        "id": null,
+        "title_cn": "lowest-common-ancestor-of-a-binary-search-tree",
         "title_en": "lowest-common-ancestor-of-a-binary-search-tree",
-        "difficulty": "Medium",
-        "category_main": "11. 链表、树与回溯",
-        "category_sub": "Tree",
-        "tags": [
-            "Tree",
-            "Depth-First Search",
-            "Binary Search Tree",
-            "Binary Tree"
-        ]
+        "difficulty": "Unknown",
+        "category_main": "13. 其他",
+        "category_sub": "未分类",
+        "tags": []
     },
     {
         "id": "236",
@@ -1650,17 +1645,13 @@
         ]
     },
     {
-        "id": "340",
-        "title_cn": "至多包含 K 个不同字符的最长子串",
+        "id": null,
+        "title_cn": "longest-substring-with-at-most-k-distinct-characters",
         "title_en": "longest-substring-with-at-most-k-distinct-characters",
-        "difficulty": "Medium",
-        "category_main": "1. 滑动窗口与双指针",
-        "category_sub": "Hash Table",
-        "tags": [
-            "Hash Table",
-            "String",
-            "Sliding Window"
-        ]
+        "difficulty": "Unknown",
+        "category_main": "13. 其他",
+        "category_sub": "未分类",
+        "tags": []
     },
     {
         "id": "349",
