@@ -1,149 +1,96 @@
-【复习：#200 岛屿数量】
-难度：Medium | 归类：4. 网格图
+【复习：#3702 最长乘积等价子数组】
+难度：Easy | 归类：1. 滑动窗口与双指针
 ═══════════════
 
-200. 岛屿数量
+3702. 最长乘积等价子数组
 
-难度: Medium | 标签: Array Depth-First Search Breadth-First Search Union-Find Matrix
+难度: Easy | 标签: Array Math Sliding Window Enumeration Number Theory
 
  题目描述
 
-给你一个由 '1'（陆地）和 '0'（水）组成的的二维网格，请你计算网格中岛屿的数量。
+给你一个由 正整数 组成的数组 nums。
 
-岛屿总是被水包围，并且每座岛屿只能由水平方向和/或竖直方向上相邻的陆地连接形成。
+如果一个数组 arr 满足 prod(arr) == lcm(arr)  gcd(arr)，则称其为 乘积等价数组 ，其中：
 
-此外，你可以假设该网格的四条边均被水包围。
+	prod(arr) 表示 arr 中所有元素的乘积。
+	gcd(arr) 表示 arr 中所有元素的最大公因数 (GCD)。
+	lcm(arr) 表示 arr 中所有元素的最小公倍数 (LCM)。
+
+返回数组 nums 的 最长 乘积等价 子数组 的长度。
 
  
 
 示例 1：
 
-输入：grid = [
-  ['1','1','1','1','0'],
-  ['1','1','0','1','0'],
-  ['1','1','0','0','0'],
-  ['0','0','0','0','0']
-]
-输出：1
+输入： nums = [1,2,1,2,1,1,1]
+
+输出： 5
+
+解释： 
+
+最长的乘积等价子数组是 [1, 2, 1, 1, 1]，其中 prod([1, 2, 1, 1, 1]) = 2， gcd([1, 2, 1, 1, 1]) = 1，以及 lcm([1, 2, 1, 1, 1]) = 2。
 
 示例 2：
 
-输入：grid = [
-  ['1','1','0','0','0'],
-  ['1','1','0','0','0'],
-  ['0','0','1','0','0'],
-  ['0','0','0','1','1']
-]
-输出：3
+输入： nums = [2,3,4,5,6]
+
+输出： 3
+
+解释： 
+
+最长的乘积等价子数组是 [3, 4, 5]。
+
+示例 3：
+
+输入： nums = [1,2,3,1,4,5,1]
+
+输出： 5
 
  
 
 提示：
 
-	m == grid.length
-	n == grid[i].length
-	1 <= m, n <= 300
-	grid[i][j] 的值为 '0' 或 '1'
+	2 <= nums.length <= 100
+	1 <= nums[i] <= 10
 
 ---
  解题思路与复盘
 
- 一句话直击本质
+1. 一句话直击本质： 通过计算子数组的乘积、最小公倍数和最大公约数，或通过质因子分解和滑动窗口，找到满足条件的最长子数组。
 
-通过遍历网格并使用深度优先搜索（DFS）、广度优先搜索（BFS）或并查集（Union-Find）来标记和合并相连的陆地，从而计算岛屿的数量。
+2. 综合思路：
+   - 版本 1 和 2： 使用双重循环遍历所有可能的子数组，计算每个子数组的乘积、最小公倍数和最大公约数，判断乘积是否等于最小公倍数与最大公约数的乘积。
+   - 版本 3： 通过预计算最小质因子，使用滑动窗口和质因子分解来寻找最长的两两互质子数组。
 
- 综合思路
+3. 全量伪代码：
+   - 双重循环方法：
+     
+     初始化结果 res 为 1
+     对于每个起始位置 left 从 0 到 n-1：
+         初始化 g, l, p 为 nums[left]
+         对于每个结束位置 right 从 left+1 到 n-1：
+             更新 p 为 p  nums[right]
+             更新 l 为 lcm(l, nums[right])
+             更新 g 为 gcd(g, nums[right])
+             如果 p 等于 l  g：
+                 更新 res 为 max(res, right - left + 1)
+     返回 res
+     
+   - 质因子分解与滑动窗口方法：
+     
+     如果数组为空，返回 0
+     如果数组长度为 1，返回 1 如果 nums[0] 为 1，否则返回 0
+     预计算每个数的最小质因子 (SPF)
+     定义辅助函数 getprimefactors(num) 获取数的所有唯一质因子
+     初始化滑动窗口的左边界 left 为 0
+     初始化最大长度 maxpairwisecoprimelen 为 0
+     对于每个右边界 right 从 0 到 n-1：
+         获取 nums[right] 的质因子并更新计数
+         如果窗口内有共享质因子，收缩左边界
+         更新 maxpairwisecoprimelen 为 max(maxpairwisecoprimelen, right - left + 1)
+     返回 max(maxpairwisecoprimelen, 2)
+     
 
-1. DFS（深度优先搜索）
-   - 递归版：从每个未访问的陆地开始，递归地将所有相连的陆地标记为已访问。
-   - 迭代版：使用栈模拟递归过程，逐步标记相连的陆地。
-
-2. BFS（广度优先搜索）
-   - 使用队列从每个未访问的陆地开始，逐层标记所有相连的陆地。
-
-3. Union-Find（并查集）
-   - 初始化每个陆地为一个独立的集合，遍历网格合并相邻的陆地集合，最终集合的数量即为岛屿数量。
-
- 全量伪代码
-
- DFS 递归版
-
-函数 numIslands(grid):
-    如果 grid 为空, 返回 0
-    初始化岛屿计数 cnt 为 0
-    遍历每个单元格 (r, c) 在 grid 中:
-        如果 grid[r][c] 是 '1':
-            调用 dfs(grid, r, c)
-            增加岛屿计数 cnt
-    返回 cnt
-
-函数 dfs(grid, r, c):
-    如果 r 或 c 越界 或 grid[r][c] 是 '0', 返回
-    将 grid[r][c] 标记为 '0'
-    调用 dfs(grid, r+1, c)
-    调用 dfs(grid, r-1, c)
-    调用 dfs(grid, r, c+1)
-    调用 dfs(grid, r, c-1)
-
- DFS 迭代版
-
-函数 dfs(grid, r, c):
-    初始化栈 stack 为 [(r, c)]
-    将 grid[r][c] 标记为 '0'
-    当栈 stack 非空时:
-        弹出栈顶元素 currR, currC
-        对于每个方向 dr, dc:
-            计算新位置 nxtR, nxtC
-            如果 nxtR 和 nxtC 在边界内 且 grid[nxtR][nxtC] 是 '1':
-                将 (nxtR, nxtC) 压入栈
-                将 grid[nxtR][nxtC] 标记为 '0'
-
- BFS
-
-函数 bfs(grid, r, c):
-    初始化队列 queue 为 [(r, c)]
-    将 grid[r][c] 标记为 '0'
-    当队列 queue 非空时:
-        弹出队首元素 currR, currC
-        对于每个方向 dr, dc:
-            计算新位置 nxtR, nxtC
-            如果 nxtR 和 nxtC 在边界内 且 grid[nxtR][nxtC] 是 '1':
-                将 (nxtR, nxtC) 加入队列
-                将 grid[nxtR][nxtC] 标记为 '0'
-
- Union-Find
-
-函数 numIslands(grid):
-    如果 grid 为空, 返回 0
-    初始化 parent 数组和岛屿计数 cnt
-    遍历每个单元格 (r, c) 在 grid 中:
-        如果 grid[r][c] 是 '1':
-            增加岛屿计数 cnt
-            初始化 parent[idx] 为 idx
-    遍历每个单元格 (r, c) 在 grid 中:
-        如果 grid[r][c] 是 '1':
-            对于右和下方向的邻居:
-                如果邻居是 '1', 调用 union 操作
-                如果 union 成功, 减少岛屿计数 cnt
-    返回 cnt
-
-函数 find(parent, i):
-    如果 parent[i] 是 i, 返回 i
-    否则, 递归查找 parent[i] 的根, 并路径压缩
-
-函数 union(parent, i, j):
-    找到 i 和 j 的根 rootI 和 rootJ
-    如果 rootI 不等于 rootJ:
-        将 rootI 的根设置为 rootJ
-        返回 True
-    返回 False
-
- 复杂度
-
-- DFS 和 BFS
-  - 时间复杂度: O(M \times N)，其中 M 和 N 分别是网格的行数和列数，因为每个单元格最多被访问一次。
-  - 空间复杂度: O(M \times N)，在最坏情况下，递归栈或队列可能需要存储整个网格。
-
-- Union-Find
-  - 时间复杂度: O(M \times N \cdot \alpha(M \times N))，其中 \alpha 是反阿克曼函数，几乎是常数时间。
-  - 空间复杂度: O(M \times N)，用于存储并查集的父节点数组。
+4. 复杂度：
+   - 版本 1 和 2 时间复杂度： O(n^2 \log(\max(nums)))，空间复杂度：O(1)。
+   - 版本 3 时间复杂度： O(n \log(\max(nums)))，空间复杂度：O(\max(nums))。
