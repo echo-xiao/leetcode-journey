@@ -1,121 +1,91 @@
-【复习：#2210 找出数组排序后的目标下标】
+【复习：#268 丢失的数字】
 难度：Easy | 归类：2. 二分算法
 ═══════════════
 
-2210. 找出数组排序后的目标下标
+268. 丢失的数字
 
-难度: Easy | 标签: Array Binary Search Sorting
+难度: Easy | 标签: Array Hash Table Math Binary Search Bit Manipulation Sorting
 
  题目描述
 
-给你一个下标从 0 开始的整数数组 nums 以及一个目标元素 target 。
-
-目标下标 是一个满足 nums[i] == target 的下标 i 。
-
-将 nums 按 非递减 顺序排序后，返回由 nums 中目标下标组成的列表。如果不存在目标下标，返回一个 空 列表。返回的列表必须按 递增 顺序排列。
+给定一个包含 [0, n] 中 n 个数的数组 nums ，找出 [0, n] 这个范围内没有出现在数组中的那个数。
 
  
 
 示例 1：
 
-输入：nums = [1,2,5,2,3], target = 2
-输出：[1,2]
-解释：排序后，nums 变为 [1,2,2,3,5] 。
-满足 nums[i] == 2 的下标是 1 和 2 。
+输入：nums = [3,0,1]
+
+输出：2
+
+解释：n = 3，因为有 3 个数字，所以所有的数字都在范围 [0,3] 内。2 是丢失的数字，因为它没有出现在 nums 中。
 
 示例 2：
 
-输入：nums = [1,2,5,2,3], target = 3
-输出：[3]
-解释：排序后，nums 变为 [1,2,2,3,5] 。
-满足 nums[i] == 3 的下标是 3 。
+输入：nums = [0,1]
+
+输出：2
+
+解释：n = 2，因为有 2 个数字，所以所有的数字都在范围 [0,2] 内。2 是丢失的数字，因为它没有出现在 nums 中。
 
 示例 3：
 
-输入：nums = [1,2,5,2,3], target = 5
-输出：[4]
-解释：排序后，nums 变为 [1,2,2,3,5] 。
-满足 nums[i] == 5 的下标是 4 。
+输入：nums = [9,6,4,2,3,5,7,0,1]
 
-示例 4：
+输出：8
 
-输入：nums = [1,2,5,2,3], target = 4
-输出：[]
-解释：nums 中不含值为 4 的元素。
-
- 
+解释：n = 9，因为有 9 个数字，所以所有的数字都在范围 [0,9] 内。8 是丢失的数字，因为它没有出现在 nums 中。
 
 提示：
 
-	1 <= nums.length <= 100
-	1 <= nums[i], target <= 100
+	n == nums.length
+	1 <= n <= 104
+	0 <= nums[i] <= n
+	nums 中的所有数字都 独一无二
+
+ 
+
+进阶：你能否实现线性时间复杂度、仅使用额外常数空间的算法解决此问题?
 
 ---
  解题思路与复盘
 
-1. 一句话直击本质： 通过对数组进行排序后，使用二分查找或线性扫描来找到目标值的起始下标，并收集所有目标值的下标。
+1. 一句话直击本质：利用排序后的数组，通过二分查找法找到第一个索引与元素不匹配的位置，即为丢失的数字。
 
 2. 综合思路：
-   - 二分查找法： 先对数组进行排序，然后使用二分查找找到目标值的起始下标，再通过线性扫描收集所有目标值的下标。
-   - 线性扫描法： 先对数组进行排序，然后直接通过线性扫描找到所有目标值的下标。
+   - 递归二分查找：通过递归的方式实现二分查找，逐步缩小查找范围，直到找到丢失的数字。
+   - 迭代二分查找：通过迭代的方式实现二分查找，使用循环来调整查找范围，最终找到丢失的数字。
 
 3. 全量伪代码：
+   - 递归二分查找：
+     
+     函数 missingNumber(nums):
+         对 nums 进行排序
+         返回 helper(nums, 0, len(nums) - 1)
 
-   - 排序数组：
-     
-     对数组 nums 进行排序
-     
-
-   - 二分查找法：
-     
-     初始化 left 为 0，right 为数组长度减 1
-     当 left 小于等于 right 时：
-         计算 mid 为 left 和 right 的中间索引
-         如果 nums[mid] 大于等于 target：
-             将 right 更新为 mid - 1
-         否则：
-             将 left 更新为 mid + 1
-     初始化结果列表 res
-     当 left 小于数组长度且 nums[left] 等于 target 时：
-         将 left 添加到 res
-         将 left 增加 1
-     返回 res
-     
-
-   - 递归二分查找法：
-     
-     定义递归函数 helper(nums, target, left, right):
-         如果 left 大于 right：
+     函数 helper(nums, left, right):
+         如果 left > right:
              返回 left
-         计算 mid 为 left 和 right 的中间索引
-         如果 nums[mid] 大于等于 target：
-             返回 helper(nums, target, left, mid-1)
-         否则：
-             返回 helper(nums, target, mid+1, right)
-     调用 helper 函数获取目标值的起始下标
-     初始化结果列表 res
-     当 left 小于数组长度且 nums[left] 等于 target 时：
-         将 left 添加到 res
-         将 left 增加 1
-     返回 res
+         计算 mid = left + (right - left) // 2
+         如果 nums[mid] == mid:
+             返回 helper(nums, mid + 1, right)
+         否则如果 nums[mid] > mid:
+             返回 helper(nums, left, mid - 1)
      
-
-   - 线性扫描法：
+   - 迭代二分查找：
      
-     初始化结果列表 res
-     初始化索引 i 为 0
-     当 i 小于数组长度时：
-         如果 nums[i] 等于 target：
-             将 i 添加到 res
-             将 i 增加 1
-         如果 nums[i] 大于 target：
-             终止循环
-         如果 nums[i] 小于 target：
-             将 i 增加 1
-     返回 res
+     函数 missingNumber(nums):
+         对 nums 进行排序
+         初始化 left = 0, right = len(nums) - 1
+         当 left <= right 时:
+             计算 mid = left + (right - left) // 2
+             如果 nums[mid] == mid:
+                 更新 left = mid + 1
+             否则如果 nums[mid] > mid:
+                 更新 right = mid - 1
+         返回 left
      
 
 4. 复杂度：
-
-   - 时间复杂度： O(n \log n)，其中 n 是数组的长度，因为需要对数组进行排序。
-   - 空间复杂度： O(1)，如果不考虑排序所需的额外空间，或者 O(n)，如果排序算法需要额外的空间。
+   - 时间复杂度：O(n \log n)，由于需要对数组进行排序，排序的时间复杂度为 O(n \log n)，二分查找的时间复杂度为 O(\log n)，但排序是主要的时间消耗。
+   - 空间复杂度：O(1)，不考虑排序所需的额外空间，递归版本的空间复杂度为 O(\log n)，因为递归调用栈的深度为 O(\log n)。
