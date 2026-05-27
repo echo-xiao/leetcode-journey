@@ -1,113 +1,84 @@
-【复习：#34 在排序数组中查找元素的第一个和最后一个位置】
+【复习：#300 最长递增子序列】
 难度：Medium | 归类：2. 二分算法
 ═══════════════
 
-34. 在排序数组中查找元素的第一个和最后一个位置
+300. 最长递增子序列
 
-难度: Medium | 标签: Array Binary Search
+难度: Medium | 标签: Array Binary Search Dynamic Programming
 
  题目描述
 
-给你一个按照非递减顺序排列的整数数组 nums，和一个目标值 target。请你找出给定目标值在数组中的开始位置和结束位置。
+给你一个整数数组 nums ，找到其中最长严格递增子序列的长度。
 
-如果数组中不存在目标值 target，返回 [-1, -1]。
-
-你必须设计并实现时间复杂度为 O(log n) 的算法解决此问题。
-
+子序列 是由数组派生而来的序列，删除（或不删除）数组中的元素而不改变其余元素的顺序。例如，[3,6,2,7] 是数组 [0,3,1,6,2,2,7] 的子序列。
  
 
 示例 1：
 
-输入：nums = [5,7,7,8,8,10], target = 8
-输出：[3,4]
+输入：nums = [10,9,2,5,3,7,101,18]
+输出：4
+解释：最长递增子序列是 [2,3,7,101]，因此长度为 4 。
 
 示例 2：
 
-输入：nums = [5,7,7,8,8,10], target = 6
-输出：[-1,-1]
+输入：nums = [0,1,0,3,2,3]
+输出：4
 
 示例 3：
 
-输入：nums = [], target = 0
-输出：[-1,-1]
+输入：nums = [7,7,7,7,7,7,7]
+输出：1
 
  
 
 提示：
 
-	0 <= nums.length <= 105
-	-109 <= nums[i] <= 109
-	nums 是一个非递减数组
-	-109 <= target <= 109
+	1 <= nums.length <= 2500
+	-104 <= nums[i] <= 104
+
+ 
+
+进阶：
+
+	你能将算法的时间复杂度降低到 O(n log(n)) 吗?
 
 ---
  解题思路与复盘
 
-1. 一句话直击本质：  
-   使用二分查找分别找到目标值在排序数组中的第一个和最后一个位置。
+1. 一句话直击本质： 通过维护一个递增序列的尾部数组，使用二分查找来高效更新该数组，从而找到最长递增子序列的长度。
 
-2. 综合思路：  
-   - 分开查找左右边界：  
-     通过两个独立的二分查找函数分别查找目标值的左边界和右边界。每个函数根据查找到的中间值调整左右指针，直到找到边界。
-   - 合并查找左右边界：  
-     使用一个函数，通过一个标志位来决定查找左边界还是右边界。根据标志位调整指针方向，找到目标值的边界。
+2. 综合思路：
+   - 动态规划 + 二分查找： 维护一个数组 tail，其中 tail[i] 表示长度为 i+1 的递增子序列的最小可能结尾元素。遍历输入数组 nums，对于每个元素 num，使用二分查找在 tail 中找到第一个大于等于 num 的位置并更新，或者将 num 添加到 tail 的末尾。
+   - 直接遍历： 直接遍历 nums，对于每个元素，使用二分查找在 tail 中找到合适的位置进行更新。
 
 3. 全量伪代码：
 
-   - 查找左边界：
-     
-     函数 leftBound(数组 nums, 整数 target):
-         初始化 left 为 0, right 为 数组长度 - 1
-         当 left 小于等于 right 时:
-             计算 mid 为 left 和 right 的中间位置
-             如果 nums[mid] 等于 target:
-                 将 right 移动到 mid - 1
-             否则如果 nums[mid] 小于 target:
-                 将 left 移动到 mid + 1
-             否则:
-                 将 right 移动到 mid - 1
-         如果 left 超出数组边界或 nums[left] 不等于 target:
-             返回 -1
-         返回 left
-     
+   plaintext
+   方法 lengthOfLIS(nums):
+       如果 nums 为空，返回 0
+       初始化 tail 数组，包含第一个元素 nums[0]
+       
+       对于 nums 中的每个元素 num:
+           如果 num 大于 tail 的最后一个元素:
+               将 num 添加到 tail 的末尾
+           否则:
+               找到 tail 中第一个大于等于 num 的位置 idx
+               将 tail[idx] 更新为 num
+       
+       返回 tail 的长度
 
-   - 查找右边界：
-     
-     函数 rightBound(数组 nums, 整数 target):
-         初始化 left 为 0, right 为 数组长度 - 1
-         当 left 小于等于 right 时:
-             计算 mid 为 left 和 right 的中间位置
-             如果 nums[mid] 等于 target:
-                 将 left 移动到 mid + 1
-             否则如果 nums[mid] 小于 target:
-                 将 left 移动到 mid + 1
-             否则:
-                 将 right 移动到 mid - 1
-         如果 right 超出数组边界或 nums[right] 不等于 target:
-             返回 -1
-         返回 right
-     
+   方法 insertToTail(tail, num):
+       初始化 left 为 0，right 为 tail 的长度减 1
+       当 left 小于等于 right 时:
+           计算 mid 为 left 和 right 的中间位置
+           如果 tail[mid] 大于等于 num:
+               将 right 更新为 mid 减 1
+           否则:
+               将 left 更新为 mid 加 1
+       返回 left
+   
 
-   - 合并查找边界：
-     
-     函数 findBound(数组 nums, 整数 target, 布尔 isFirst):
-         初始化 left 为 0, right 为 数组长度 - 1
-         初始化 candidate 为 -1
-         当 left 小于等于 right 时:
-             计算 mid 为 left 和 right 的中间位置
-             如果 nums[mid] 等于 target:
-                 将 candidate 设为 mid
-                 如果 isFirst 为真:
-                     将 right 移动到 mid - 1
-                 否则:
-                     将 left 移动到 mid + 1
-             否则如果 nums[mid] 小于 target:
-                 将 left 移动到 mid + 1
-             否则:
-                 将 right 移动到 mid - 1
-         返回 candidate
-     
+4. 复杂度：
 
-4. 复杂度：  
-   - 时间复杂度： O(\log n)，因为每次查找都是通过二分查找进行的。
-   - 空间复杂度： O(1)，因为只使用了常数级别的额外空间。
+   - 时间复杂度： O(n \log n)，其中 n 是输入数组 nums 的长度。每个元素都需要通过二分查找更新 tail 数组，二分查找的时间复杂度为 O(\log n)。
+   - 空间复杂度： O(n)，用于存储 tail 数组，最坏情况下 tail 的长度与 nums 相同。
