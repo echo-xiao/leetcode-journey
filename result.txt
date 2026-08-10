@@ -1,96 +1,77 @@
-【复习：#745 寻找比目标字母大的最小字母】
-难度：Easy | 归类：2. 二分算法
+【复习：#861 翻转图像】
+难度：Easy | 归类：1. 滑动窗口与双指针
 ═══════════════
 
-745. 寻找比目标字母大的最小字母
+861. 翻转图像
 
-难度: Easy | 标签: Array Binary Search
+难度: Easy | 标签: Array Two Pointers Bit Manipulation Matrix Simulation
 
  题目描述
 
-给你一个字符数组 letters，该数组按非递减顺序排序，以及一个字符 target。letters 里至少有两个不同的字符。
+给定一个 n x n 的二进制矩阵 image ，先 水平 翻转图像，然后 反转 图像并返回 结果 。
 
-返回 letters 中大于 target 的最小的字符。如果不存在这样的字符，则返回 letters 的第一个字符。
+水平翻转图片就是将图片的每一行都进行翻转，即逆序。
+
+	例如，水平翻转 [1,1,0] 的结果是 [0,1,1]。
+
+反转图片的意思是图片中的 0 全部被 1 替换， 1 全部被 0 替换。
+
+	例如，反转 [0,1,1] 的结果是 [1,0,0]。
 
  
 
 示例 1：
 
-输入: letters = ['c', 'f', 'j']，target = 'a'
-输出: 'c'
-解释：letters 中字典上比 'a' 大的最小字符是 'c'。
+输入：image = [[1,1,0],[1,0,1],[0,0,0]]
+输出：[[1,0,0],[0,1,0],[1,1,1]]
+解释：首先翻转每一行: [[0,1,1],[1,0,1],[0,0,0]]；
+     然后反转图片: [[1,0,0],[0,1,0],[1,1,1]]
 
-示例 2:
+示例 2：
 
-输入: letters = ['c','f','j'], target = 'c'
-输出: 'f'
-解释：letters 中字典顺序上大于 'c' 的最小字符是 'f'。
-
-示例 3:
-
-输入: letters = ['x','x','y','y'], target = 'z'
-输出: 'x'
-解释：letters 中没有一个字符在字典上大于 'z'，所以我们返回 letters[0]。
+输入：image = [[1,1,0,0],[1,0,0,1],[0,1,1,1],[1,0,1,0]]
+输出：[[1,1,0,0],[0,1,1,0],[0,0,0,1],[1,0,1,0]]
+解释：首先翻转每一行: [[0,0,1,1],[1,0,0,1],[1,1,1,0],[0,1,0,1]]；
+     然后反转图片: [[1,1,0,0],[0,1,1,0],[0,0,0,1],[1,0,1,0]]
 
  
 
 提示：
 
-	2 <= letters.length <= 104
-	letters[i] 是一个小写字母
-	letters 按非递减顺序排序
-	letters 最少包含两个不同的字母
-	target 是一个小写字母
+	n == image.length
+	n == image[i].length
+	1 <= n <= 20
+	images[i][j] == 0 或 1.
 
 ---
  解题思路与复盘
 
-1. 一句话直击本质： 该算法的核心逻辑是利用二分查找在有序字符数组中寻找比目标字母大的最小字母。
+1. 一句话直击本质：该算法的核心逻辑是通过双指针法翻转每一行，然后逐位取反实现图像的翻转与反转。
 
 2. 综合思路：
-   - 递归二分查找： 通过递归的方式实现二分查找，逐步缩小查找范围，直到找到比目标字母大的最小字母。
-   - 迭代二分查找： 通过迭代的方式实现二分查找，使用循环来调整查找范围，最终找到目标字母。
+   - 迭代法：使用双指针法逐行翻转图像，然后遍历整个图像矩阵，将每个元素取反。
 
 3. 全量伪代码：
-
-   - 递归二分查找：
-     
-     函数 nextGreatestLetter(letters, target):
-         调用 helper(letters, target, 0, len(letters) - 1)
-         返回 letters[index % len(letters)]
-
-     函数 helper(letters, target, left, right):
-         如果 left > right:
-             返回 left
-         
-         mid = left + (right - left) // 2
-         
-         如果 letters[mid] > target:
-             返回 helper(letters, target, left, mid - 1)
-         否则:
-             返回 helper(letters, target, mid + 1, right)
-     
-
-   - 迭代二分查找：
-     
-     函数 nextGreatestLetter(letters, target):
-         left = 0
-         right = len(letters) - 1
-         
-         当 left < right:
-             mid = left + (right - left) // 2
-             
-             如果 letters[mid] > target:
-                 right = mid
-             否则:
-                 left = mid + 1
-         
-         如果 letters[left] > target:
-             返回 letters[left]
-         否则:
-             返回 letters[0]
-     
+   plaintext
+   定义函数 flipAndInvertImage(输入图像):
+       对于每一行 i 从 0 到 图像的长度:
+           初始化左指针 left 为 0
+           初始化右指针 right 为 图像长度减 1
+           当 left 小于 right 时:
+               交换图像第 i 行的 left 和 right 位置的元素
+               将 left 增加 1
+               将 right 减少 1
+       
+       对于每一行 i 从 0 到 图像的长度:
+           对于每一列 j 从 0 到 图像的长度:
+               如果图像第 i 行第 j 列的元素是 1:
+                   将其置为 0
+               否则:
+                   将其置为 1
+       
+       返回图像
+   
 
 4. 复杂度：
-   - 时间复杂度：O(\log n)，因为二分查找的时间复杂度是对数级别的。
-   - 空间复杂度：递归版本是 O(\log n)（由于递归调用栈），迭代版本是 O(1)。
+   - 时间复杂度：\mathcal{O}(n^2)，其中 n 是图像的边长，因为需要遍历整个图像矩阵两次。
+   - 空间复杂度：\mathcal{O}(1)，因为算法在原地修改图像，没有使用额外的空间。
