@@ -48,13 +48,16 @@ def assign(
     solved: list[SolvedProblem],
     tags_by_slug: dict[str, list[str]],
     id_resolver: Callable[[str], int],
+    title_lookup: Callable[[str], str | None],
 ) -> tuple[list[Assignment], list[SolvedProblem]]:
     """Assign solved problems to sections; return assignments and leftovers.
 
     Cross-listed problems go to the smallest section they appear in, on the
     reasoning that a narrower section describes the technique more precisely.
     Problems absent from every list are matched to the section whose already
-    placed members have the most similar LeetCode tag profile.
+    placed members have the most similar LeetCode tag profile. Their title is
+    not available from the taxonomy, so ``title_lookup`` is asked for it,
+    falling back to the slug when it returns ``None`` or an empty string.
     """
     by_slug: dict[str, list[ProblemEntry]] = defaultdict(list)
     for entry in entries:
@@ -120,7 +123,7 @@ def assign(
                 # Ask LeetCode rather than fall back to the directory prefix.
                 problem_id=id_resolver(problem.slug),
                 id_source="leetcode-api",
-                title=problem.slug,
+                title=title_lookup(problem.slug) or problem.slug,
                 list_no=best_key[0],
                 list_name=sibling.list_name,
                 chapter=best_key[1] or None,

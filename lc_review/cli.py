@@ -4,12 +4,14 @@ from __future__ import annotations
 
 import argparse
 import json
+import re
+from collections.abc import Callable
 from pathlib import Path
 
 from lc_review.classify import assign
 from lc_review.fupan import attach, parse_easy_page, parse_medium_page
 from lc_review.lingshen import fetch_all
-from lc_review.problems import read_ai_sections, resolve_frontend_id, scan
+from lc_review.problems import SolvedProblem, read_ai_sections, resolve_frontend_id, scan
 from lc_review.state import build_state, load_state, render_judgment_report, save_state
 from lc_review.table import render_table
 
@@ -33,12 +35,57 @@ def _tags_by_slug() -> dict[str, list[str]]:
     return {record["title_en"]: record.get("tags", []) for record in records}
 
 
+README_TITLE_HEADING_RE = re.compile(r"^#\s*\d+\.\s*(.+?)\s*$", re.MULTILINE)
+
+
+def parse_readme_title_heading(text: str) -> str | None:
+    """Parse the leading ``# <number>. <title>`` heading of a README_CN.md.
+
+    Returns just the title, with the number and separator stripped. Returns
+    ``None`` when no such heading is present.
+    """
+    match = README_TITLE_HEADING_RE.search(text)
+    if match is None:
+        return None
+    return match.group(1)
+
+
+def _title_lookup(solved: list[SolvedProblem]) -> Callable[[str], str | None]:
+    """Build a slug -> Chinese title lookup from local sources only.
+
+    Prefers ``summary.json``'s ``title_cn`` (only ``title_cn`` and
+    ``title_en`` are read from it). Falls back to the leading heading of the
+    problem's own ``README_CN.md`` for slugs summary.json does not cover.
+    """
+    titles_by_slug: dict[str, str] = {}
+    if SUMMARY_PATH.exists():
+        records = json.loads(SUMMARY_PATH.read_text(encoding="utf-8"))
+        titles_by_slug = {record["title_en"]: record["title_cn"] for record in records}
+    readme_by_slug = {problem.slug: problem.directory for problem in solved}
+
+    def lookup(slug: str) -> str | None:
+        title = titles_by_slug.get(slug)
+        if title:
+            return title
+        directory = readme_by_slug.get(slug)
+        if directory is None:
+            return None
+        readme = REPO / "Problems" / directory / "README_CN.md"
+        if not readme.exists():
+            return None
+        return parse_readme_title_heading(readme.read_text(encoding="utf-8"))
+
+    return lookup
+
+
 def build_state_command(refresh: bool) -> None:
     entries = fetch_all(CACHE_DIR, refresh=refresh)
     solved, malformed = scan(REPO / "Problems")
     if malformed:
         raise SystemExit(f"malformed problem directories, repair them first: {malformed}")
-    assignments, unplaceable = assign(entries, solved, _tags_by_slug(), resolve_frontend_id)
+    assignments, unplaceable = assign(
+        entries, solved, _tags_by_slug(), resolve_frontend_id, _title_lookup(solved)
+    )
     ai_sections = {
         problem.slug: read_ai_sections(REPO / "Problems" / problem.directory / "README_CN.md")
         for problem in solved
