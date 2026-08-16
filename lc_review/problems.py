@@ -8,8 +8,28 @@ import urllib.request
 from dataclasses import dataclass
 from pathlib import Path
 
-PSEUDOCODE_RE = re.compile(r"^3\.\s*全量伪代码：\s*$(.*?)^4\.\s", re.DOTALL | re.MULTILINE)
-COMPLEXITY_RE = re.compile(r"^4\.\s*复杂度：\s*$(.*)", re.DOTALL | re.MULTILINE)
+def _section_marker(number: str, name: str) -> re.Pattern[str]:
+    """Build a regex matching a section marker line in any of its real forms.
+
+    The generator writes the same marker three different ways across the
+    corpus: plain (``3. 全量伪代码：``), bold (``3. **全量伪代码：**``), and as
+    a markdown heading (``### 全量伪代码`` or ``### 3. 全量伪代码``, no colon).
+    All three must match so the section is never silently treated as absent.
+    """
+    return re.compile(
+        rf"^(?:###\s*)?(?:{number}\.\s*)?\*{{0,2}}{name}\*{{0,2}}：?\*{{0,2}}\s*$",
+        re.MULTILINE,
+    )
+
+
+PSEUDOCODE_START_RE = _section_marker("3", "全量伪代码")
+COMPLEXITY_START_RE = _section_marker("4", "复杂度")
+
+# A level-2 heading (exactly ``## ``, not ``### ``) marks the start of the
+# next major README section (e.g. the next problem's own retrospective
+# block). Deeper headings like ``#### DFS 递归版`` are legitimate structure
+# *inside* the pseudocode section and must not truncate it.
+TOP_HEADING_RE = re.compile(r"^##(?!#)\s", re.MULTILINE)
 
 
 @dataclass(frozen=True)
@@ -84,9 +104,21 @@ def read_ai_sections(readme: Path) -> dict[str, str]:
     if not readme.exists():
         return {"pseudocode": "", "complexity": ""}
     text = readme.read_text(encoding="utf-8")
-    pseudocode = PSEUDOCODE_RE.search(text)
-    complexity = COMPLEXITY_RE.search(text)
-    return {
-        "pseudocode": pseudocode.group(1).strip() if pseudocode else "",
-        "complexity": complexity.group(1).strip() if complexity else "",
-    }
+
+    pseudocode_start = PSEUDOCODE_START_RE.search(text)
+    complexity_start = COMPLEXITY_START_RE.search(text)
+
+    pseudocode = ""
+    if pseudocode_start:
+        start = pseudocode_start.end()
+        end_candidates = [len(text)]
+        if complexity_start and complexity_start.start() > pseudocode_start.start():
+            end_candidates.append(complexity_start.start())
+        top_heading = TOP_HEADING_RE.search(text, start)
+        if top_heading:
+            end_candidates.append(top_heading.start())
+        pseudocode = text[start : min(end_candidates)].strip()
+
+    complexity = text[complexity_start.end() :].strip() if complexity_start else ""
+
+    return {"pseudocode": pseudocode, "complexity": complexity}
