@@ -7,14 +7,16 @@ import json
 from pathlib import Path
 
 from lc_review.classify import assign
+from lc_review.fupan import attach, parse_easy_page, parse_medium_page
 from lc_review.lingshen import fetch_all
 from lc_review.problems import read_ai_sections, resolve_frontend_id, scan
-from lc_review.state import build_state, render_judgment_report, save_state
+from lc_review.state import build_state, load_state, render_judgment_report, save_state
 
 REPO = Path(__file__).resolve().parent.parent
 STATE_PATH = REPO / "review_state.json"
 CACHE_DIR = REPO / "data" / "lingshen"
 SUMMARY_PATH = REPO / "summary.json"
+NOTION_DIR = REPO / "data" / "notion"
 
 
 def _tags_by_slug() -> dict[str, list[str]]:
@@ -49,14 +51,40 @@ def build_state_command(refresh: bool) -> None:
     print(f"wrote judgment review list to {report_path}")
 
 
+def attach_fupan_command() -> None:
+    state = load_state(STATE_PATH)
+    retrospectives = []
+    easy = NOTION_DIR / "easy.txt"
+    medium = NOTION_DIR / "medium.txt"
+    if easy.exists():
+        retrospectives += parse_easy_page(easy.read_text(encoding="utf-8"))
+    if medium.exists():
+        retrospectives += parse_medium_page(medium.read_text(encoding="utf-8"))
+    state, orphans = attach(state, retrospectives)
+    save_state(state, STATE_PATH)
+    with_retro = sum(1 for record in state.values() if record["我的复盘"] is not None)
+    orphan_path = REPO / "docs" / "lingshen" / "retrospectives-without-code.md"
+    orphan_path.parent.mkdir(parents=True, exist_ok=True)
+    orphan_path.write_text(
+        "# Retrospectives with no local solution\n\n"
+        + "\n".join(f"- {o.problem_id} ({o.source})" for o in sorted(orphans, key=lambda o: o.problem_id))
+        + "\n",
+        encoding="utf-8",
+    )
+    print(f"attached {with_retro} retrospectives; {len(orphans)} have no local code")
+
+
 def main() -> None:
     parser = argparse.ArgumentParser(prog="lc_review")
     subparsers = parser.add_subparsers(dest="command", required=True)
     build = subparsers.add_parser("build-state", help="rebuild review_state.json")
     build.add_argument("--refresh", action="store_true", help="re-download the taxonomy lists")
+    subparsers.add_parser("attach-fupan", help="attach Notion retrospectives to the state file")
     args = parser.parse_args()
     if args.command == "build-state":
         build_state_command(args.refresh)
+    if args.command == "attach-fupan":
+        attach_fupan_command()
 
 
 if __name__ == "__main__":

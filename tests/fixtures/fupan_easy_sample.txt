@@ -1,0 +1,7 @@
+robert - coffee chat
+sde分类：
+- prodcut（full stack） - ai
+为什么做过的题目能很容易写出来
+1385、find the distance value between two arrays：这个题目只能用暴力解法吗？如果要优化算法的话，肯定要先排序。
+1826、faulty sensor：感觉这个题目是披着双指针外衣的数组题目，逻辑很简单。
+2108、find first palindromic string in the array：遍历数组里面每个元素，判断对应的元素是否palindromic。
