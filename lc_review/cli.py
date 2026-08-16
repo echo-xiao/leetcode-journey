@@ -8,6 +8,13 @@ import re
 from collections.abc import Callable
 from pathlib import Path
 
+from lc_review.anki import (
+    export_elements,
+    export_pseudocode,
+    export_retrospectives,
+    highlight_density,
+    weakness_rank,
+)
 from lc_review.classify import assign
 from lc_review.elements import CARDS, render_elements, suggest_chapter_links
 from lc_review.fupan import attach, parse_easy_page, parse_medium_page
@@ -140,6 +147,25 @@ def build_elements_command() -> None:
     print(f"wrote {path}")
 
 
+def export_anki_command() -> None:
+    state = load_state(STATE_PATH)
+    entries = fetch_all(CACHE_DIR)
+    entry_order = {}
+    for entry in entries:
+        entry_order.setdefault((entry.list_no, entry.chapter or "", entry.section or ""), entry.order)
+    rank = weakness_rank(highlight_density(state))
+    out = REPO / "docs" / "anki"
+    out.mkdir(parents=True, exist_ok=True)
+    (out / "elements.tsv").write_text(export_elements(CARDS, {}), encoding="utf-8")
+    (out / "retrospectives.tsv").write_text(
+        export_retrospectives(state, rank, entry_order), encoding="utf-8"
+    )
+    (out / "pseudocode.tsv").write_text(
+        export_pseudocode(state, rank, entry_order), encoding="utf-8"
+    )
+    print(f"wrote three decks to {out}")
+
+
 def main() -> None:
     parser = argparse.ArgumentParser(prog="lc_review")
     subparsers = parser.add_subparsers(dest="command", required=True)
@@ -148,6 +174,7 @@ def main() -> None:
     subparsers.add_parser("attach-fupan", help="attach Notion retrospectives to the state file")
     subparsers.add_parser("build-table", help="regenerate the progress table")
     subparsers.add_parser("build-elements", help="regenerate the eighteen technique cards sheet")
+    subparsers.add_parser("export-anki", help="export the three Anki decks as TSV")
     args = parser.parse_args()
     if args.command == "build-state":
         build_state_command(args.refresh)
@@ -157,6 +184,8 @@ def main() -> None:
         build_table_command()
     if args.command == "build-elements":
         build_elements_command()
+    if args.command == "export-anki":
+        export_anki_command()
 
 
 if __name__ == "__main__":
