@@ -41,18 +41,36 @@ def escape_field(text: str) -> str:
 
 
 def order_key(
+    slug: str,
     record: dict,
     rank: dict[str, int],
-    entry_order: dict[tuple[str, str, str], int],
+    entry_order: dict[str, dict[tuple[str, str, str], int]],
 ) -> tuple[int, str, int, int]:
-    """Sort by weakness rank, then technique, then the source's own ordering."""
+    """Sort by weakness rank, then technique, then the source's own ordering.
+
+    ``entry_order`` maps a problem's slug to every taxonomy placement it was
+    seen at (a problem can be cross-listed in more than one entry). The order
+    used is the entry matching this record's *assigned* placement (its own
+    ``题单``/``章``/``节``); if that exact placement is not among the entries
+    for this slug, fall back to the smallest order recorded for the slug, and
+    only then to a large sentinel. ``record["id"]`` (the LeetCode number)
+    stays as the final tiebreak only, so it never drives ordering within a
+    section on its own.
+    """
     topic = record["要素卡"] or ""
     list_no = record["题单"].split(".", 1)[0]
-    key = (list_no, record["章"] or "", record["节"] or "")
+    placement = (list_no, record["章"] or "", record["节"] or "")
+    placements = entry_order.get(slug, {})
+    if placement in placements:
+        order = placements[placement]
+    elif placements:
+        order = min(placements.values())
+    else:
+        order = 10**6
     return (
         rank.get(topic, len(rank)),
         topic,
-        entry_order.get(key, 10**6),
+        order,
         record["id"],
     )
 
@@ -73,7 +91,12 @@ def _tags(record: dict) -> str:
 
 
 def _sorted_records(state: dict[str, dict], rank, entry_order) -> list[dict]:
-    return sorted(state.values(), key=lambda record: order_key(record, rank, entry_order))
+    return [
+        record
+        for _slug, record in sorted(
+            state.items(), key=lambda item: order_key(item[0], item[1], rank, entry_order)
+        )
+    ]
 
 
 def export_elements(

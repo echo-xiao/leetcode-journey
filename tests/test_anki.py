@@ -1,11 +1,13 @@
 from lc_review.anki import (
     escape_field,
+    export_elements,
     export_pseudocode,
     export_retrospectives,
     highlight_density,
     order_key,
     weakness_rank,
 )
+from lc_review.elements import ElementCard, FIELDS
 
 RECORD = {
     "id": 1004,
@@ -47,16 +49,81 @@ def test_weakness_rank_is_empty_when_nothing_is_highlighted():
 
 def test_order_key_puts_weaker_topics_first():
     rank = {"动态规划": 0, "滑动窗口": 1}
-    dp = order_key({**RECORD, "要素卡": "动态规划"}, rank, {})
-    sliding = order_key(RECORD, rank, {})
+    dp = order_key("max-consecutive-ones-iii", {**RECORD, "要素卡": "动态规划"}, rank, {})
+    sliding = order_key("max-consecutive-ones-iii", RECORD, rank, {})
     assert dp < sliding
 
 
 def test_order_key_falls_back_to_source_order_within_a_topic():
     rank = {"滑动窗口": 0}
-    entry_order = {("1", "二、不定长滑动窗口", "§2.1 求最长"): 7}
-    key = order_key(RECORD, rank, entry_order)
+    entry_order = {
+        "max-consecutive-ones-iii": {("1", "二、不定长滑动窗口", "§2.1 求最长"): 7}
+    }
+    key = order_key("max-consecutive-ones-iii", RECORD, rank, entry_order)
     assert 7 in key
+
+
+def test_order_key_falls_back_to_smallest_order_when_placement_not_recorded():
+    """If the record's own placement is not among the slug's entries, use the
+    smallest order recorded for that slug rather than the sentinel."""
+    rank = {"滑动窗口": 0}
+    entry_order = {
+        "max-consecutive-ones-iii": {
+            ("1", "二、不定长滑动窗口", "§2.9 elsewhere"): 3,
+            ("1", "二、不定长滑动窗口", "§2.1 别处"): 1,
+        }
+    }
+    key = order_key("max-consecutive-ones-iii", RECORD, rank, entry_order)
+    assert 1 in key
+
+
+def test_order_key_falls_back_to_sentinel_when_slug_unknown():
+    rank = {"滑动窗口": 0}
+    key = order_key("unknown-slug", RECORD, rank, {})
+    assert 10**6 in key
+
+
+def test_within_section_order_follows_taxonomy_not_leetcode_id():
+    """Several problems share one section; taxonomy order disagrees with id order.
+
+    The exporter must follow the taxonomy's own per-problem ``order`` (the
+    author already sorted easy-to-hard), not fall back to the LeetCode id.
+    """
+    common = {
+        "题单": "1. 滑动窗口与双指针",
+        "章": "二、不定长滑动窗口",
+        "节": "§2.1 求最长",
+        "归属来源": "灵神",
+        "亦属": [],
+        "要素卡": "滑动窗口",
+        "难度分": 1600,
+        "AI题解": {"伪代码": "", "复杂度": ""},
+        "已生成卡片": [],
+    }
+    placement = ("1", "二、不定长滑动窗口", "§2.1 求最长")
+    state = {
+        "slug-high-id-early-in-taxonomy": {
+            **common,
+            "id": 3090,
+            "题名": "A",
+            "我的复盘": {"来源": "x", "正文": "a", "高亮": []},
+        },
+        "slug-low-id-late-in-taxonomy": {
+            **common,
+            "id": 3,
+            "题名": "B",
+            "我的复盘": {"来源": "x", "正文": "b", "高亮": []},
+        },
+    }
+    entry_order = {
+        "slug-high-id-early-in-taxonomy": {placement: 0},
+        "slug-low-id-late-in-taxonomy": {placement: 1},
+    }
+    rank = {"滑动窗口": 0}
+    rows = export_retrospectives(state, rank, entry_order).splitlines()
+    ids_in_order = [row.split("\t")[1] for row in rows]
+    assert ids_in_order[0].startswith("3090")
+    assert ids_in_order[1].startswith("3.")
 
 
 def test_escape_field_flattens_newlines_and_tabs():
@@ -94,3 +161,38 @@ def test_pseudocode_deck_emits_a_separate_complexity_note():
     rows = export_pseudocode({"a": RECORD}, {"滑动窗口": 0}, {}).splitlines()
     assert len(rows) == 2
     assert any("$O(n)$" in row for row in rows)
+
+
+ELEMENT_CARD = ElementCard(
+    "滑动窗口", ("https://labuladong.online/algo/essential-technique/sliding-window-framework/",), ("滑动窗口",)
+)
+
+
+def test_export_elements_emits_one_note_per_technique_and_field():
+    rows = export_elements((ELEMENT_CARD,), {}).splitlines()
+    assert len(rows) == len(FIELDS)
+
+
+def test_export_elements_deck_name_is_element_technique():
+    rows = export_elements((ELEMENT_CARD,), {}).splitlines()
+    decks = {row.split("\t")[0] for row in rows}
+    assert decks == {"LeetCode::要素::滑动窗口"}
+
+
+def test_export_elements_field_body_appears_on_the_back():
+    bodies = {("滑动窗口", FIELDS[0]): "窗口的定义在此"}
+    rows = export_elements((ELEMENT_CARD,), bodies).splitlines()
+    backs = [row.split("\t")[2] for row in rows]
+    assert any("窗口的定义在此" in back for back in backs)
+
+
+def test_export_elements_cites_the_source_url():
+    rows = export_elements((ELEMENT_CARD,), {}).splitlines()
+    back = rows[0].split("\t")[2]
+    assert "https://labuladong.online/algo/essential-technique/sliding-window-framework/" in back
+
+
+def test_export_elements_missing_body_renders_an_explicit_placeholder():
+    rows = export_elements((ELEMENT_CARD,), {}).splitlines()
+    backs = [row.split("\t")[2] for row in rows]
+    assert all("待填写" in back for back in backs)

@@ -155,13 +155,14 @@ def build_elements_command() -> None:
 def export_anki_command() -> None:
     state = load_state(STATE_PATH)
     entries = fetch_all(CACHE_DIR)
-    entry_order = {}
+    entry_order: dict[str, dict[tuple[str, str, str], int]] = {}
     for entry in entries:
-        entry_order.setdefault((entry.list_no, entry.chapter or "", entry.section or ""), entry.order)
+        placement = (entry.list_no, entry.chapter or "", entry.section or "")
+        entry_order.setdefault(entry.slug, {})[placement] = entry.order
     rank = weakness_rank(highlight_density(state))
     out = REPO / "docs" / "anki"
     out.mkdir(parents=True, exist_ok=True)
-    (out / "elements.tsv").write_text(export_elements(CARDS, {}), encoding="utf-8")
+    (out / "elements.tsv").write_text(export_elements(CARDS, BODIES), encoding="utf-8")
     (out / "retrospectives.tsv").write_text(
         export_retrospectives(state, rank, entry_order), encoding="utf-8"
     )
