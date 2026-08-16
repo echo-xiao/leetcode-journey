@@ -1,6 +1,14 @@
 import json
 
-from lc_review.lingshen import LISTS, ProblemEntry, extract_post_content, parse_list
+import pytest
+
+from lc_review.lingshen import (
+    LISTS,
+    ProblemEntry,
+    extract_post_content,
+    fetch_all,
+    parse_list,
+)
 
 
 def test_parses_every_problem_entry(lingshen_sample):
@@ -94,7 +102,104 @@ def test_extract_post_content_pulls_markdown_from_next_data():
 
 
 def test_extract_post_content_raises_when_script_missing():
-    import pytest
-
     with pytest.raises(ValueError, match="__NEXT_DATA__"):
         extract_post_content("<html><body>nothing here</body></html>")
+
+
+def test_extract_post_content_raises_when_no_long_content_string_found():
+    payload = {
+        "props": {
+            "pageProps": {
+                "dehydratedState": {
+                    "queries": [
+                        {"state": {"data": {"content": "too short"}}},
+                    ]
+                }
+            }
+        }
+    }
+    html = (
+        "<html><body>"
+        f'<script id="__NEXT_DATA__" type="application/json">{json.dumps(payload)}</script>'
+        "</body></html>"
+    )
+    with pytest.raises(ValueError, match="no post content found"):
+        extract_post_content(html)
+
+
+def test_extract_post_content_prefers_qa_question_over_earlier_long_content():
+    """An unrelated long ``content`` string that appears earlier in dict
+    iteration order must not shadow the known-correct qaQuestion.content."""
+    payload = {
+        "props": {
+            "pageProps": {
+                "dehydratedState": {
+                    "queries": [
+                        {
+                            "state": {
+                                "data": {
+                                    "unrelatedLongContent": {
+                                        "content": "DECOY " + "y" * 2100
+                                    },
+                                    "qaQuestion": {
+                                        "content": "## 一、真正的题单\n" + "x" * 2100
+                                    },
+                                }
+                            }
+                        },
+                    ]
+                }
+            }
+        }
+    }
+    html = (
+        "<html><body>"
+        f'<script id="__NEXT_DATA__" type="application/json">{json.dumps(payload)}</script>'
+        "</body></html>"
+    )
+    content = extract_post_content(html)
+    assert content.startswith("## 一、真正的题单")
+    assert "DECOY" not in content
+
+
+def test_fetch_all_uses_cache_and_does_not_redownload(tmp_path, monkeypatch):
+    download_calls = []
+
+    def fake_download(slug):
+        download_calls.append(slug)
+        return f"<html>{slug}</html>"
+
+    monkeypatch.setattr("lc_review.lingshen._download", fake_download)
+    monkeypatch.setattr(
+        "lc_review.lingshen.extract_post_content", lambda html: "## chapter\n"
+    )
+
+    for list_no, _, _ in LISTS:
+        (tmp_path / f"{list_no}.md").write_text("## cached chapter\n", encoding="utf-8")
+
+    entries = fetch_all(tmp_path)
+
+    assert download_calls == []
+    assert entries == []
+
+
+def test_fetch_all_refresh_true_forces_redownload(tmp_path, monkeypatch):
+    download_calls = []
+
+    def fake_download(slug):
+        download_calls.append(slug)
+        return f"<html>{slug}</html>"
+
+    monkeypatch.setattr("lc_review.lingshen._download", fake_download)
+    monkeypatch.setattr(
+        "lc_review.lingshen.extract_post_content", lambda html: "## chapter\n"
+    )
+
+    for list_no, _, _ in LISTS:
+        (tmp_path / f"{list_no}.md").write_text("## cached chapter\n", encoding="utf-8")
+
+    fetch_all(tmp_path, refresh=True)
+
+    assert download_calls == [slug for _, _, slug in LISTS]
+    for list_no, _, _ in LISTS:
+        assert (tmp_path / f"{list_no}.md").read_text(encoding="utf-8") == "## chapter\n"

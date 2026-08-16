@@ -106,18 +106,46 @@ def _walk_for_content(node: object) -> Iterator[str]:
             yield from _walk_for_content(value)
 
 
+def _walk_for_qa_question_content(node: object) -> Iterator[str]:
+    """Yield ``content`` strings found under a ``qaQuestion`` key.
+
+    This is the known-correct shape of the post payload
+    (``...state.data.qaQuestion.content``), so a match here is preferred
+    over any other long ``content`` string that might appear elsewhere in
+    the tree.
+    """
+    if isinstance(node, dict):
+        for key, value in node.items():
+            if key == "qaQuestion" and isinstance(value, dict):
+                content = value.get("content")
+                if isinstance(content, str):
+                    yield content
+                    continue
+            yield from _walk_for_qa_question_content(value)
+    elif isinstance(node, list):
+        for value in node:
+            yield from _walk_for_qa_question_content(value)
+
+
 def extract_post_content(html: str) -> str:
     """Return the post's raw markdown from an embedded __NEXT_DATA__ blob.
 
     The exact JSON path is
     ``props.pageProps.dehydratedState.queries[1].state.data.qaQuestion.content``
-    but the query index is not stable across posts, so we search the tree for
-    the first sufficiently long ``content`` string instead of hard-coding it.
+    but the query index is not stable across posts, so we search the tree
+    instead of hard-coding it. The search is preferential: a ``content``
+    string nested under a ``qaQuestion`` key is the known-correct shape and
+    is returned first if present; only if that search finds nothing do we
+    fall back to the first sufficiently long ``content`` string anywhere in
+    the tree.
     """
     match = NEXT_DATA_RE.search(html)
     if match is None:
         raise ValueError("no __NEXT_DATA__ script found in page")
-    content = next(_walk_for_content(json.loads(match.group(1))), None)
+    tree = json.loads(match.group(1))
+    content = next(_walk_for_qa_question_content(tree), None)
+    if content is None:
+        content = next(_walk_for_content(tree), None)
     if content is None:
         raise ValueError("no post content found inside __NEXT_DATA__")
     return content
