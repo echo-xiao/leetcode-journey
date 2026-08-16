@@ -11,6 +11,7 @@ from lc_review.fupan import attach, parse_easy_page, parse_medium_page
 from lc_review.lingshen import fetch_all
 from lc_review.problems import read_ai_sections, resolve_frontend_id, scan
 from lc_review.state import build_state, load_state, render_judgment_report, save_state
+from lc_review.table import render_table
 
 REPO = Path(__file__).resolve().parent.parent
 STATE_PATH = REPO / "review_state.json"
@@ -74,17 +75,29 @@ def attach_fupan_command() -> None:
     print(f"attached {with_retro} retrospectives; {len(orphans)} have no local code")
 
 
+def build_table_command() -> None:
+    state = load_state(STATE_PATH)
+    entries = fetch_all(CACHE_DIR)
+    path = REPO / "docs" / "lingshen" / "大表.md"
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(render_table(state, entries), encoding="utf-8")
+    print(f"wrote {path}")
+
+
 def main() -> None:
     parser = argparse.ArgumentParser(prog="lc_review")
     subparsers = parser.add_subparsers(dest="command", required=True)
     build = subparsers.add_parser("build-state", help="rebuild review_state.json")
     build.add_argument("--refresh", action="store_true", help="re-download the taxonomy lists")
     subparsers.add_parser("attach-fupan", help="attach Notion retrospectives to the state file")
+    subparsers.add_parser("build-table", help="regenerate the progress table")
     args = parser.parse_args()
     if args.command == "build-state":
         build_state_command(args.refresh)
     if args.command == "attach-fupan":
         attach_fupan_command()
+    if args.command == "build-table":
+        build_table_command()
 
 
 if __name__ == "__main__":
