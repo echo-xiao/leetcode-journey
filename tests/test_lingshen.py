@@ -1,4 +1,6 @@
-from lc_review.lingshen import ProblemEntry, parse_list
+import json
+
+from lc_review.lingshen import LISTS, ProblemEntry, extract_post_content, parse_list
 
 
 def test_parses_every_problem_entry(lingshen_sample):
@@ -56,3 +58,43 @@ def test_entry_fields_are_positional_in_declared_order():
     assert a.chapter == "一"
     assert a.section == "§1.1"
     assert a.order == 0
+
+
+def test_lists_has_twelve_entries_with_unique_slugs():
+    assert len(LISTS) == 12
+    assert len({slug for _, _, slug in LISTS}) == 12
+
+
+def test_extract_post_content_pulls_markdown_from_next_data():
+    payload = {
+        "props": {
+            "pageProps": {
+                "dehydratedState": {
+                    "queries": [
+                        {"state": {"data": {"unrelated": "x"}}},
+                        {
+                            "state": {
+                                "data": {
+                                    "qaQuestion": {"content": "## 一、入门\n" + "x" * 2100}
+                                }
+                            }
+                        },
+                    ]
+                }
+            }
+        }
+    }
+    html = (
+        "<html><body>"
+        f'<script id="__NEXT_DATA__" type="application/json">{json.dumps(payload)}</script>'
+        "</body></html>"
+    )
+    content = extract_post_content(html)
+    assert content.startswith("## 一、入门")
+
+
+def test_extract_post_content_raises_when_script_missing():
+    import pytest
+
+    with pytest.raises(ValueError, match="__NEXT_DATA__"):
+        extract_post_content("<html><body>nothing here</body></html>")
