@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import re
 from collections import defaultdict
 from dataclasses import dataclass
 
@@ -83,31 +84,100 @@ def suggest_chapter_links(entries: list[ProblemEntry]) -> dict[str, list[tuple[s
     return dict(links)
 
 
+PASS_THROUGH_BODIES = ("原文未涉及", "待填写")
+CELL_CAP = 60
+_PITFALL_ITEM_RE = re.compile(r"^\d+\.\s", re.MULTILINE)
+
+
+def _distill_cell(text: str) -> str:
+    """Reduce a paragraph-length body to its leading claim for a table cell.
+
+    Cuts at the first 全角句号/分号, strips trailing punctuation, flattens
+    any embedded newline (which would otherwise break the markdown table
+    row), caps the result at roughly ``CELL_CAP`` characters, and escapes
+    ``|`` so the cell cannot be mistaken for a column boundary. The two
+    literal placeholder strings pass through untouched.
+    """
+    if text in PASS_THROUGH_BODIES:
+        return text
+    flattened = text.replace("\r\n", " ").replace("\n", " ")
+    cut = len(flattened)
+    for sep in ("；", "。"):
+        idx = flattened.find(sep)
+        if idx != -1 and idx < cut:
+            cut = idx
+    lead = flattened[:cut].strip(" ，。；：、")
+    if len(lead) > CELL_CAP:
+        lead = lead[:CELL_CAP].rstrip() + "…"
+    return lead.replace("|", "\\|")
+
+
+def _pitfall_count(body: str | None) -> int:
+    """Count the numbered problem entries in a 典型坑 body.
+
+    Each pitfall entry starts with ``<leetcode id>. `` at the start of a
+    line (see element_bodies.BODIES); the highlight bullets beneath it don't
+    match, so this counts problems, not individual highlights.
+    """
+    if not body or body in PASS_THROUGH_BODIES:
+        return 0
+    return len(_PITFALL_ITEM_RE.findall(body))
+
+
+def _pitfall_cell(body: str | None) -> str:
+    count = _pitfall_count(body)
+    return f"{count} 条" if count else "—"
+
+
+def _source_links(urls: tuple[str, ...]) -> str:
+    if len(urls) == 1:
+        return f"[原文]({urls[0]})"
+    return "、".join(f"[原文{i}]({url})" for i, url in enumerate(urls, start=1))
+
+
 def render_elements(
     cards: tuple[ElementCard, ...],
     links: dict[str, list[tuple[str, str]]],
     bodies: dict[tuple[str, str], str] | None = None,
 ) -> str:
-    """Emit the sheet. A field with no entry in ``bodies`` stays marked 待填写
-    rather than being invented; a field whose source genuinely does not cover
-    it should have its body set to the literal string 原文未涉及, not be left
-    out of ``bodies``.
+    """Emit the sheet as a single markdown table, one row per technique.
+
+    A field with no entry in ``bodies`` stays marked 待填写 rather than
+    being invented; a field whose source genuinely does not cover it should
+    have its body set to the literal string 原文未涉及, not be left out of
+    ``bodies``. Cell text is distilled from the full body (see
+    ``_distill_cell``) so the sheet stays scannable; the full bodies still
+    go into the Anki elements deck via ``lc_review.anki.export_elements``.
     """
     bodies = bodies or {}
-    lines = ["# 要素表", "", "每张卡对应 labuladong 的一篇框架文。正文从原文抽取，不自撰。", ""]
-    for index, card in enumerate(cards, start=1):
-        lines += [f"## {index}. {card.name}", ""]
-        lines.append("来源：" + "、".join(f"<{url}>" for url in card.sources))
-        covered = links.get(card.name, [])
-        lines.append(
-            "覆盖章（我方判断，待 echo 复核）："
-            + ("；".join(f"{no} / {chapter}" for no, chapter in covered) if covered else "无")
-        )
-        lines.append("")
-        for field in FIELDS:
+    table_fields = FIELDS[:-1]  # everything except 典型坑, which gets a count column instead
+    header = ["题型", *table_fields, "典型坑", "来源"]
+    lines = [
+        "# 要素表",
+        "",
+        "每行对应 labuladong 的一篇框架文；单元格是原文的首句摘要，不自撰。"
+        "典型坑列显示 echo 复盘中标出的问题数，完整坑点见 Anki 要素卡。",
+        "",
+        "| " + " | ".join(header) + " |",
+        "| " + " | ".join(["---"] * len(header)) + " |",
+    ]
+    for card in cards:
+        row = [card.name]
+        for field in table_fields:
             body = bodies.get((card.name, field), "待填写")
-            lines += [f"### {field}", "", body, ""]
-        lines += ["### 变体", "", "待填写", ""]
+            row.append(_distill_cell(body))
+        row.append(_pitfall_cell(bodies.get((card.name, "典型坑"))))
+        row.append(_source_links(card.sources))
+        lines.append("| " + " | ".join(row) + " |")
+    lines += ["", "## 章节对应（我方判断，待 echo 复核）", ""]
+    any_links = False
+    for card in cards:
+        covered = links.get(card.name, [])
+        if covered:
+            any_links = True
+            lines.append(f"- {card.name}：" + "；".join(f"{no} / {chapter}" for no, chapter in covered))
+    if not any_links:
+        lines.append("（无匹配）")
     return "\n".join(lines)
 
 
