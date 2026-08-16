@@ -12,11 +12,17 @@ from dataclasses import dataclass
 
 # A colour span sometimes wraps the entry number itself, e.g.
 # ``<span color="orange">2、LC 904 水果成篮：</span>难点在于...``. The opening
-# tag is optional and consumed as part of the header so it never leaks into
-# the body; the header also swallows an immediate closing tag so a
-# number-wrapping span does not turn into a garbage highlight containing the
-# entry number and title (see extract_highlights docstring).
-_SPAN_OPEN = r'(?:<span color=\\?"[a-z_]+\\?">)?'
+# tag is optional and consumed as part of the header (captured, so it can be
+# re-applied to the body below) so it never leaks into the body; the header
+# also swallows an immediate closing tag so a number-wrapping span does not
+# turn into a garbage highlight containing the entry number and title (see
+# extract_highlights docstring). Sometimes that same opening span instead
+# closes partway through the body -- e.g. problem 589, where
+# ``<span color="orange">589、title：``real highlight``</span>rest`` -- and the
+# header's own optional close does not fire because it only matches
+# immediately after the colon; see _rebalance_dangling_span for how that
+# dangling ``</span>`` is repaired.
+_SPAN_OPEN = r'(<span color=\\?"[a-z_]+\\?">)?'
 _SPAN_CLOSE = r"(?:</span>)?"
 
 EASY_ENTRY_RE = re.compile(
@@ -42,6 +48,31 @@ def _normalize_line_breaks(text: str) -> str:
     return BR_RE.sub("\n", text)
 
 
+def _rebalance_dangling_span(span_open: str | None, body: str) -> str:
+    """Re-pair a highlight span whose opening tag sat before the entry number.
+
+    When echo's orange span opens before the number and closes partway
+    through the body (problem 589 is the canonical example -- see
+    ``_SPAN_OPEN`` above), the entry-header regex consumes the opening tag as
+    header noise, leaving a ``</span>`` in the body with no matching opener.
+    That drops the highlighted text (``extract_highlights`` needs a matched
+    pair) and leaves malformed HTML for ``to_anki_html`` to choke on.
+    Re-prepending the original opening tag to the body restores the pair
+    without pulling the number/title back into the highlight, since those
+    were already stripped by the header match.
+    """
+    if not span_open:
+        return body
+    close_pos = body.find("</span>")
+    if close_pos == -1:
+        return body
+    open_match = HIGHLIGHT_OPEN_RE.search(body)
+    if open_match is not None and open_match.start() < close_pos:
+        # The body already has its own well-formed span; nothing dangling.
+        return body
+    return span_open + body
+
+
 def _entries_in_line(pattern: re.Pattern[str], line: str) -> list[tuple[str, str]]:
     """Split one line into (captured_id, body) pairs for every entry match.
 
@@ -54,7 +85,9 @@ def _entries_in_line(pattern: re.Pattern[str], line: str) -> list[tuple[str, str
     pairs = []
     for index, match in enumerate(matches):
         end = matches[index + 1].start() if index + 1 < len(matches) else len(line)
-        pairs.append((match.group(1), line[match.end() : end].strip()))
+        body = line[match.end() : end].strip()
+        body = _rebalance_dangling_span(match.group(1), body)
+        pairs.append((match.group(2), body))
     return pairs
 
 # Notion emits <span color="orange">…</span>; the MCP transport sometimes
@@ -139,23 +172,44 @@ def attach(
     A retrospective with no matching local record is returned as an orphan
     rather than dropped: echo wrote roughly 170 of those for problems whose
     code never got synced down, and losing them would lose real work.
+
+    A problem id can appear more than once across the two Notion pages (42 do
+    in practice). Only the longest body is kept as ``正文``, but every
+    duplicate's highlights are unioned into ``高亮`` -- in first-seen order,
+    exact duplicates collapsed -- because a shorter, losing body can still
+    carry a highlight the winning body never mentions.
     """
     slug_by_id = {record["id"]: slug for slug, record in state.items()}
     orphans: list[Retrospective] = []
+    highlights_by_slug: dict[str, list[str]] = {}
+    for slug, record in state.items():
+        existing = record.get("我的复盘")
+        if existing is not None:
+            highlights_by_slug[slug] = list(existing.get("高亮", []))
+
     for retro in retrospectives:
         slug = slug_by_id.get(retro.problem_id)
         if slug is None:
             orphans.append(retro)
             continue
+        seen = highlights_by_slug.setdefault(slug, [])
+        for highlight in retro.highlights:
+            if highlight not in seen:
+                seen.append(highlight)
         existing = state[slug].get("我的复盘")
         if existing is not None and len(existing["正文"]) >= len(retro.body):
             continue
         state[slug]["我的复盘"] = {
             "来源": retro.source,
             "正文": retro.body,
-            "高亮": list(retro.highlights),
+            "高亮": [],  # filled in below once every duplicate has been seen
             "Day": retro.day,
             "模式": retro.topic,
             "日期": retro.date,
         }
+
+    for slug, highlights in highlights_by_slug.items():
+        record = state[slug].get("我的复盘")
+        if record is not None:
+            record["高亮"] = highlights
     return state, orphans

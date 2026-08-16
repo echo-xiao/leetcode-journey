@@ -122,6 +122,45 @@ def test_medium_page_handles_span_wrapped_entry_number():
     assert entry.highlights == ()
 
 
+def test_easy_page_captures_highlight_when_span_closes_inside_the_body():
+    text = (
+        '<span color="orange">589、N-ary tree preorder traversal：'
+        "多叉树的遍历，跟二叉树的遍历，两个逻辑整体的区别在于</span>，"
+        "多叉树的遍历是一种..."
+    )
+    entry = parse_easy_page(text)[0]
+    assert entry.problem_id == 589
+    assert entry.highlights == ("多叉树的遍历，跟二叉树的遍历，两个逻辑整体的区别在于",)
+    assert "589" not in entry.highlights[0]
+    assert "preorder" not in entry.highlights[0]
+    assert entry.body.count("<span") == entry.body.count("</span>")
+    html = to_anki_html(entry.body)
+    assert "background" in html
+    assert "color=" not in html
+    assert "多叉树的遍历，跟二叉树的遍历，两个逻辑整体的区别在于" in html
+
+
+def test_attach_unions_highlights_across_duplicate_entries():
+    state = {"slug": {"id": 1, "我的复盘": None}}
+    short = Retrospective(1, "short", "notion-easy", None, None, None, ("highlight from short",))
+    long = Retrospective(
+        1, "a much longer retrospective body", "notion-medium", None, None, None, ("highlight from long",)
+    )
+    state, _ = attach(state, [short, long])
+    assert state["slug"]["我的复盘"]["正文"] == "a much longer retrospective body"
+    assert state["slug"]["我的复盘"]["高亮"] == ["highlight from short", "highlight from long"]
+
+
+def test_attach_deduplicates_identical_highlights_across_duplicates():
+    state = {"slug": {"id": 1, "我的复盘": None}}
+    first = Retrospective(1, "short", "notion-easy", None, None, None, ("same highlight",))
+    second = Retrospective(
+        1, "a much longer body here", "notion-medium", None, None, None, ("same highlight", "different one")
+    )
+    state, _ = attach(state, [first, second])
+    assert state["slug"]["我的复盘"]["高亮"] == ["same highlight", "different one"]
+
+
 def test_medium_day_heading_tolerates_backslash_escaped_pipe():
     text = "- -- Day 1 \\| W1 滑动窗口 \\| 定长滑动窗口 （同向）(2026-05-24) ---\n1、LC 1456 定长子串中元音的最大数目：body."
     entries = parse_medium_page(text)
