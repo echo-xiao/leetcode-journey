@@ -88,3 +88,42 @@ def test_attach_stores_highlights_alongside_the_body():
     retro = Retrospective(1, "body", "notion-easy", None, None, None, ("加入和修复的顺序反了",))
     state, _ = attach(state, [retro])
     assert state["slug"]["我的复盘"]["高亮"] == ["加入和修复的顺序反了"]
+
+
+def test_easy_page_splits_br_joined_entries_on_one_physical_line():
+    text = "1385、find the distance value：first body.<br>1826、faulty sensor：second body."
+    entries = parse_easy_page(text)
+    assert [e.problem_id for e in entries] == [1385, 1826]
+    assert entries[0].body == "first body."
+    assert entries[1].body == "second body."
+
+
+def test_easy_page_handles_span_wrapped_entry_number():
+    text = '<span color="orange">1385、find the distance value：</span>这个题目只能用暴力解法吗？'
+    entry = parse_easy_page(text)[0]
+    assert entry.problem_id == 1385
+    assert entry.body.startswith("这个题目")
+    assert entry.highlights == ()
+
+
+def test_medium_page_splits_br_joined_entries_on_one_physical_line():
+    text = "1、LC 15 三数之和：固定一个值，然后双指针。<br>2、LC 16 最接近的三数之和：另一道题。"
+    entries = parse_medium_page(text)
+    assert [e.problem_id for e in entries] == [15, 16]
+    assert entries[0].body == "固定一个值，然后双指针。"
+    assert entries[1].body == "另一道题。"
+
+
+def test_medium_page_handles_span_wrapped_entry_number():
+    text = '<span color="orange">2、LC 904 水果成篮：</span>难点在于while条件怎么写。'
+    entry = parse_medium_page(text)[0]
+    assert entry.problem_id == 904
+    assert entry.body.startswith("难点在于")
+    assert entry.highlights == ()
+
+
+def test_medium_day_heading_tolerates_backslash_escaped_pipe():
+    text = "- -- Day 1 \\| W1 滑动窗口 \\| 定长滑动窗口 （同向）(2026-05-24) ---\n1、LC 1456 定长子串中元音的最大数目：body."
+    entries = parse_medium_page(text)
+    assert entries[0].day == "Day 1"
+    assert entries[0].date == "2026-05-24"
