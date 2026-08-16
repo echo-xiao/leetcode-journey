@@ -9,6 +9,7 @@ from collections.abc import Callable
 from pathlib import Path
 
 from lc_review.classify import assign
+from lc_review.elements import CARDS, render_elements, suggest_chapter_links
 from lc_review.fupan import attach, parse_easy_page, parse_medium_page
 from lc_review.lingshen import fetch_all
 from lc_review.problems import SolvedProblem, read_ai_sections, resolve_frontend_id, scan
@@ -131,6 +132,14 @@ def build_table_command() -> None:
     print(f"wrote {path}")
 
 
+def build_elements_command() -> None:
+    entries = fetch_all(CACHE_DIR)
+    path = REPO / "docs" / "lingshen" / "要素表.md"
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(render_elements(CARDS, suggest_chapter_links(entries)), encoding="utf-8")
+    print(f"wrote {path}")
+
+
 def main() -> None:
     parser = argparse.ArgumentParser(prog="lc_review")
     subparsers = parser.add_subparsers(dest="command", required=True)
@@ -138,6 +147,7 @@ def main() -> None:
     build.add_argument("--refresh", action="store_true", help="re-download the taxonomy lists")
     subparsers.add_parser("attach-fupan", help="attach Notion retrospectives to the state file")
     subparsers.add_parser("build-table", help="regenerate the progress table")
+    subparsers.add_parser("build-elements", help="regenerate the eighteen technique cards sheet")
     args = parser.parse_args()
     if args.command == "build-state":
         build_state_command(args.refresh)
@@ -145,6 +155,8 @@ def main() -> None:
         attach_fupan_command()
     if args.command == "build-table":
         build_table_command()
+    if args.command == "build-elements":
+        build_elements_command()
 
 
 if __name__ == "__main__":
