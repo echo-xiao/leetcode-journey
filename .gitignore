@@ -5,3 +5,6 @@ __pycache__/
 .idea/
 docs/
 .DS_Store
+data/
+review_state.json
+.superpowers/
