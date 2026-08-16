@@ -84,9 +84,16 @@ def suggest_chapter_links(entries: list[ProblemEntry]) -> dict[str, list[tuple[s
 
 
 def render_elements(
-    cards: tuple[ElementCard, ...], links: dict[str, list[tuple[str, str]]]
+    cards: tuple[ElementCard, ...],
+    links: dict[str, list[tuple[str, str]]],
+    bodies: dict[tuple[str, str], str] | None = None,
 ) -> str:
-    """Emit the skeleton. Bodies stay marked 待填写 until read from the source."""
+    """Emit the sheet. A field with no entry in ``bodies`` stays marked 待填写
+    rather than being invented; a field whose source genuinely does not cover
+    it should have its body set to the literal string 原文未涉及, not be left
+    out of ``bodies``.
+    """
+    bodies = bodies or {}
     lines = ["# 要素表", "", "每张卡对应 labuladong 的一篇框架文。正文从原文抽取，不自撰。", ""]
     for index, card in enumerate(cards, start=1):
         lines += [f"## {index}. {card.name}", ""]
@@ -98,6 +105,46 @@ def render_elements(
         )
         lines.append("")
         for field in FIELDS:
-            lines += [f"### {field}", "", "待填写", ""]
+            body = bodies.get((card.name, field), "待填写")
+            lines += [f"### {field}", "", body, ""]
         lines += ["### 变体", "", "待填写", ""]
     return "\n".join(lines)
+
+
+def chapter_to_cards(entries: list[ProblemEntry]) -> dict[tuple[str, str], str]:
+    """Invert ``suggest_chapter_links``: (题单编号, 章) -> the one card that owns it.
+
+    Several cards' keyword lists can both match the same chapter (e.g. both
+    单调栈 and 栈与队列 match a chapter named "一、单调栈"). Ties are broken by
+    ``CARDS`` order, which lists the more specific technique first, so the
+    result is a single card name rather than a list — this keeps the mapping
+    compatible with review_state.json's 要素卡 field, which anki.py already
+    treats as a plain string.
+    """
+    links = suggest_chapter_links(entries)
+    owner: dict[tuple[str, str], str] = {}
+    for card in CARDS:
+        for chapter_key in links.get(card.name, []):
+            owner.setdefault(chapter_key, card.name)
+    return owner
+
+
+def link_state_to_cards(state: dict[str, dict], entries: list[ProblemEntry]) -> tuple[int, int]:
+    """Fill in each state record's 要素卡 from its (题单, 章), in place.
+
+    A record whose chapter matches no card's keywords keeps 要素卡 as None.
+    Returns (linked_count, unlinked_count).
+    """
+    owner = chapter_to_cards(entries)
+    linked = 0
+    unlinked = 0
+    for record in state.values():
+        list_no = record["题单"].split(".", 1)[0].strip()
+        chapter = record["章"]
+        card_name = owner.get((list_no, chapter)) if chapter else None
+        record["要素卡"] = card_name
+        if card_name:
+            linked += 1
+        else:
+            unlinked += 1
+    return linked, unlinked

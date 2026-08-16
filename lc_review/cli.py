@@ -16,7 +16,8 @@ from lc_review.anki import (
     weakness_rank,
 )
 from lc_review.classify import assign
-from lc_review.elements import CARDS, render_elements, suggest_chapter_links
+from lc_review.element_bodies import BODIES
+from lc_review.elements import CARDS, link_state_to_cards, render_elements, suggest_chapter_links
 from lc_review.fupan import attach, parse_easy_page, parse_medium_page
 from lc_review.lingshen import fetch_all
 from lc_review.problems import SolvedProblem, read_ai_sections, resolve_frontend_id, scan
@@ -141,9 +142,13 @@ def build_table_command() -> None:
 
 def build_elements_command() -> None:
     entries = fetch_all(CACHE_DIR)
+    state = load_state(STATE_PATH)
+    linked, unlinked = link_state_to_cards(state, entries)
+    save_state(state, STATE_PATH)
+    print(f"linked {linked} state records to a card; {unlinked} matched no card")
     path = REPO / "docs" / "lingshen" / "要素表.md"
     path.parent.mkdir(parents=True, exist_ok=True)
-    path.write_text(render_elements(CARDS, suggest_chapter_links(entries)), encoding="utf-8")
+    path.write_text(render_elements(CARDS, suggest_chapter_links(entries), BODIES), encoding="utf-8")
     print(f"wrote {path}")
 
 
