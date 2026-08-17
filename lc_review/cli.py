@@ -62,6 +62,13 @@ def build_answers_command(apply: bool, limit: int | None) -> None:
         elements_render.main()
 
 
+def export_anki_command() -> None:
+    """Problems/*/ -> anki/*.tsv, ready to import."""
+    from .anki_export import run
+
+    run()
+
+
 def sync_all_command(apply: bool) -> None:
     """The day-to-day command: LeetCode -> Problems/ -> Notion, in that order."""
     steps = (
@@ -98,6 +105,9 @@ def main() -> None:
     fupan = subparsers.add_parser("sync-fupan", help="复盘写入 Notion 复盘列")
     fupan.add_argument("--apply", action="store_true", help="实际写入 Notion")
 
+    # Writes only into anki/ inside the repo, so there is nothing to opt into.
+    subparsers.add_parser("export-anki", help="导出 Anki 卡片 TSV")
+
     args = parser.parse_args()
     if args.command == "sync-all":
         sync_all_command(args.apply)
@@ -109,6 +119,8 @@ def main() -> None:
         sync_review_md_command(args.apply)
     elif args.command == "sync-fupan":
         sync_fupan_command(args.apply)
+    elif args.command == "export-anki":
+        export_anki_command()
 
 
 if __name__ == "__main__":

@@ -45,6 +45,17 @@ python3 -m lc_review.cli sync-review-md --apply  # 只更新 review.md
 python3 -m lc_review.cli sync-fupan --apply      # 只更新 Notion 复盘列
 ```
 
+## 刷卡
+
+```bash
+python3 -m lc_review.cli export-anki
+```
+
+生成 `anki/elements.tsv`，Anki 里 File → Import 导入，牌组是 `LeetCode::要素`，
+一题一张：正面题目，背面这道题的要素怎么填。标签按题型打好，可以只刷某一类。
+
+`anki/` 不进版本库——它是从 `Problems/` 生成的，重跑一条命令就有。
+
 ## 需要配置什么
 
 `.env`（已在 `.gitignore` 里，不会进版本库）：
