@@ -31,10 +31,18 @@ class Assignment:
     rating: int | None
     origin: str
     also_in: list[Placement] = field(default_factory=list)
+    # Diagnostics for a ORIGIN_OUTSIDE placement: how confident the tag-based
+    # match was, and what evidence drove it. None for every other origin.
+    match_score: float | None = None
+    match_evidence: str | None = None
 
 
 def _placement(entry: ProblemEntry) -> Placement:
     return (entry.list_no, entry.chapter or "", entry.section or "")
+
+
+def _assignment_placement(assignment: Assignment) -> Placement:
+    return (assignment.list_no, assignment.chapter or "", assignment.section or "")
 
 
 def _jaccard(left: set[str], right: set[str]) -> float:
@@ -99,7 +107,7 @@ def assign(
     profiles: dict[Placement, set[str]] = defaultdict(set)
     detail: dict[Placement, Assignment] = {}
     for assignment in assignments:
-        key = (assignment.list_no, assignment.chapter or "", assignment.section or "")
+        key = _assignment_placement(assignment)
         profiles[key].update(tags_by_slug.get(assignment.slug, []))
         detail.setdefault(key, assignment)
 
@@ -116,6 +124,7 @@ def assign(
             unplaceable.append(problem)
             continue
         sibling = detail[best_key]
+        shared_tags = sorted(candidate_tags & profiles[best_key])
         assignments.append(
             Assignment(
                 slug=problem.slug,
@@ -131,6 +140,11 @@ def assign(
                 rating=None,
                 origin=ORIGIN_OUTSIDE,
                 also_in=[],
+                match_score=best_score,
+                match_evidence=(
+                    f"closest sibling `{sibling.slug}`; shared tags: "
+                    f"{', '.join(shared_tags) if shared_tags else 'none'}"
+                ),
             )
         )
 

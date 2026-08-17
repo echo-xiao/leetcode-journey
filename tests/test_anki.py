@@ -152,6 +152,50 @@ def test_retrospective_back_keeps_the_highlight_as_a_background_span():
     assert 'color="orange"' not in back
 
 
+def test_missing_highlight_is_appended_to_the_back_as_supplementary_highlight():
+    record = {
+        **RECORD,
+        "我的复盘": {
+            "来源": "notion-easy",
+            "正文": "plain body with no highlight span at all",
+            "高亮": ["highlight lost from a losing duplicate"],
+            "Day": None, "模式": None, "日期": None,
+        },
+    }
+    rows = export_retrospectives({"a": record}, {"滑动窗口": 0}, {}).splitlines()
+    back = rows[0].split("\t")[2]
+    assert "补充高亮" in back
+    assert "background" in back
+    assert "highlight lost from a losing duplicate" in back
+
+
+def test_short_highlight_that_is_a_substring_of_unrelated_body_text_still_counts_as_missing():
+    """A highlight is only "already visible" if it is an actual highlighted
+    span in 正文, not merely a plain-text substring match -- e.g. the
+    highlight "回溯" must not be considered present just because the body
+    contains the unrelated word "回溯算法"."""
+    record = {
+        **RECORD,
+        "我的复盘": {
+            "来源": "notion-easy",
+            "正文": "这是一个利用回溯算法的题目，没有真正标出高亮。",
+            "高亮": ["回溯"],
+            "Day": None, "模式": None, "日期": None,
+        },
+    }
+    rows = export_retrospectives({"a": record}, {"滑动窗口": 0}, {}).splitlines()
+    back = rows[0].split("\t")[2]
+    assert "补充高亮" in back
+    assert back.count("background") == 1
+
+
+def test_highlight_already_present_in_body_is_not_duplicated_as_supplementary():
+    rows = export_retrospectives({"a": RECORD}, {"滑动窗口": 0}, {}).splitlines()
+    back = rows[0].split("\t")[2]
+    assert back.count("再记录") == 1
+    assert "补充高亮" not in back
+
+
 def test_pseudocode_deck_labels_the_content_as_machine_generated():
     rows = export_pseudocode({"a": RECORD}, {"滑动窗口": 0}, {}).splitlines()
     assert any("GPT 生成" in row for row in rows)
@@ -166,33 +210,72 @@ def test_pseudocode_deck_emits_a_separate_complexity_note():
 ELEMENT_CARD = ElementCard(
     "滑动窗口", ("https://labuladong.online/algo/essential-technique/sliding-window-framework/",), ("滑动窗口",)
 )
+ESSENTIALS_SAMPLE = {
+    "滑动窗口": ("什么时候移动 right 扩大窗口？", "什么时候移动 left 缩小窗口？"),
+}
 
 
-def test_export_elements_emits_one_note_per_technique_and_field():
-    rows = export_elements((ELEMENT_CARD,), {}).splitlines()
-    assert len(rows) == len(FIELDS)
+def test_export_elements_emits_one_note_per_essential_question():
+    rows = export_elements((ELEMENT_CARD,), ESSENTIALS_SAMPLE, {}).splitlines()
+    assert len(rows) == len(ESSENTIALS_SAMPLE["滑动窗口"])
 
 
 def test_export_elements_deck_name_is_element_technique():
-    rows = export_elements((ELEMENT_CARD,), {}).splitlines()
+    rows = export_elements((ELEMENT_CARD,), ESSENTIALS_SAMPLE, {}).splitlines()
     decks = {row.split("\t")[0] for row in rows}
     assert decks == {"LeetCode::要素::滑动窗口"}
 
 
+def test_export_elements_front_contains_the_essential_question():
+    rows = export_elements((ELEMENT_CARD,), ESSENTIALS_SAMPLE, {}).splitlines()
+    fronts = [row.split("\t")[1] for row in rows]
+    assert any("什么时候移动 right 扩大窗口" in front for front in fronts)
+
+
 def test_export_elements_field_body_appears_on_the_back():
     bodies = {("滑动窗口", FIELDS[0]): "窗口的定义在此"}
-    rows = export_elements((ELEMENT_CARD,), bodies).splitlines()
+    rows = export_elements((ELEMENT_CARD,), ESSENTIALS_SAMPLE, bodies).splitlines()
     backs = [row.split("\t")[2] for row in rows]
     assert any("窗口的定义在此" in back for back in backs)
 
 
 def test_export_elements_cites_the_source_url():
-    rows = export_elements((ELEMENT_CARD,), {}).splitlines()
+    rows = export_elements((ELEMENT_CARD,), ESSENTIALS_SAMPLE, {}).splitlines()
     back = rows[0].split("\t")[2]
     assert "https://labuladong.online/algo/essential-technique/sliding-window-framework/" in back
 
 
 def test_export_elements_missing_body_renders_an_explicit_placeholder():
-    rows = export_elements((ELEMENT_CARD,), {}).splitlines()
+    rows = export_elements((ELEMENT_CARD,), ESSENTIALS_SAMPLE, {}).splitlines()
     backs = [row.split("\t")[2] for row in rows]
-    assert all("待填写" in back for back in backs)
+    assert all("待补充" in back for back in backs)
+
+
+def test_export_elements_excludes_典型坑_from_the_guidance_text():
+    bodies = {
+        ("滑动窗口", "问题的定义"): "定义在此",
+        ("滑动窗口", "典型坑"): "19. 某题\n  - 某坑",
+    }
+    rows = export_elements((ELEMENT_CARD,), ESSENTIALS_SAMPLE, bodies).splitlines()
+    backs = [row.split("\t")[2] for row in rows]
+    assert all("某坑" not in back for back in backs)
+
+
+def test_export_elements_skips_a_card_with_no_essentials_entirely():
+    empty_card = ElementCard(
+        "数学技巧", ("https://labuladong.online/algo/essential-technique/math-techniques-summary/",), ("数学",)
+    )
+    rows = export_elements((empty_card,), {"数学技巧": ()}, {}).splitlines()
+    assert rows == []
+
+
+def test_export_elements_orders_by_weakness_rank_not_card_order():
+    weak_card = ElementCard("弱项技巧", ("https://labuladong.online/algo/x/",), ("x",))
+    strong_card = ElementCard("强项技巧", ("https://labuladong.online/algo/y/",), ("y",))
+    essentials = {"弱项技巧": ("弱项问题？",), "强项技巧": ("强项问题？",)}
+    rank = {"弱项技巧": 0, "强项技巧": 1}
+    # CARDS order here deliberately puts the strong technique first, to prove
+    # ordering follows rank rather than positional order.
+    rows = export_elements((strong_card, weak_card), essentials, {}, rank).splitlines()
+    assert rows[0].split("\t")[0] == "LeetCode::要素::弱项技巧"
+    assert rows[1].split("\t")[0] == "LeetCode::要素::强项技巧"

@@ -146,6 +146,35 @@ def test_uncovered_problem_gets_the_looked_up_title():
     assert robber.title == "打家劫舍"
 
 
+def test_uncovered_problem_records_match_score_and_evidence():
+    entries = [entry("7", "一", "§1.1", 746, "min-cost")]
+    solved = [
+        SolvedProblem(747, "min-cost", "747_min-cost"),
+        SolvedProblem(198, "house-robber", "198_house-robber"),
+    ]
+    tags = {
+        "min-cost": ["Array", "Dynamic Programming"],
+        "house-robber": ["Array", "Dynamic Programming"],
+    }
+    assignments, _ = assign(entries, solved, tags, fake_resolver, fake_title_lookup)
+    robber = next(a for a in assignments if a.slug == "house-robber")
+    assert robber.match_score == 1.0
+    assert "house-robber" not in robber.match_evidence  # evidence names the sibling, not itself
+    assert "min-cost" in robber.match_evidence
+    assert "Array" in robber.match_evidence
+
+
+def test_lingshen_and_cross_sourced_assignments_have_no_match_score():
+    entries = [
+        entry("1", "一", "§1.1", 11, "container"),
+        entry("10", "二", "§2.1", 11, "container"),
+    ]
+    solved = [SolvedProblem(11, "container", "11_container")]
+    assignments, _ = assign(entries, solved, {}, never_called, no_title_lookup)
+    assert assignments[0].match_score is None
+    assert assignments[0].match_evidence is None
+
+
 def test_uncovered_problem_with_no_lookup_result_falls_back_to_the_slug():
     entries = [entry("7", "一", "§1.1", 746, "min-cost")]
     solved = [

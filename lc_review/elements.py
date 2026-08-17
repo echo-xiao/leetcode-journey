@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-import re
 from collections import defaultdict
 from dataclasses import dataclass
 
@@ -84,24 +83,25 @@ def suggest_chapter_links(entries: list[ProblemEntry]) -> dict[str, list[tuple[s
     return dict(links)
 
 
-PASS_THROUGH_BODIES = ("原文未涉及", "待填写")
-_PITFALL_ITEM_RE = re.compile(r"^\d+\.\s", re.MULTILINE)
+def _pitfall_count(state: dict[str, dict], card_name: str) -> int:
+    """Count problems linked to this card with an actual highlighted pitfall.
 
-
-def _pitfall_count(body: str | None) -> int:
-    """Count the numbered problem entries in a 典型坑 body.
-
-    Each pitfall entry starts with ``<leetcode id>. `` at the start of a
-    line (see element_bodies.BODIES); the highlight bullets beneath it don't
-    match, so this counts problems, not individual highlights.
+    Derived from ``review_state.json`` at render time -- never from a frozen
+    copy of echo's highlight text -- so a new retrospective is reflected the
+    next time this renders, with no separate frequency to keep in sync. See
+    ``lc_review.element_bodies``'s module docstring: 不在代码里写死任何踩坑频次.
     """
-    if not body or body in PASS_THROUGH_BODIES:
-        return 0
-    return len(_PITFALL_ITEM_RE.findall(body))
+    return sum(
+        1
+        for record in state.values()
+        if record.get("要素卡") == card_name
+        and record.get("我的复盘")
+        and record["我的复盘"].get("高亮")
+    )
 
 
-def _pitfall_cell(body: str | None) -> str:
-    count = _pitfall_count(body)
+def _pitfall_cell(state: dict[str, dict], card_name: str) -> str:
+    count = _pitfall_count(state, card_name)
     return f"{count} 条" if count else "—"
 
 
@@ -131,29 +131,30 @@ def _essentials_cell(items: tuple[str, ...]) -> str:
 def render_elements(
     cards: tuple[ElementCard, ...],
     links: dict[str, list[tuple[str, str]]],
-    bodies: dict[tuple[str, str], str] | None = None,
+    state: dict[str, dict] | None = None,
 ) -> str:
     """Emit the sheet as a single markdown table, one row per technique.
 
     Each technique gets its own 要素 -- the small set of questions you must
     answer to write that kind of code -- from
     ``lc_review.element_essentials.ESSENTIALS``, not the six generic fields
-    in ``FIELDS`` (those still back the Anki elements deck via ``BODIES``
-    and ``lc_review.anki.export_elements``, but no longer drive this sheet).
-    The 典型坑 column shows only a count, sourced from ``bodies``' 典型坑
-    field the same way the previous layout did; the full pitfall text stays
-    in the Anki deck.
+    in ``FIELDS`` (those still back the Anki elements deck's guidance text
+    via ``element_bodies.BODIES`` and ``lc_review.anki.export_elements``, but
+    no longer drive this sheet). The 典型坑 column shows a count computed
+    live from ``state`` (``review_state.json``'s ``我的复盘.高亮``), never
+    from a frozen copy; the full pitfall text stays in the Anki deck.
     """
     from lc_review.element_essentials import ESSENTIALS
 
-    bodies = bodies or {}
+    state = state or {}
     header = ["题型", "要素", "典型坑", "来源"]
     lines = [
         "# 要素表",
         "",
         "每行对应一种题型；「要素」是写这类代码前必须回答的问题，逐条列出，"
         "来自原文自己的框架或从原文的坚持中提炼（见 lc_review/element_essentials.py "
-        "里每条的出处说明）。典型坑列显示 echo 复盘中标出的问题数，完整坑点见 Anki 要素卡。",
+        "里每条的出处说明）。典型坑列显示 echo 复盘中标出的问题数（实时从 "
+        "review_state.json 统计，不是写死的），完整坑点见 Anki 要素卡。",
         "",
         "| " + " | ".join(header) + " |",
         "| " + " | ".join(["---"] * len(header)) + " |",
@@ -162,7 +163,7 @@ def render_elements(
         row = [
             card.name,
             _essentials_cell(ESSENTIALS.get(card.name, ())),
-            _pitfall_cell(bodies.get((card.name, "典型坑"))),
+            _pitfall_cell(state, card.name),
             _source_links(card.sources),
         ]
         lines.append("| " + " | ".join(row) + " |")
@@ -196,11 +197,17 @@ def chapter_to_cards(entries: list[ProblemEntry]) -> dict[tuple[str, str], str]:
     return owner
 
 
+CARD_LINK_SOURCE = "关键词匹配"
+
+
 def link_state_to_cards(state: dict[str, dict], entries: list[ProblemEntry]) -> tuple[int, int]:
     """Fill in each state record's 要素卡 from its (题单, 章), in place.
 
     A record whose chapter matches no card's keywords keeps 要素卡 as None.
-    Returns (linked_count, unlinked_count).
+    Also records ``要素卡来源`` -- like ``归属来源`` and ``题号来源``, this is
+    our judgment rather than a fact from the taxonomy, and it deserves the
+    same provenance marker they already get. Null exactly when 要素卡 is
+    null. Returns (linked_count, unlinked_count).
     """
     owner = chapter_to_cards(entries)
     linked = 0
@@ -210,6 +217,7 @@ def link_state_to_cards(state: dict[str, dict], entries: list[ProblemEntry]) -> 
         chapter = record["章"]
         card_name = owner.get((list_no, chapter)) if chapter else None
         record["要素卡"] = card_name
+        record["要素卡来源"] = CARD_LINK_SOURCE if card_name else None
         if card_name:
             linked += 1
         else:

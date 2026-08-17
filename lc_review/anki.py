@@ -8,7 +8,7 @@ within a technique.
 from __future__ import annotations
 
 from lc_review.elements import FIELDS, ElementCard
-from lc_review.fupan import to_anki_html
+from lc_review.fupan import HIGHLIGHT_STYLE, extract_highlights, to_anki_html
 
 
 def highlight_density(state: dict[str, dict]) -> dict[str, int]:
@@ -99,25 +99,86 @@ def _sorted_records(state: dict[str, dict], rank, entry_order) -> list[dict]:
     ]
 
 
+# 典型坑 is excluded from the guidance text: it is pitfalls, not guidance for
+# answering an essential question, and (see FIX 7 / elements._pitfall_count)
+# is derived from live state at render time, not from this frozen file.
+GUIDANCE_FIELDS: tuple[str, ...] = tuple(field for field in FIELDS if field != "典型坑")
+_PLACEHOLDER_BODIES = ("原文未涉及", "待填写")
+
+
+def _guidance_text(card_name: str, bodies: dict[tuple[str, str], str]) -> str:
+    """Collect this technique's non-placeholder field bodies as one passage.
+
+    ``element_essentials.ESSENTIALS`` questions are technique-specific and
+    were not authored with a one-to-one mapping onto ``element_bodies.BODIES``'
+    six generic fields, so a card's back shows all of that technique's real
+    guidance rather than guessing which single field answers which question.
+    """
+    parts = [
+        bodies[(card_name, field)]
+        for field in GUIDANCE_FIELDS
+        if bodies.get((card_name, field)) not in (None, *_PLACEHOLDER_BODIES)
+    ]
+    return "\n\n".join(parts) if parts else "待补充"
+
+
 def export_elements(
-    cards: tuple[ElementCard, ...], bodies: dict[tuple[str, str], str]
+    cards: tuple[ElementCard, ...],
+    essentials: dict[str, tuple[str, ...]],
+    bodies: dict[tuple[str, str], str],
+    rank: dict[str, int] | None = None,
 ) -> str:
-    """One note per (technique, field). Bodies come from the elements sheet."""
+    """One note per (technique, essential question), weakest technique first.
+
+    Driven by ``element_essentials.ESSENTIALS`` -- each technique's own
+    questions -- not the six generic ``FIELDS``, which was the framing echo
+    rejected. A technique with an empty ``ESSENTIALS`` entry (an honest gap:
+    its source article states no unifying checklist) emits no notes at all,
+    rather than placeholder cards nobody asked for.
+    """
+    rank = rank or {}
+    ordered_cards = sorted(cards, key=lambda card: (rank.get(card.name, len(rank)), card.name))
     rows = []
-    for card in cards:
-        for field in FIELDS:
-            body = bodies.get((card.name, field), "待填写")
+    for card in ordered_cards:
+        questions = essentials.get(card.name, ())
+        if not questions:
+            continue
+        guidance = _guidance_text(card.name, bodies)
+        for question in questions:
             rows.append(
                 "\t".join(
                     [
                         f"LeetCode::要素::{card.name}",
-                        escape_field(f"{card.name} —— {field}是什么？"),
-                        escape_field(body + "\n\n来源：" + "、".join(card.sources)),
+                        escape_field(f"{card.name} —— {question}"),
+                        escape_field(guidance + "\n\n来源：" + "、".join(card.sources)),
                         f"要素::{card.name}",
                     ]
                 )
             )
     return "\n".join(rows)
+
+
+def _append_missing_highlights(body_html: str, retro: dict) -> str:
+    """Append any highlight not already visible in ``正文`` to the card back.
+
+    ``fupan.attach`` unions highlights across duplicate Notion entries but
+    keeps only the longest body, so a highlight that came from a losing
+    duplicate can end up recorded in ``高亮`` without ever appearing in
+    ``正文``. Dropping it silently on the Anki card would make that highlight
+    -- echo's own weakness signal -- invisible everywhere.
+
+    A highlight only counts as "already visible" if it is actually rendered
+    as a highlighted span in ``正文`` (via ``fupan.extract_highlights``), not
+    merely a plain-text substring match -- a short highlight like "回溯" can
+    otherwise appear to already be present just because a longer unrelated
+    word like "回溯算法" happens to contain it.
+    """
+    highlighted_in_body = set(extract_highlights(retro["正文"]))
+    missing = [h for h in retro.get("高亮", []) if h not in highlighted_in_body]
+    if not missing:
+        return body_html
+    extra_spans = "\n".join(f"{HIGHLIGHT_STYLE}{h}</span>" for h in missing)
+    return body_html + "\n\n补充高亮：\n" + extra_spans
 
 
 def export_retrospectives(state: dict[str, dict], rank, entry_order) -> str:
@@ -127,12 +188,13 @@ def export_retrospectives(state: dict[str, dict], rank, entry_order) -> str:
         retro = record["我的复盘"]
         if not retro:
             continue
+        back = _append_missing_highlights(to_anki_html(retro["正文"]), retro)
         rows.append(
             "\t".join(
                 [
                     f"LeetCode::我的复习::{record['题单']}",
                     escape_field(f"{record['id']}. {record['题名']}"),
-                    escape_field(to_anki_html(retro["正文"])),
+                    escape_field(back),
                     _tags(record),
                 ]
             )

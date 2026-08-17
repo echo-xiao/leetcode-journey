@@ -61,25 +61,75 @@ def test_save_and_load_round_trip(tmp_path):
 
 
 def test_judgment_report_lists_only_cross_outside_and_unplaceable():
-    state = build_state(
-        [
-            an_assignment(),
-            an_assignment(slug="container", problem_id=11, origin=ORIGIN_CROSS,
-                          also_in=[("1", "一", "§1.1")]),
-            an_assignment(slug="design-thing", problem_id=1, origin=ORIGIN_OUTSIDE),
-        ],
-        [
-            SolvedProblem(747, "min-cost", "747_min-cost"),
-            SolvedProblem(11, "container", "11_container"),
-            SolvedProblem(1, "design-thing", "1_design-thing"),
-        ],
-        {},
-    )
-    report = render_judgment_report(state, [SolvedProblem(9, "odd-one", "9_odd-one")])
+    assignments = [
+        an_assignment(),
+        an_assignment(slug="container", problem_id=11, origin=ORIGIN_CROSS,
+                      also_in=[("1", "一", "§1.1")]),
+        an_assignment(
+            slug="design-thing", problem_id=1, origin=ORIGIN_OUTSIDE,
+            match_score=0.5, match_evidence="closest sibling `x`; shared tags: Array",
+        ),
+    ]
+    report = render_judgment_report(assignments, [SolvedProblem(9, "odd-one", "9_odd-one")])
     assert "container" in report
     assert "design-thing" in report
     assert "odd-one" in report
     assert "min-cost" not in report
+
+
+def test_judgment_report_shows_the_jaccard_score_and_evidence_for_outside_picks():
+    assignments = [
+        an_assignment(
+            slug="design-thing", problem_id=1, origin=ORIGIN_OUTSIDE,
+            match_score=0.667, match_evidence="closest sibling `missing-number`; shared tags: Array, Math",
+        ),
+    ]
+    report = render_judgment_report(assignments, [])
+    assert "jaccard=0.67" in report
+    assert "missing-number" in report
+    assert "Array, Math" in report
+
+
+def test_build_state_carries_forward_retrospective_and_cards_from_previous():
+    previous = {
+        "min-cost": {
+            "我的复盘": {"来源": "notion-easy", "正文": "hand written", "高亮": []},
+            "要素卡": "动态规划",
+            "要素卡来源": "关键词匹配",
+            "已生成卡片": ["伪代码"],
+        }
+    }
+    state = build_state(
+        [an_assignment()],
+        [SolvedProblem(747, "min-cost", "747_min-cost")],
+        {},
+        previous=previous,
+    )
+    assert state["min-cost"]["我的复盘"]["正文"] == "hand written"
+    assert state["min-cost"]["要素卡"] == "动态规划"
+    assert state["min-cost"]["要素卡来源"] == "关键词匹配"
+    assert state["min-cost"]["已生成卡片"] == ["伪代码"]
+
+
+def test_build_state_defaults_when_slug_absent_from_previous():
+    state = build_state(
+        [an_assignment()],
+        [SolvedProblem(747, "min-cost", "747_min-cost")],
+        {},
+        previous={"other-slug": {"我的复盘": {"正文": "should not leak"}}},
+    )
+    assert state["min-cost"]["我的复盘"] is None
+    assert state["min-cost"]["要素卡"] is None
+    assert state["min-cost"]["要素卡来源"] is None
+    assert state["min-cost"]["已生成卡片"] == []
+
+
+def test_build_state_with_no_previous_at_all_still_defaults_cleanly():
+    state = build_state(
+        [an_assignment()], [SolvedProblem(747, "min-cost", "747_min-cost")], {}
+    )
+    assert state["min-cost"]["我的复盘"] is None
+    assert state["min-cost"]["要素卡来源"] is None
 
 
 def test_state_carries_id_source_for_both_lingshen_and_api_derived_ids():

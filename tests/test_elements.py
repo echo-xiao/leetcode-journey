@@ -21,7 +21,15 @@ def test_every_card_cites_at_least_one_source():
             assert url.startswith("https://labuladong.online/algo/")
 
 
-def test_the_six_fields_cover_echos_example_plus_her_top_weaknesses():
+def test_the_deck_is_driven_by_essentials_not_the_six_generic_fields():
+    """FIELDS predates ESSENTIALS and is the framing echo rejected twice (see
+    element_essentials.py's module docstring). It survives only as the label
+    set element_bodies.BODIES is keyed on for the Anki elements deck's
+    guidance text (lc_review.anki.export_elements) -- it must not drive the
+    sheet or the deck's card count/order any more; ESSENTIALS does.
+    """
+    from lc_review.element_essentials import ESSENTIALS
+
     assert FIELDS == (
         "问题的定义",
         "主体 / 状态",
@@ -30,6 +38,10 @@ def test_the_six_fields_cover_echos_example_plus_her_top_weaknesses():
         "操作顺序",
         "典型坑",
     )
+    # 滑动窗口's real questions are its own framework wording, not FIELDS'
+    # generic six labels.
+    assert ESSENTIALS["滑动窗口"] != FIELDS
+    assert all(question.endswith("？") for question in ESSENTIALS["滑动窗口"])
 
 
 def test_chapter_links_are_suggested_by_keyword_match():
@@ -88,12 +100,15 @@ def test_no_cell_contains_a_raw_newline():
     assert len(table_lines) == 2 + len(CARDS)
 
 
-def test_pitfall_column_shows_a_count_not_the_pitfall_text():
-    pitfalls = "19. 题目一\n  - 坑一\n24. 题目二\n  - 坑二\n61. 题目三\n  - 坑三"
-    bodies = {(CARDS[0].name, "典型坑"): pitfalls}
-    output = render_elements(CARDS, {}, bodies)
+def test_pitfall_column_shows_a_count_derived_from_state_not_a_frozen_body():
+    state = {
+        "a": {"要素卡": CARDS[0].name, "我的复盘": {"高亮": ["坑一"]}},
+        "b": {"要素卡": CARDS[0].name, "我的复盘": {"高亮": ["坑二"]}},
+        "c": {"要素卡": CARDS[0].name, "我的复盘": {"高亮": ["坑三"]}},
+        "d": {"要素卡": "别的技巧", "我的复盘": {"高亮": ["不该被计入"]}},
+    }
+    output = render_elements(CARDS, {}, state)
     assert "坑一" not in output
-    assert "坑二" not in output
     assert "3 条" in output
 
 
@@ -105,14 +120,21 @@ def test_pitfall_column_shows_a_dash_when_there_are_no_pitfalls():
         assert cells[-2] == "—"
 
 
-def test_original_body_string_原文未涉及_counts_as_no_pitfalls():
-    # 典型坑 is the only FIELDS entry render_elements still reads from
-    # bodies; the placeholder string used elsewhere in element_bodies.BODIES
-    # must not be miscounted as a pitfall entry.
-    bodies = {(CARDS[0].name, "典型坑"): "原文未涉及"}
-    output = render_elements(CARDS, {}, bodies)
+def test_pitfall_count_ignores_records_with_no_actual_highlights():
+    state = {"a": {"要素卡": CARDS[0].name, "我的复盘": {"高亮": []}}}
+    output = render_elements(CARDS, {}, state)
     row = next(line for line in output.splitlines() if line.startswith(f"| {CARDS[0].name}"))
     assert "—" in row
+
+
+def test_pitfall_count_reflects_a_freshly_added_retrospective_highlight():
+    """The count must never desynchronise from state: adding a highlight
+    changes the count on the very next render, with nothing to keep in sync
+    by hand."""
+    state = {"a": {"要素卡": CARDS[0].name, "我的复盘": {"高亮": ["新增的坑"]}}}
+    output = render_elements(CARDS, {}, state)
+    row = next(line for line in output.splitlines() if line.startswith(f"| {CARDS[0].name}"))
+    assert "1 条" in row
 
 
 def test_render_keeps_exactly_one_chapter_linkage_section_below_the_table():
@@ -144,3 +166,14 @@ def test_link_state_to_cards_fills_in_matched_records_and_leaves_others_null():
     assert state["matched"]["要素卡"] == "滑动窗口"
     assert state["unmatched"]["要素卡"] is None
     assert state["no_chapter"]["要素卡"] is None
+
+
+def test_link_state_to_cards_records_provenance_of_the_judgment():
+    entries = [ProblemEntry("1", "滑动窗口与双指针", 1, "a", "a", None, "一、定长滑动窗口", "§1.1", 0)]
+    state = {
+        "matched": {"题单": "1. 滑动窗口与双指针", "章": "一、定长滑动窗口", "要素卡": None},
+        "unmatched": {"题单": "1. 滑动窗口与双指针", "章": "没有这个章", "要素卡": None},
+    }
+    link_state_to_cards(state, entries)
+    assert state["matched"]["要素卡来源"] == "关键词匹配"
+    assert state["unmatched"]["要素卡来源"] is None
