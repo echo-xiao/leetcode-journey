@@ -23,23 +23,38 @@ PROBLEMS = REPO / "Problems"
 SPAN_OPEN_RE = re.compile(r'<span color=\\?"[a-z_]+\\?">')
 SPAN_CLOSE_RE = re.compile(r"</span>")
 ESCAPE_RE = re.compile(r"\\([|\[\]<>*_`])")
+# "a == b" written as prose about code. Requires an operand on both sides so a
+# highlight marker (which has none) is never caught.
+COMPARISON_RE = re.compile(r"[\w\]\)][\w\[\]\.\(\)]*\s*==\s*[\w\[\(\-][\w\[\]\.\(\)\-]*")
 
 
 def to_markdown(body: str) -> str:
     """Notion export markup -> GitHub markdown, keeping the highlights visible.
 
-    Bold is how the orange marking survives: GitHub strips the colour span
-    outright, which would erase echo's own record of what tripped her up.
+    ``==text==`` renders as a shaded block on GitHub, which is the closest
+    thing Markdown has to Notion's orange — inline colour styles are stripped
+    for safety and would leave the marking invisible. Bold is emitted as well
+    so the emphasis still shows in editors that do not support ``==``.
     """
-    text = SPAN_OPEN_RE.sub("**", body)
-    text = SPAN_CLOSE_RE.sub("**", text)
+    # An "==" the author typed is a comparison operator (nums[mid] == x), not
+    # a highlight. Wrap those first, before "==" gains a second meaning, or
+    # they pair up with the real markers and shade whole paragraphs by
+    # accident.
+    text = COMPARISON_RE.sub(lambda m: f"`{m.group(0).strip()}`", body)
+    text = SPAN_OPEN_RE.sub("==**", text)
+    text = SPAN_CLOSE_RE.sub("**==", text)
     text = ESCAPE_RE.sub(r"\1", text)
-    text = re.sub(r"\*\*\s*\*\*", "", text)          # empty bold from adjacent spans
+    text = re.sub(r"==\*\*\s*\*\*==", "", text)      # empty mark from adjacent spans
     text = re.sub(r"\n{3,}", "\n\n", text)
     text = text.strip()
-    # A span opened in the source and never closed leaves an odd marker, which
-    # renders as a literal ** and swallows the rest of the paragraph. Drop the
-    # stray one rather than guessing where the emphasis was meant to end.
+    # A span opened in the source and never closed leaves odd markers, which
+    # render literally and swallow the rest of the paragraph. Count only the
+    # highlight markers themselves — a backticked "==" is a comparison the
+    # author wrote and must not drag the balance off.
+    while text.count("==**") > text.count("**=="):
+        text = text.replace("==**", "**", 1)
+    while text.count("**==") > text.count("==**"):
+        text = text.replace("**==", "**", 1)
     if text.count("**") % 2:
         text = text[::-1].replace("**", "", 1)[::-1]
     return text

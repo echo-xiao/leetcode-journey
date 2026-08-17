@@ -1,6 +1,6 @@
 # 567. 字符串的排列 · 复盘
 
-把判断逻辑 if s1Count == s2Count 卸载了 while right - left > len(s1) 的循环里面。其他的什么都没有问题。
+把判断逻辑 if `s1Count == s2Count` 卸载了 while right - left > len(s1) 的循环里面。其他的什么都没有问题。
 
 ---
 

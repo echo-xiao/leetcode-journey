@@ -4,4 +4,4 @@
 
 ---
 
-还是派生变量的问题，如果写了派生变量winlen（窗口长度）和 mostfreq（最频繁出现的值） 在 while 之前算了一次，之后不管 left 和 counter 怎么变，while 条件里用的永远是那个初始值，不会自动更新。**每个for loop里面winlen和mostfreq都会计算一次，但是，这个值就会是while loop里面的初始值。**
+还是派生变量的问题，如果写了派生变量winlen（窗口长度）和 mostfreq（最频繁出现的值） 在 while 之前算了一次，之后不管 left 和 counter 怎么变，while 条件里用的永远是那个初始值，不会自动更新。==**每个for loop里面winlen和mostfreq都会计算一次，但是，这个值就会是while loop里面的初始值。**==

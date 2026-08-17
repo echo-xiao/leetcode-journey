@@ -3,7 +3,6 @@ import requests
 import json
 import time
 import anthropic
-from tqdm import tqdm
 from dotenv import load_dotenv
 
 # 1. 初始化
@@ -34,15 +33,21 @@ session.headers.update({
     'Content-Type': 'application/json'
 })
 
-print(f"--- 环境检查 ---")
-print(f"Debug - Session: {LC_SESSION[:15] if LC_SESSION else 'None'}...")
-print(f"Debug - CSRF: {LC_CSRF[:15] if LC_CSRF else 'None'}...")
-print(f"Debug - Claude Key: {'已找到' if CLAUDE_KEY else '未找到'}")
-print(f"----------------\n")
+
+def describe_environment() -> str:
+    """What the module found in .env, for callers that want to log it.
+
+    Printing this at import time made the module unusable as a library: every
+    command that touched it dumped four lines of diagnostics first.
+    """
+    return (
+        f"Session: {'有' if LC_SESSION else '无'} | "
+        f"CSRF: {'有' if LC_CSRF else '无'} | "
+        f"Claude Key: {'有' if CLAUDE_KEY else '无'}"
+    )
+
 
 # ================= 配置区 =================
-TEST_MODE = False  # True: 只处理前 TEST_LIMIT 题，用于调试
-TEST_LIMIT = 10
 BASE_URL_EN = "https://leetcode.com"
 BASE_URL_CN = "https://leetcode.cn"
 
@@ -304,96 +309,3 @@ def classify_question(tags, title):
             return main_cat, sub_cat
 
     return "13. 其他", "未分类"
-
-
-def main():
-    print("🚀 开始运行 LeetCode 同步程序...")
-    all_questions = get_all_ac_questions(session)
-
-    if not all_questions:
-        print("❌ 未获取到题目，请检查配置。")
-        return
-
-    if TEST_MODE:
-        print(f"🧪 测试模式开启：仅处理前 {TEST_LIMIT} 题")
-        all_questions = all_questions[:TEST_LIMIT]
-
-    if not os.path.exists("Problems"):
-        os.makedirs("Problems")
-
-    # 用于生成 summary.json 的汇总列表
-    summary_data = []
-
-    for q_basic in tqdm(all_questions, desc="📦 深度同步中"):
-        slug = q_basic['titleSlug']
-        try:
-            q_id, difficulty, tags, prob_cn = get_problem_details(slug)
-            cn_title = (prob_cn['translatedTitle'] if prob_cn else slug) or slug
-            folder = f"Problems/{q_id}_{slug}"
-
-            # 1. 自动分类
-            main_cat, sub_cat = classify_question(tags, cn_title)
-
-            # 2. 收集 JSON 数据 (包含 6 个核心字段)
-            summary_data.append({
-                "id": q_id,
-                "title_cn": cn_title,
-                "title_en": slug,
-                "difficulty": difficulty,
-                "category_main": main_cat,
-                "category_sub": sub_cat,
-                "tags": tags
-            })
-
-            # 断点续传
-            if os.path.exists(f"{folder}/README_CN.md") and not TEST_MODE:
-                continue
-
-            os.makedirs(folder, exist_ok=True)
-            ac_subs = get_all_ac_submissions(slug)
-            if not ac_subs: continue
-
-            all_codes = {}
-            for i, sub in enumerate(ac_subs):
-                code = get_submission_code(sub['id'])
-                if not code: continue
-                lang = sub['lang']
-                ext = {"python": "py", "python3": "py", "java": "java", "cpp": "cpp", "javascript": "js"}.get(lang,
-                                                                                                              "txt")
-
-                with open(f"{folder}/solution_{i + 1}.{ext}", 'w', encoding='utf-8') as f:
-                    f.write(code)
-                all_codes[f"{sub['id']}_{lang}"] = code
-
-            # AI 综合分析
-            analysis = ai_analyze_all_versions(cn_title, all_codes)
-
-            # 3. 写入 Markdown，同时标注分类
-            existing_desc = read_existing_description(folder)
-            new_desc = prob_cn.get('translatedContent') if prob_cn and prob_cn.get('translatedContent') else None
-            description = new_desc or existing_desc or '暂无描述'
-
-            write_problem_files(folder, q_id, cn_title, difficulty, tags,
-                                main_cat, sub_cat, description, analysis)
-
-            time.sleep(0.5)
-
-        except Exception as e:
-            print(f"\n❌ 处理 {slug} 出错: {e}")
-            continue
-
-    # 4. 持久化 summary.json
-    with open("summary.json", "w", encoding="utf-8") as f:
-        json.dump(summary_data, f, ensure_ascii=False, indent=4)
-
-    print(f"\n✅ 同步完成！summary.json 已更新，共计 {len(summary_data)} 题。")
-
-
-
-
-
-if __name__ == "__main__":
-    main()
-
-
-

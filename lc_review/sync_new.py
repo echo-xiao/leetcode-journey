@@ -12,7 +12,6 @@ successful no-op forever. ``require_session`` turns that into a loud failure.
 from __future__ import annotations
 
 import os
-import sys
 from pathlib import Path
 
 REPO = Path(__file__).resolve().parent.parent
@@ -26,8 +25,7 @@ def require_session() -> tuple[str, int]:
     empty username and zero solved, which is indistinguishable from "nothing
     new" unless it is checked for explicitly.
     """
-    sys.path.insert(0, str(REPO))
-    import fetch_all_pro as fetcher
+    from . import leetcode_api as fetcher
 
     data = fetcher.session.get(f"{fetcher.BASE_URL_EN}/api/problems/all/", timeout=25).json()
     user = data.get("user_name") or ""
@@ -53,8 +51,7 @@ def local_slugs() -> set[str]:
 
 def missing_questions() -> list[dict]:
     """Solved on LeetCode but absent from Problems/."""
-    sys.path.insert(0, str(REPO))
-    import fetch_all_pro as fetcher
+    from . import leetcode_api as fetcher
 
     have = local_slugs()
     return [q for q in fetcher.get_all_ac_questions(fetcher.session) if q["titleSlug"] not in have]
@@ -110,8 +107,7 @@ def run(dry_run: bool = True, limit: int | None = None) -> list[dict]:
     user, solved = require_session()
     print(f"👤 {user} | 力扣已通过 {solved} 道 | 本地 {len(local_slugs())} 道")
 
-    sys.path.insert(0, str(REPO))
-    import fetch_all_pro as fetcher
+    from . import leetcode_api as fetcher
 
     pending = missing_questions()
     if limit:
