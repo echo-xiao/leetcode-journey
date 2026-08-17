@@ -1,17 +1,26 @@
-from lc_review.element_essentials import ESSENTIALS, EXPLICIT_FRAMEWORK
-from lc_review.elements import CARDS
+from lc_review.element_essentials import ESSENTIALS, EXPLICIT_FRAMEWORK, FAMILIES, SLOTS
 
-CARD_NAMES = {card.name for card in CARDS}
-
-
-def test_every_essentials_key_is_a_real_card_name():
-    for name in ESSENTIALS:
-        assert name in CARD_NAMES, f"{name!r} is not a card in CARDS"
+# CARDS lived in lc_review.elements, which existed only to render the docs/
+# sheet that Notion replaced. ESSENTIALS is the definition now, so the three
+# tables are checked against each other instead.
 
 
-def test_every_card_has_an_essentials_entry():
-    for card in CARDS:
-        assert card.name in ESSENTIALS, f"{card.name} has no ESSENTIALS entry"
+def test_slots_and_families_cover_the_same_techniques():
+    assert set(SLOTS) == set(ESSENTIALS)
+    assert set(FAMILIES) == set(ESSENTIALS)
+
+
+def test_each_slot_labels_exactly_one_question():
+    for name, questions in ESSENTIALS.items():
+        assert len(SLOTS[name]) == len(questions), (
+            f"{name}: {len(SLOTS[name])} slots for {len(questions)} questions"
+        )
+
+
+def test_every_family_is_one_of_the_three():
+    allowed = {"递归系", "循环系", "洞察系", "递归系 / 循环系"}
+    for name, family in FAMILIES.items():
+        assert family in allowed, f"{name}: unexpected family {family!r}"
 
 
 def test_no_entry_is_long_enough_to_stop_being_a_checklist():
@@ -29,9 +38,9 @@ def test_every_item_is_a_short_question():
             assert len(item) <= 60, f"{name}: {item!r} is too long for a table cell"
 
 
-def test_explicit_framework_cards_are_real_card_names():
+def test_explicit_framework_cards_are_real_technique_names():
     for name in EXPLICIT_FRAMEWORK:
-        assert name in CARD_NAMES
+        assert name in ESSENTIALS
 
 
 def test_every_card_now_has_a_checklist():

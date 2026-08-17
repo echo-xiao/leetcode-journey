@@ -1,0 +1,57 @@
+# 1146. 字符串的最大公因子 · 题目
+
+**难度**: Easy | **标签**: `Math` `String` `Euclidean Algorithm` `Greatest Common Divisor`
+
+**归类**: 9. 数学算法 > Math
+
+## 题目描述
+
+<p>对于字符串&nbsp;<code>s</code> 和&nbsp;<code>t</code>，只有在&nbsp;<code>s = t + t + t + ... + t + t</code>（<code>t</code> 自身连接 1 次或多次）时，我们才认定&nbsp;“<code>t</code> 能除尽 <code>s</code>”。</p>
+
+<p>给定两个字符串&nbsp;<code>str1</code>&nbsp;和&nbsp;<code>str2</code>&nbsp;。返回 <em>最长字符串&nbsp;<code>x</code>，要求满足&nbsp;<code>x</code> 能除尽 <code>str1</code> 且 <code>x</code> 能除尽 <code>str2</code></em> 。</p>
+
+<p>&nbsp;</p>
+
+<p>&nbsp;</p>
+
+<p><strong class="example">示例 1：</strong></p>
+
+<div class="example-block">
+<p><span class="example-io"><b>输入：</b>str1 = "ABCABC", str2 = "ABC"</span></p>
+
+<p><span class="example-io"><b>输出：</b>"ABC"</span></p>
+</div>
+
+<p><strong class="example">示例 2：</strong></p>
+
+<div class="example-block">
+<p><span class="example-io"><b>输入：</b>str1 = "ABABAB", str2 = "ABAB"</span></p>
+
+<p><span class="example-io"><b>输出：</b>"AB"</span></p>
+</div>
+
+<p><strong class="example">示例 3：</strong></p>
+
+<div class="example-block">
+<p><span class="example-io"><b>输入：</b>str1 = "LEET", str2 = "CODE"</span></p>
+
+<p><span class="example-io"><b>输出：</b>""</span></p>
+</div>
+
+<p><strong class="example">示例 4：</strong></p>
+
+<div class="example-block">
+<p><span class="example-io"><b>输入：</b>str1 = "AAAAAB", str2 = "AAA"</span></p>
+
+<p><span class="example-io"><b>输出：</b>""</span></p>
+</div>
+
+<p>&nbsp;</p>
+
+<p><strong>提示：</strong></p>
+
+<ul>
+	<li><code>1 &lt;= str1.length, str2.length &lt;= 1000</code></li>
+	<li><code>str1</code>&nbsp;和&nbsp;<code>str2</code>&nbsp;由大写英文字母组成</li>
+</ul>
+
