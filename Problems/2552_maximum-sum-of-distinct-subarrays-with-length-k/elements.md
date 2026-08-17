@@ -1,3 +1,9 @@
 # 2552. 长度为 K 子数组中的最大和 · 要素
 
-还没生成，运行 tools/build_elements.py 补上。
+1. 定长还是变长：定长窗口，窗口大小固定为k，先建好[0,k-1]的初始窗口，之后每次进一个出一个
+
+2. 进窗口更新：right指针i从k开始每次前进一步，进窗口时把nums[i]累加进sum，并把counter[nums[i]]加1
+
+3. 出窗口时机：因为窗口定长，元素nums[i]进窗口的同时nums[i-k]就要出窗口，出窗口时sum减去nums[i-k]，counter[nums[i-k]]减1，若减到0就把这个key从counter里删掉
+
+4. 记结果时机：每次窗口更新完后，判断counter里不同key的个数是否等于k（即窗口内元素互不相同），是的话才用当前sum去更新maxSum

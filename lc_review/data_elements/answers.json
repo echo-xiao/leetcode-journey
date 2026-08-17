@@ -2085,5 +2085,169 @@
   "node为空直接返回，不做任何处理，也不更新prev",
   "先递归处理左子树，然后比较prev和当前node的值，如果prev大于node说明出现逆序，第一次出现就记录first为prev，每次出现都把second更新为node，最后把prev设为当前node，再递归处理右子树",
   "主体代码写在中序位置（左子树递归之后、右子树递归之前），因为要利用中序遍历下有序性来判断逆序对"
+ ],
+ "11_container-with-most-water": [
+  "用左右指针相向而行，left从0开始，right从数组末尾开始，向中间收缩找最大面积",
+  "本题不涉及，因为本题是双指针相向收缩找最大容积，不是快慢指针原地覆盖数组的场景",
+  "当left < right时继续循环，也就是left和right相遇时停止"
+ ],
+ "1445_number-of-sub-arrays-of-size-k-and-average-greater-than-or-equal-to-threshold": [
+  "定长窗口，窗口大小固定为k",
+  "right从0走到k-1时把arr[right]累加进窗口和，构建初始窗口",
+  "从i=k开始每次right前进一格就同时移出最旧元素arr[i-k]，即窗口和=窗口和+arr[i]-arr[i-k]，左右指针同步滑动",
+  "每次窗口和确定后（包括初始窗口和之后每次滑动后）立即判断窗口和是否>=threshold*k，满足就把计数器加1"
+ ],
+ "1321_get-equal-substrings-within-budget": [
+  "变长窗口，窗口大小随代价约束动态变化，不是固定长度",
+  "right每次向右移动一步扩大窗口，把|s[right]-t[right]|加到总代价ttl里",
+  "当ttl超过maxCost时就要移动left收缩窗口，移出s[left]和t[left]的差值，从ttl中减去，直到ttl不超过maxCost为止",
+  "每次right移动、窗口调整合法后，用right-left+1更新最大长度maxlen"
+ ],
+ "1528_kids-with-the-greatest-number-of-candies": [
+  "本质是比较运算：只要某孩子当前糖果数加上额外糖果不小于数组最大值，就说明他能拥有最多糖果，用的是最大值的定义性质而非公式推导",
+  "本题不涉及枚举优化，只需遍历一遍candies数组求最大值，再遍历一遍做比较判断，没有可以缩小的范围",
+  "糖果数量和extraCandies都是很小的正整数（题目范围通常在1到100以内），不会溢出，也不需要取模"
+ ],
+ "1138_grumpy-bookstore-owner": [
+  "定长窗口，窗口大小固定为 minutes",
+  "right从0滑到n-1，每次right位置若grumpy为1，就把customers[right]加到flex里",
+  "当窗口大小超过minutes（即i>=minutes）时，同时移除left=i-minutes位置，如果该位置grumpy为1就从flex里减去customers[i-minutes]，left随之右移",
+  "每次窗口滑动更新完flex后都要立即计算fixed+flex并更新maxres，取最大值"
+ ],
+ "1028_interval-list-intersections": [
+  "用的是两个独立的同向指针 left 和 right，分别在两个列表里各自前进，不是同一数组内的相向或快慢指针",
+  "本题不涉及，因为不是原地覆盖写入类问题，没有慢指针表示已处理区间的写入位置",
+  "当 left 达到 firstList 长度或 right 达到 secondList 长度（任一列表遍历完）时循环停止"
+ ],
+ "151_reverse-words-in-a-string": [
+  "本题实际用的是列表（lst）模拟单词收集容器，靠反转列表顺序实现单词逆序，并非典型栈或队列的先进后出/先进先出逻辑",
+  "存的是扫描过程中收集到的一个个完整单词（字符串），不是下标也不是配对信息",
+  "遇到非空格字符时把字符累加到临时变量tmp里，遇到空格且tmp非空时把tmp作为一个单词存入lst并清空tmp，这就是'进'的时机；本题没有'出'的操作，只在最后统一反转lst并拼接",
+  "循环结束后lst里保存的是原字符串中按顺序切分出的所有单词，最后把这个列表整体反转再拼接就是答案，不存在中间剩余未处理的元素"
+ ],
+ "1146_greatest-common-divisor-of-strings": [
+  "两个字符串有公共因子串的充要条件是str1+str2==str2+str1，此时最大公因子串长度等于len(str1)和len(str2)的最大公约数gcd(l1,l2)",
+  "本题不涉及枚举范围缩减，因为求gcd用的是辗转相除法而不是枚举，验证候选串也只需固定次数的重复比较，没有可以缩到sqrt(n)或只看质因数的枚举过程",
+  "字符串长度和内容都是普通int范围内的值，不涉及大数运算，也不需要取模，唯一要注意的是重复构造字符串时长度不能算错导致越界"
+ ],
+ "1538_maximum-points-you-can-obtain-from-cards": [
+  "定长窗口，窗口大小固定为 length = n - k，即需要排除的中间牌数",
+  "i 从 length 遍历到 n-1，每次把 cardPoints[i] 加入窗口并累加到 windowSum 里",
+  "窗口大小固定，每进一个新元素就要同时移出最左边的元素 cardPoints[i-length]，把它从 windowSum 中减掉，实现窗口整体右移",
+  "每次更新完 windowSum 后立刻比较并更新 minWindowSum，遍历结束后用 total - minWindowSum 得到最终答案"
+ ],
+ "1567_maximum-number-of-vowels-in-a-substring-of-given-length": [
+  "定长窗口，窗口大小固定为k，不需要根据条件伸缩",
+  "窗口每次向右滑动一位时新进入的字符是右端字符，如果它是元音字母就把计数cnt加1",
+  "每次滑动窗口时同步移出左端字符（即滑动前窗口最左边那个字符），如果它是元音字母就把cnt减1，出窗口和进窗口是同一步完成的",
+  "每次滑动窗口更新完cnt后立刻用maxCnt和cnt比较取较大值，遍历结束后maxCnt就是答案"
+ ],
+ "15_3sum": [
+  "用左右指针相向而行，在固定nums[i]后，left从i+1出发、right从数组末尾出发向中间夹逼查找两数之和",
+  "本题不涉及，本题是相向双指针求和问题，没有快慢指针写入数组的场景",
+  "right和left在同一个while循环里移动，停止条件是left小于right不成立即左右指针相遇或交叉时结束该轮内层循环"
+ ],
+ "1813_maximum-erasure-value": [
+  "变长窗口，因为要找的是最长的无重复元素连续子数组，窗口大小随元素是否重复动态变化",
+  "right从0遍历到末尾，每次把nums[right]计数加1、窗口和加上nums[right]",
+  "当nums[right]的计数大于1（说明窗口内出现重复）时，就不断移动left，把nums[left]计数减1（减到0就从哈希表删掉）、窗口和减去nums[left]，直到不再重复",
+  "每次right移动完成、窗口收缩到不含重复元素后，用当前窗口和更新历史最大得分"
+ ],
+ "16_3sum-closest": [
+  "用左右指针相向而行：固定nums[i]后，left从i+1出发、right从n-1出发，向中间夹逼寻找和最接近target的组合",
+  "本题不涉及，因为这是左右指针夹逼问题，不是快慢指针同向遍历，没有慢指针写入位置的概念",
+  "right/left指针相遇即停（while left < right），左右指针相遇时该i对应的内层搜索结束，外层i继续遍历下一个数"
+ ],
+ "18_4sum": [
+  "用左右指针相向而行，left从j+1开始，right从n-1开始，向中间收缩找和为target的组合",
+  "本题不涉及，因为本题是相向双指针找组合，不是同向快慢指针做原地写入",
+  "内层while循环条件是left<right，两指针相遇（left>=right）就停止，外层i、j则遍历到n-1为止"
+ ],
+ "1894_merge-strings-alternately": [
+  "这里其实是双指针同向同步移动，用同一个索引i分别去访问word1和word2的第i位，不是相向也不是传统快慢指针",
+  "本题不涉及slow指针，因为不是原地覆盖数组的场景，而是把字符依次append到新结果列表里",
+  "循环变量i从0走到max(n1,n2)-1，即以两个字符串中较长的那个长度为界，跑完就停，中途通过i<n1和i<n2判断各自是否越界"
+ ],
+ "1901_equal-sum-arrays-with-minimum-number-of-operations": [
+  "把两数组元素能带来的最大差值改变量（大数组元素变1能减少x-1，小数组元素变6能增加6-y）汇总排序，每次挑改变量最大的元素去操作",
+  "局部最优就是每一步都选当前gains列表里数值最大的那个改变量，不用管后面还剩多少差值",
+  "因为每次操作独立且互不影响，要用最少次数补齐固定的diff，肯定优先用单次贡献最大的操作，这样用的操作次数一定最少（类似用最大面值凑钱，次数最少）"
+ ],
+ "1966_frequency-of-the-most-frequent-element": [
+  "变长窗口，窗口大小随着能否用不超过k次操作把窗口内数补齐到最大值而动态变化",
+  "right每次向右移动一位就把nums[right]加入窗口，更新窗口和ttl，并按cost = nums[right]*(right-left+1) - ttl算出把窗口补齐到nums[right]所需操作数",
+  "当cost > k时移动left收缩窗口，移出nums[left]时要把ttl减去nums[left]、left加1，并重新计算cost直到cost <= k",
+  "每次right移动、窗口调整满足cost <= k后，用当前窗口长度right-left+1去更新最大频数maxlen"
+ ],
+ "238_product-of-array-except-self": [
+  "这题是前缀和的变体，用左侧累乘积和右侧累乘积代替前缀和/后缀和，不需要频繁查询区间，只是各扫一遍算累积结果",
+  "本题不用数组存前缀积而是用变量left/right从1开始累乘，left初始为1相当于preSum[0]=1（乘法单位元），天然省掉了第一个位置左边没有元素的特判",
+  "本题不涉及差分，因为这里不需要对区间做增减操作，只是单纯求每个位置左右两侧的累乘积"
+ ],
+ "2211_k-radius-subarray-averages": [
+  "定长窗口，窗口大小固定为2k+1个元素",
+  "i每往右移一步就把nums[i+k]加入windowSum，也就是窗口右端点跟着i+k同步右移",
+  "i每往右移一步（i>k时）就把nums[i-k-1]从windowSum中减掉，即左端点跟着i-k-1同步右移，保持窗口长度恒为2k+1",
+  "每次窗口和windowSum更新完（对每个满足k<=i<=n-k-1的i）就立刻算res[i]=windowSum//(2k+1)，不需要等窗口结束"
+ ],
+ "2134_maximize-the-confusion-of-an-exam": [
+  "变长窗口，窗口大小随着能容忍的翻转次数k动态变化，不是固定长度",
+  "right从0到n-1逐个右移扩大窗口，每次把answerKey[right]加入窗口，如果它等于目标字符c就把cnt加1",
+  "当窗口内目标字符数cnt超过k时（说明非目标字符数太多，超过k次可翻转次数），就移动left缩小窗口，移出answerKey[left]时如果它等于c就把cnt减1，然后left加1",
+  "每次right右移完成、窗口收缩到合法状态后，用当前窗口长度right-left+1去更新maxlen"
+ ],
+ "2552_maximum-sum-of-distinct-subarrays-with-length-k": [
+  "定长窗口，窗口大小固定为k，先建好[0,k-1]的初始窗口，之后每次进一个出一个",
+  "right指针i从k开始每次前进一步，进窗口时把nums[i]累加进sum，并把counter[nums[i]]加1",
+  "因为窗口定长，元素nums[i]进窗口的同时nums[i-k]就要出窗口，出窗口时sum减去nums[i-k]，counter[nums[i-k]]减1，若减到0就把这个key从counter里删掉",
+  "每次窗口更新完后，判断counter里不同key的个数是否等于k（即窗口内元素互不相同），是的话才用当前sum去更新maxSum"
+ ],
+ "2572_append-characters-to-string-to-make-subsequence": [
+  "这里是同向双指针：i遍历s（相当于快指针），指针i2（本题里用i表示）指向t中下一个待匹配字符，同向推进不回退",
+  "本题不涉及原地覆盖写入，指针i的含义是t中下一个待匹配字符的下标，不是写入位置",
+  "遍历s的指针（fast）在越过s末尾时停止，同时t的指针一旦匹配完（i等于t长度）就不再继续增加"
+ ],
+ "2786_find-the-longest-semi-repetitive-substring": [
+  "变长窗口，因为半重复子串的最大长度不固定，要靠重复对数量的约束动态伸缩",
+  "right每次向右移动一位纳入新字符，若s[right]==s[right-1]则cnt加1（新增一对相邻相同字符）",
+  "当cnt>1（窗口内重复对超过1个）时收缩left，若s[left]==s[left+1]说明左边界处的重复对被移除，cnt减1，然后left右移一位",
+  "每次right移动完成、窗口调整合法（cnt≤1）后，用right-left+1更新maxlen"
+ ],
+ "2712_find-the-maximum-number-of-marked-indices": [
+  "排序后，让左半部分最小的数尽量去匹配右半部分中刚好够用（不超过它两倍）的那个最小值，用双指针从左到右扫描配对",
+  "当前左指针指向的数 nums[left] 乘以2如果小于等于右指针指向的数 nums[right]，就立即配对标记两个下标，否则说明右边这个数太小不够用，右指针右移换更大的数再试",
+  "因为数组已排序，若某个较大值能满足与当前最小值配对（2*nums[left]<=nums[right]），那它一定也能满足后面更大的左值，所以把最小的可行右值留给当前最小的左值不会浪费资源，反而给后续的左值留出更多更大的右值可选，这样贪心配对能使总配对数最多"
+ ],
+ "345_reverse-vowels-of-a-string": [
+  "用左右指针相向而行，i从头j从尾向中间靠拢寻找元音进行交换",
+  "本题不涉及，因为这里用的是左右指针相向夹逼，不是快慢指针同向遍历，没有slow这个角色",
+  "当i>=j时停止，即左右指针相遇或交错"
+ ],
+ "985_bag-of-tokens": [
+  "用左右指针相向而行：left指向排序后最小令牌，right指向最大令牌",
+  "本题不涉及，因为本题是相向双指针而非快慢指针，没有写入位置的概念",
+  "当left>right（两指针相遇交叉）或者能量不足且score为0无法继续操作时停止"
+ ],
+ "611_valid-triangle-number": [
+  "这里是左右指针相向而行：固定最大边nums[i]，left从0、right从i-1向中间移动来统计组合",
+  "本题不涉及，因为用的是相向双指针而不是快慢指针，没有慢指针写入位置的概念",
+  "内层while循环在left<right时进行，当left与right相遇（left>=right）时停止，然后外层i继续向前固定下一个最大边"
+ ],
+ "2954_maximum-sum-of-almost-unique-subarray": [
+  "定长窗口，窗口大小固定为k，每次滑动整体右移一格",
+  "right每次向右移一格纳入nums[right]，把它加到windowSum里，并在counter里给它计数+1",
+  "窗口大小固定为k，所以每次right进窗口后立刻让left也同步右移移出nums[left-k]（即最左端旧元素），把它从windowSum减掉，并在counter里给它计数-1，若计数归零就把这个key从counter里删掉",
+  "每次窗口滑动完（更新完windowSum和counter后），只要counter的键数量（不同元素个数）>=m，就用windowSum更新maxSum"
+ ],
+ "524_longest-word-in-dictionary-through-deleting": [
+  "这里是同向快慢指针，i指针走s、j指针走word，两个指针都只往前走不回头，用来判断word是否是s的子序列",
+  "本题不涉及slow指向待写入位置这个含义，因为这里不是原地覆盖数组，而是j指向word中下一个待匹配的字符位置",
+  "当i走到s末尾（i==len(s)）或者j已经走完整个word（j==len(word)，说明匹配成功）时停止，取先满足的那个"
+ ],
+ "2891_maximum-beauty-of-an-array-after-applying-operation": [
+  "变长窗口：先把数组排序，right不断右移扩展窗口，只有当窗口内nums[right]-nums[left]>2k时才收缩left，窗口大小不固定。",
+  "right每次遍历时自动加入nums[right]，不需要额外更新其他数据，因为排序后只需比较当前右端点和左端点的值。",
+  "当nums[right]-nums[left]>2k时，说明窗口内最大值和最小值差太大，就把left右移，直到差值不超过2k为止，移出元素时也不需要额外维护数据，只是让left指针前移。",
+  "每次right移动确定窗口合法后（即nums[right]-nums[left]<=2k），就用right-left+1更新一次最大长度maxlen。"
  ]
 }

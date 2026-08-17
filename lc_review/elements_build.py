@@ -18,7 +18,7 @@ import concurrent.futures as cf
 
 import anthropic
 
-from .elements_render import SPEC, PROBLEMS, SCRATCH, load_map
+from .elements_render import REPO, SPEC, PROBLEMS, SCRATCH, load_map
 
 MODEL = "claude-sonnet-5"
 ANSWERS_PATH = os.path.join(SCRATCH, "answers.json")
@@ -189,8 +189,11 @@ def main():
     todo = [f for f in sorted(ymap) if force or f not in answers]
     if limit:
         todo = todo[:limit]
-    print("待处理 {} 道（已有 {} 道）".format(len(todo), len(answers)))
-    if not todo:
+    print("待处理 {} 道（已有 {} 道，待判题型 {} 道）".format(len(todo), len(answers), len(need_class)))
+    # Newly downloaded problems are not in ymap yet, so todo is empty until
+    # they have been classified. Returning on `not todo` alone would skip the
+    # classification step that is the only thing able to populate it.
+    if not todo and not need_class:
         return
 
     load_key()
