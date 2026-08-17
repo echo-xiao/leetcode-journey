@@ -172,6 +172,44 @@ def export_anki_command() -> None:
     print(f"wrote three decks to {out}")
 
 
+def render_daily_brief(state: dict[str, dict], new_slugs: list[str], today: str) -> str:
+    """Summarise what changed, and what still needs echo's hand."""
+    missing_retro = [r for r in state.values() if not r["我的复盘"]]
+    no_cards = [r for r in state.values() if not r["已生成卡片"]]
+    lines = [
+        f"# {today} 刷题简报",
+        "",
+        f"新增 {len(new_slugs)} 题",
+        f"待生成卡片 {len(no_cards)} 题",
+        "",
+        f"## 缺复盘（{len(missing_retro)} 题）",
+        "",
+    ]
+    lines += [f"- {r['id']}. {r['题名']}" for r in sorted(missing_retro, key=lambda r: r["id"])]
+    lines.append("")
+    return "\n".join(lines)
+
+
+def daily_command(date: str) -> None:
+    previous = load_state(STATE_PATH) if STATE_PATH.exists() else {}
+    build_state_command(refresh=False)
+    state = load_state(STATE_PATH)
+    for slug, record in state.items():
+        if slug in previous:
+            record["我的复盘"] = previous[slug]["我的复盘"]
+            record["要素卡"] = previous[slug]["要素卡"]
+            record["已生成卡片"] = previous[slug]["已生成卡片"]
+    save_state(state, STATE_PATH)
+    attach_fupan_command()
+    build_table_command()
+    export_anki_command()
+    new_slugs = sorted(set(load_state(STATE_PATH)) - set(previous))
+    path = REPO / "docs" / "daily" / f"{date}.md"
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(render_daily_brief(load_state(STATE_PATH), new_slugs, date), encoding="utf-8")
+    print(f"wrote {path}")
+
+
 def main() -> None:
     parser = argparse.ArgumentParser(prog="lc_review")
     subparsers = parser.add_subparsers(dest="command", required=True)
@@ -181,6 +219,8 @@ def main() -> None:
     subparsers.add_parser("build-table", help="regenerate the progress table")
     subparsers.add_parser("build-elements", help="regenerate the eighteen technique cards sheet")
     subparsers.add_parser("export-anki", help="export the three Anki decks as TSV")
+    daily = subparsers.add_parser("daily", help="refresh everything and write today's brief")
+    daily.add_argument("--date", required=True, help="YYYY-MM-DD")
     args = parser.parse_args()
     if args.command == "build-state":
         build_state_command(args.refresh)
@@ -192,6 +232,8 @@ def main() -> None:
         build_elements_command()
     if args.command == "export-anki":
         export_anki_command()
+    if args.command == "daily":
+        daily_command(args.date)
 
 
 if __name__ == "__main__":
