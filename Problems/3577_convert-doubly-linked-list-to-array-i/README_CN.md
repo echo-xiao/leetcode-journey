@@ -2,66 +2,6 @@
 
 **难度**: Easy | **标签**: `Array` `Linked List` `Doubly-Linked List`
 
-## 题目描述
-
-<p>给定一个<strong>双向链表</strong>的<code>head</code>，该链表的节点具有下一个指针和上一个指针。</p>
-
-<p>返回一个整数数组，其中包含链表的元素<strong>按顺序</strong>排列。</p>
-
-<p>&nbsp;</p>
-<p><strong class="example">示例 1:</strong></p>
-
-<div class="example-block">
-<p><strong>输入:</strong> <span class="example-io">head = [1,2,3,4,3,2,1]</span></p>
-
-<p><strong>输出:</strong> <span class="example-io">[1,2,3,4,3,2,1]</span></p>
-</div>
-
-<p><strong class="example">示例 2:</strong></p>
-
-<div class="example-block">
-<p><strong>输入:</strong> <span class="example-io">head = [2,2,2,2,2]</span></p>
-
-<p><strong>输出:</strong> <span class="example-io">[2,2,2,2,2]</span></p>
-</div>
-
-<p><strong class="example">示例 3:</strong></p>
-
-<div class="example-block">
-<p><strong>输入:</strong> <span class="example-io">head = [3,2,3,2,3,2]</span></p>
-
-<p><strong>输出:</strong> <span class="example-io">[3,2,3,2,3,2]</span></p>
-</div>
-
-<p>&nbsp;</p>
-<p><strong>约束条件:</strong></p>
-
-<ul>
-	<li>给定链表中的节点数量在范围<code>[1, 50]</code>内。</li>
-	<li><code>1 &lt;= Node.val &lt;= 50</code></li>
-</ul>
-
----
-## 解题思路与复盘
-
-1. 一句话直击本质：遍历双链表，将每个节点的值依次存入数组。
-
-2. 综合思路：
-   - 迭代法：使用一个指针从链表头开始，逐个访问每个节点，将节点的值添加到数组中，直到链表末尾。
-   - 递归法：虽然在这个问题中没有递归实现，但理论上可以通过递归访问每个节点，将节点值添加到数组中。
-
-3. 全量伪代码：
-   - 迭代法：
-     ```
-     定义函数 toArray(head)
-         初始化空数组 tmp
-         初始化指针 curr 指向 head
-         当 curr 不为空时
-             将 curr 的值添加到 tmp
-             将 curr 移动到下一个节点
-         返回数组 tmp
-     ```
-
-4. 复杂度：
-   - 时间复杂度：$O(n)$，其中 $n$ 是链表中节点的数量，因为需要遍历整个链表。
-   - 空间复杂度：$O(n)$，因为需要存储链表中所有节点的值到数组中。
+- [题目](problem.md)
+- [解题思路与伪代码](pseudocode.md)
+- [要素](elements.md)

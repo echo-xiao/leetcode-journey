@@ -2,64 +2,6 @@
 
 **难度**: Medium | **标签**: `Hash Table` `String` `Sliding Window`
 
-## 题目描述
-
-<p>给定一个字符串 <code>s</code>，返回 <em>包含最多 <strong>两个不同字符</strong> 的最长 </em><span data-keyword="substring-nonempty"><em>子串</em></span><em> 的长度</em>。</p>
-
-<p>&nbsp;</p>
-<p><strong class="example">示例 1:</strong></p>
-
-<pre>
-<strong>输入:</strong> s = &quot;eceba&quot;
-<strong>输出:</strong> 3
-<strong>解释:</strong> 子串是 &quot;ece&quot;，其长度为 3。
-</pre>
-
-<p><strong class="example">示例 2:</strong></p>
-
-<pre>
-<strong>输入:</strong> s = &quot;ccaabbb&quot;
-<strong>输出:</strong> 5
-<strong>解释:</strong> 子串是 &quot;aabbb&quot;，其长度为 5。
-</pre>
-
-<p>&nbsp;</p>
-<p><strong>约束条件:</strong></p>
-
-<ul>
-	<li><code>1 &lt;= s.length &lt;= 10<sup>5</sup></code></li>
-	<li><code>s</code> 由英文字母组成。</li>
-</ul>
-
----
-## 解题思路与复盘
-
-1. 一句话直击本质：使用滑动窗口维护一个最多包含两个不同字符的子串，并在窗口右移过程中更新最长子串长度。
-
-2. 综合思路：
-   - 滑动窗口：通过双指针（left 和 right）维护一个动态窗口，窗口内的字符集合最多包含两个不同字符。当窗口内字符种类超过两个时，移动左指针缩小窗口，直到满足条件。
-   - 数据结构：使用列表 `res` 来存储当前窗口内的字符，并通过集合 `set(res)` 来判断窗口内不同字符的数量。
-
-3. 全量伪代码：
-   ```
-   定义函数 lengthOfLongestSubstringTwoDistinct，输入为字符串 s
-       初始化变量 string 为 s 的副本
-       初始化 left, right, maxLen 为 0
-       初始化空列表 res
-
-       当 right 小于 string 的长度时，执行以下循环：
-           将 string[right] 添加到 res
-           将 right 增加 1
-
-           当 res 中不同字符的数量大于 2 时，执行以下循环：
-               删除 res 中的第一个元素
-               将 left 增加 1
-
-           更新 maxLen 为 max(maxLen, right - left)
-
-       返回 maxLen
-   ```
-
-4. 复杂度：
-   - 时间复杂度：$O(n)$，其中 $n$ 是字符串的长度。每个字符在滑动窗口中最多被访问两次（一次加入窗口，一次移出窗口）。
-   - 空间复杂度：$O(n)$，在最坏情况下，窗口内的字符可能全部不同，需要存储所有字符。
+- [题目](problem.md)
+- [解题思路与伪代码](pseudocode.md)
+- [要素](elements.md)

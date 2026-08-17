@@ -1,0 +1,70 @@
+# 34. 在排序数组中查找元素的第一个和最后一个位置 · 解题思路与伪代码
+
+1. **一句话直击本质：**  
+   使用二分查找分别找到目标值在排序数组中的第一个和最后一个位置。
+
+2. **综合思路：**  
+   - **分开查找左右边界：**  
+     通过两个独立的二分查找函数分别查找目标值的左边界和右边界。每个函数根据查找到的中间值调整左右指针，直到找到边界。
+   - **合并查找左右边界：**  
+     使用一个函数，通过一个标志位来决定查找左边界还是右边界。根据标志位调整指针方向，找到目标值的边界。
+
+3. **全量伪代码：**
+
+   - **查找左边界：**
+     ```
+     函数 leftBound(数组 nums, 整数 target):
+         初始化 left 为 0, right 为 数组长度 - 1
+         当 left 小于等于 right 时:
+             计算 mid 为 left 和 right 的中间位置
+             如果 nums[mid] 等于 target:
+                 将 right 移动到 mid - 1
+             否则如果 nums[mid] 小于 target:
+                 将 left 移动到 mid + 1
+             否则:
+                 将 right 移动到 mid - 1
+         如果 left 超出数组边界或 nums[left] 不等于 target:
+             返回 -1
+         返回 left
+     ```
+
+   - **查找右边界：**
+     ```
+     函数 rightBound(数组 nums, 整数 target):
+         初始化 left 为 0, right 为 数组长度 - 1
+         当 left 小于等于 right 时:
+             计算 mid 为 left 和 right 的中间位置
+             如果 nums[mid] 等于 target:
+                 将 left 移动到 mid + 1
+             否则如果 nums[mid] 小于 target:
+                 将 left 移动到 mid + 1
+             否则:
+                 将 right 移动到 mid - 1
+         如果 right 超出数组边界或 nums[right] 不等于 target:
+             返回 -1
+         返回 right
+     ```
+
+   - **合并查找边界：**
+     ```
+     函数 findBound(数组 nums, 整数 target, 布尔 isFirst):
+         初始化 left 为 0, right 为 数组长度 - 1
+         初始化 candidate 为 -1
+         当 left 小于等于 right 时:
+             计算 mid 为 left 和 right 的中间位置
+             如果 nums[mid] 等于 target:
+                 将 candidate 设为 mid
+                 如果 isFirst 为真:
+                     将 right 移动到 mid - 1
+                 否则:
+                     将 left 移动到 mid + 1
+             否则如果 nums[mid] 小于 target:
+                 将 left 移动到 mid + 1
+             否则:
+                 将 right 移动到 mid - 1
+         返回 candidate
+     ```
+
+4. **复杂度：**  
+   - **时间复杂度：** $O(\log n)$，因为每次查找都是通过二分查找进行的。
+   - **空间复杂度：** $O(1)$，因为只使用了常数级别的额外空间。
