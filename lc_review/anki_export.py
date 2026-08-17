@@ -27,6 +27,10 @@ OUT_DIR = REPO / "anki"
 TSV_HEADER = "#separator:tab\n#html:true\n#deck column:1\n#tags column:4\n"
 
 TAG_RE = re.compile(r"<[^>]+>")
+# Block-level tags carry the statement's line structure. Collapsing them into
+# spaces along with the inline tags turns a worked example into one long
+# run-on, which is exactly what makes a card unreadable.
+BLOCK_END_RE = re.compile(r"</(p|pre|div|li|ul|ol|h[1-6]|blockquote)>|<br\s*/?>", re.I)
 # Only the constraints block is dropped. The worked examples stay: several
 # statements are one clause long because the real definition sits behind a
 # link on the site ("判断它是否是平衡二叉树"), and without the examples the card
@@ -35,9 +39,18 @@ TRIM_RE = re.compile(r"(提示[：:]|进阶[：:]|Constraints[：:])")
 
 
 def _plain(text: str) -> str:
-    text = TAG_RE.sub(" ", text)
+    """HTML -> text, keeping paragraph and line breaks.
+
+    Inline tags vanish outright rather than becoming spaces: "<strong>输入：
+    </strong>nums" should read "输入：nums", not "输入： nums".
+    """
+    text = BLOCK_END_RE.sub("\n", text)
+    text = TAG_RE.sub("", text)
     text = html.unescape(text)
-    return re.sub(r"\s+", " ", text).strip()
+    text = text.replace("\u00a0", " ")
+    text = re.sub(r"[ \t]+", " ", text)
+    text = re.sub(r" *\n *", "\n", text)
+    return re.sub(r"\n{3,}", "\n\n", text).strip()
 
 
 def statement_of(folder: Path, limit: int = 500) -> str:
@@ -52,7 +65,17 @@ def statement_of(folder: Path, limit: int = 500) -> str:
     cut = TRIM_RE.search(body)
     if cut and cut.start() > 30:
         body = body[: cut.start()].strip()
-    return body[:limit]
+    if len(body) <= limit:
+        return body
+    # Cut on a line boundary; slicing mid-sentence looks like a bug.
+    kept: list[str] = []
+    used = 0
+    for line in body.splitlines():
+        if used + len(line) > limit:
+            break
+        kept.append(line)
+        used += len(line) + 1
+    return "\n".join(kept).strip() or body[:limit]
 
 
 def title_of(folder: Path) -> str:
