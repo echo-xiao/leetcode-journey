@@ -311,6 +311,53 @@ def sync_fupan_command(apply: bool) -> None:
     sync(fetch_easy(), fetch_medium(), titles={}, dry_run=not apply)
 
 
+def sync_new_command(apply: bool, limit: int | None) -> None:
+    """Newly solved LeetCode problems -> Problems/ + a row in 「LC 旧题回顾」."""
+    from .sync_new import run
+
+    run(dry_run=not apply, limit=limit)
+
+
+def build_elements_answers_command(apply: bool, limit: int | None) -> None:
+    """Answer each problem's framework slots, then render elements.md.
+
+    Costs one Claude call per problem, so it only fills in what is missing
+    unless --force is passed to the underlying script.
+    """
+    import sys as _sys
+
+    from . import elements_build, elements_render
+
+    argv = _sys.argv
+    _sys.argv = ["build"] + ([f"--limit={limit}"] if limit else [])
+    try:
+        elements_build.main()
+    finally:
+        _sys.argv = argv
+    if apply:
+        elements_render.main()
+
+
+def sync_all_command(apply: bool) -> None:
+    """The day-to-day command: LeetCode -> Problems/ -> Notion, in that order.
+
+    Ordering matters. New problems have to exist locally before their
+    retrospectives can be filed next to them, and their review rows have to
+    exist before the 复盘 column can be written.
+    """
+    steps = (
+        ("拉取新 AC 题并在 Notion 建行", lambda: sync_new_command(apply, None)),
+        ("生成新题的要素答案", lambda: build_elements_answers_command(apply, None)),
+        ("复盘写入 Problems/*/review.md", lambda: sync_review_md_command(apply)),
+        ("复盘写入 Notion 复盘列", lambda: sync_fupan_command(apply)),
+    )
+    for index, (label, step) in enumerate(steps, 1):
+        print(f"\n[{index}/{len(steps)}] {label}")
+        step()
+    if not apply:
+        print("\n以上为试运行。确认无误后加 --apply 实际写入。")
+
+
 def main() -> None:
     parser = argparse.ArgumentParser(prog="lc_review")
     subparsers = parser.add_subparsers(dest="command", required=True)
@@ -332,7 +379,20 @@ def main() -> None:
     )
     fupan.add_argument("--apply", action="store_true", help="actually write to Notion")
 
-    daily = subparsers.add_parser("daily", help="refresh everything and write today's brief")
+    new = subparsers.add_parser("sync-new", help="download newly solved problems and register them")
+    new.add_argument("--apply", action="store_true", help="actually download and write")
+    new.add_argument("--limit", type=int, default=None, help="cap how many problems to process")
+
+    elems = subparsers.add_parser("build-answers", help="answer the framework slots per problem")
+    elems.add_argument("--apply", action="store_true", help="also render elements.md")
+    elems.add_argument("--limit", type=int, default=None, help="cap how many problems to process")
+
+    all_cmd = subparsers.add_parser(
+        "sync-all", help="day-to-day: new problems, elements, review.md, Notion"
+    )
+    all_cmd.add_argument("--apply", action="store_true", help="actually write everything")
+
+    daily = subparsers.add_parser("daily", help="[legacy] regenerate the docs/ artefacts")
     daily.add_argument("--date", required=True, help="YYYY-MM-DD")
     args = parser.parse_args()
     if args.command == "build-state":
@@ -349,6 +409,12 @@ def main() -> None:
         sync_review_md_command(args.apply)
     if args.command == "sync-fupan":
         sync_fupan_command(args.apply)
+    if args.command == "sync-new":
+        sync_new_command(args.apply, args.limit)
+    if args.command == "build-answers":
+        build_elements_answers_command(args.apply, args.limit)
+    if args.command == "sync-all":
+        sync_all_command(args.apply)
     if args.command == "daily":
         daily_command(args.date)
 

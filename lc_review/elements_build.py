@@ -18,7 +18,7 @@ import concurrent.futures as cf
 
 import anthropic
 
-from render_elements import SPEC, PROBLEMS, SCRATCH, load_map
+from .elements_render import SPEC, PROBLEMS, SCRATCH, load_map
 
 MODEL = "claude-sonnet-5"
 ANSWERS_PATH = os.path.join(SCRATCH, "answers.json")
