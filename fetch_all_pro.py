@@ -2,18 +2,21 @@ import os
 import requests
 import json
 import time
-from openai import OpenAI
+import anthropic
 from tqdm import tqdm
 from dotenv import load_dotenv
 
 # 1. 初始化
 load_dotenv()
-client = OpenAI(api_key=os.getenv('CHATGPT_TOKEN'))
+
+# The analysis runs on Claude; the key lives in .env as CLAUDE_TOKEN.
+CLAUDE_MODEL = "claude-sonnet-5"
+claude = anthropic.Anthropic(api_key=os.getenv('CLAUDE_TOKEN'))
 
 # --- 环境检查 ---
 LC_SESSION = os.getenv('LEETCODE_SESSION')
 LC_CSRF = os.getenv('LEETCODE_CSRFTOKEN')
-OPENAI_KEY = os.getenv('CHATGPT_TOKEN')
+CLAUDE_KEY = os.getenv('CLAUDE_TOKEN')
 
 # ================= 核心：身份验证 Session 配置 =================
 # 创建一个全局 Session 对象，它会自动管理 Cookie 和 Header
@@ -34,13 +37,12 @@ session.headers.update({
 print(f"--- 环境检查 ---")
 print(f"Debug - Session: {LC_SESSION[:15] if LC_SESSION else 'None'}...")
 print(f"Debug - CSRF: {LC_CSRF[:15] if LC_CSRF else 'None'}...")
-print(f"Debug - OpenAI Key: {'已找到' if OPENAI_KEY else '未找到'}")
+print(f"Debug - Claude Key: {'已找到' if CLAUDE_KEY else '未找到'}")
 print(f"----------------\n")
 
 # ================= 配置区 =================
-TEST_MODE = False  # ⭐ True: 仅测试 10 题; False: 全量同步 364+ 题
+TEST_MODE = False  # True: 只处理前 TEST_LIMIT 题，用于调试
 TEST_LIMIT = 10
-PATCH_MODE = os.getenv('PATCH_MODE', 'false').lower() == 'true'  # 仅修复描述为 None 的题目
 BASE_URL_EN = "https://leetcode.com"
 BASE_URL_CN = "https://leetcode.cn"
 
@@ -238,7 +240,11 @@ def write_problem_files(folder, q_id, cn_title, difficulty, tags,
 
 
 def ai_analyze_all_versions(title, codes_dict):
-    """GPT-4o 综合分析所有 AC 版本"""
+    """Summarise every AC version of one problem into the pseudocode section.
+
+    Runs on Claude via the repo's CLAUDE_TOKEN. The four numbered parts are
+    what pseudocode.md is built from, so the shape here is load-bearing.
+    """
     code_context = ""
     for i, (key, code) in enumerate(codes_dict.items()):
         code_context += f"--- 版本 {i + 1} (ID: {key}) ---\n{code}\n\n"
@@ -253,51 +259,19 @@ def ai_analyze_all_versions(title, codes_dict):
         f"代码集如下：\n{code_context}"
     )
     try:
-        response = client.chat.completions.create(
-            model="gpt-4o",
-            messages=[{"role": "system", "content": "你是一个严谨的算法专家。"}, {"role": "user", "content": prompt}],
-            temperature=0.2
+        message = claude.messages.create(
+            model=CLAUDE_MODEL,
+            max_tokens=8000,
+            thinking={"type": "adaptive"},
+            output_config={"effort": "medium"},
+            system="你是一个严谨的算法专家。",
+            messages=[{"role": "user", "content": prompt}],
         )
-        return response.choices[0].message.content
+        return "".join(b.text for b in message.content if b.type == "text")
     except Exception as e:
         return f"AI 复盘生成失败: {e}"
 
 
-def classify_question(tags, title):
-    """
-    根据标签和标题，将题目归类到你提供的 12 大类中
-    返回: (大类名称, 小类建议)
-    """
-    tag_set = set(tags)
-
-    # 映射配置 (大类关键字 -> 对应的 LeetCode 标签或关键字)
-    mapping = {
-        "1. 滑动窗口与双指针": ["Sliding Window", "Two Pointers", "双指针", "滑动窗口"],
-        "2. 二分算法": ["Binary Search", "二分查找"],
-        "3. 单调栈": ["Monotonic Stack", "单调栈"],
-        "4. 网格图": ["Matrix", "Grid", "矩阵"],
-        "5. 位运算": ["Bit Manipulation", "位运算"],
-        "6. 图论算法": ["Graph", "Topological Sort", "Shortest Path", "Minimum Spanning Tree", "图", "拓扑排序"],
-        "7. 动态规划": ["Dynamic Programming", "背包问题", "状态压缩", "动态规划"],
-        "8. 常用数据结构": ["Stack", "Queue", "Heap (Priority Queue)", "Trie", "Union Find", "Fenwick Tree",
-                            "Segment Tree", "Prefix Sum", "堆", "并查集", "前缀和"],
-        "9. 数学算法": ["Math", "Number Theory", "Combinatorics", "Geometry", "数学", "数论", "组合数学"],
-        "10. 贪心与思维": ["Greedy", "Brainteaser", "贪心", "脑筋急转弯"],
-        "11. 链表、树与回溯": ["Linked List", "Tree", "Binary Tree", "Backtracking", "Depth-First Search",
-                              "Breadth-First Search", "回溯", "二叉树", "深度优先搜索"],
-        "12. 字符串": ["String", "String Matching", "字符串", "KMP"]
-    }
-
-    # 优先级匹配
-    for main_cat, keywords in mapping.items():
-        if any(k.lower() in [t.lower() for t in tags] for k in keywords):
-            # 简单取第一个匹配的标签作为小类，或根据子类逻辑细化
-            sub_cat = tags[0] if tags else "通用"
-            return main_cat, sub_cat
-
-    return "13. 其他", "未分类"
-
-# ================= 主程序 =================
 def classify_question(tags, title):
     """
     核心分类逻辑：基于 LeetCode 标签将题目映射至 12 大类体系
@@ -417,92 +391,9 @@ def main():
 
 
 
-def patch_none_descriptions():
-    """仅修复 README 中描述为 None 的题目，不重新生成 AI 分析"""
-    print("🔧 补丁模式：仅修复描述为 None 的题目...")
-    fixed, failed = [], []
-
-    for folder in sorted(os.listdir("Problems")):
-        # The statement lives in problem.md; older folders still keep it in README_CN.md.
-        readme_path = next(
-            (p for p in (f"Problems/{folder}/problem.md", f"Problems/{folder}/README_CN.md")
-             if os.path.exists(p)),
-            None,
-        )
-        if not readme_path:
-            continue
-        with open(readme_path, "r", encoding="utf-8") as f:
-            content = f.read()
-        if "题目描述\n\nNone" not in content:
-            continue
-
-        parts = folder.split("_", 1)
-        if len(parts) < 2:
-            continue
-        slug = parts[1]
-        print(f"  修复: {folder} ...", end=" ", flush=True)
-
-        # 先试 leetcode.cn（中文）
-        desc = None
-        try:
-            q_cn = "query q($s: String!) { question(titleSlug: $s) { translatedContent } }"
-            r = requests.post(f"{BASE_URL_CN}/graphql",
-                              json={"query": q_cn, "variables": {"titleSlug": slug}},
-                              timeout=10).json()
-            desc = r.get("data", {}).get("question", {}).get("translatedContent")
-        except:
-            pass
-
-        # 再试 leetcode.com（认证，抓英文描述，再用 GPT 翻译）
-        if not desc:
-            try:
-                q_en = "query q($titleSlug: String!) { question(titleSlug: $titleSlug) { content } }"
-                r = session.post(f"{BASE_URL_EN}/graphql",
-                                 json={"query": q_en, "variables": {"titleSlug": slug}},
-                                 timeout=10)
-                data = r.json()
-                if "errors" in data:
-                    print(f"[API error: {data['errors'][0].get('message','')}]", end=" ", flush=True)
-                q = data.get("data", {}).get("question", {})
-                en_content = q.get("content") if q else None
-                if en_content:
-                    try:
-                        resp = client.chat.completions.create(
-                            model="gpt-4o-mini",
-                            messages=[
-                                {"role": "system", "content": "将以下 LeetCode 题目描述（HTML格式）翻译成中文，保留HTML标签，只输出翻译结果。"},
-                                {"role": "user", "content": en_content}
-                            ],
-                            temperature=0.2
-                        )
-                        desc = resp.choices[0].message.content
-                    except:
-                        desc = en_content  # GPT 失败就用英文
-            except Exception as e:
-                print(f"[ex: {e}]", end=" ", flush=True)
-
-        if desc:
-            import re as _re
-            updated = _re.sub(r'(## 题目描述\n\n)None(\n\n---|\n*\Z)', r'\g<1>' + desc + r'\2', content)
-            with open(readme_path, "w", encoding="utf-8") as f:
-                f.write(updated)
-            print("✓")
-            fixed.append(folder)
-        else:
-            print("✗")
-            failed.append(folder)
-        time.sleep(0.3)
-
-    print(f"\n✅ 补丁完成：修复 {len(fixed)} 道，失败 {len(failed)} 道")
-    if failed:
-        print("失败题目：", failed)
-
 
 if __name__ == "__main__":
-    if PATCH_MODE:
-        patch_none_descriptions()
-    else:
-        main()
+    main()
 
 
 

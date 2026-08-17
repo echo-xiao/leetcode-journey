@@ -296,6 +296,21 @@ def daily_command(date: str) -> None:
     print(f"wrote {path}")
 
 
+def sync_review_md_command(apply: bool) -> None:
+    """Notion retrospectives -> Problems/*/review.md."""
+    from .sync_review_md import sync
+
+    sync(dry_run=not apply)
+
+
+def sync_fupan_command(apply: bool) -> None:
+    """Notion retrospectives -> the 复盘 column of 「LC 旧题回顾」."""
+    from .notion_pages import fetch_easy, fetch_medium
+    from .sync_fupan import sync
+
+    sync(fetch_easy(), fetch_medium(), titles={}, dry_run=not apply)
+
+
 def main() -> None:
     parser = argparse.ArgumentParser(prog="lc_review")
     subparsers = parser.add_subparsers(dest="command", required=True)
@@ -305,6 +320,18 @@ def main() -> None:
     subparsers.add_parser("build-table", help="regenerate the progress table")
     subparsers.add_parser("build-elements", help="regenerate the eighteen technique cards sheet")
     subparsers.add_parser("export-anki", help="export the three Anki decks as TSV")
+
+    # Both sync commands default to a dry run: they touch Notion and the
+    # working tree, so the write has to be asked for explicitly.
+    review_md = subparsers.add_parser(
+        "sync-review-md", help="write Notion retrospectives into Problems/*/review.md"
+    )
+    review_md.add_argument("--apply", action="store_true", help="actually write the files")
+    fupan = subparsers.add_parser(
+        "sync-fupan", help="push Notion retrospectives into the 复盘 column"
+    )
+    fupan.add_argument("--apply", action="store_true", help="actually write to Notion")
+
     daily = subparsers.add_parser("daily", help="refresh everything and write today's brief")
     daily.add_argument("--date", required=True, help="YYYY-MM-DD")
     args = parser.parse_args()
@@ -318,6 +345,10 @@ def main() -> None:
         build_elements_command()
     if args.command == "export-anki":
         export_anki_command()
+    if args.command == "sync-review-md":
+        sync_review_md_command(args.apply)
+    if args.command == "sync-fupan":
+        sync_fupan_command(args.apply)
     if args.command == "daily":
         daily_command(args.date)
 

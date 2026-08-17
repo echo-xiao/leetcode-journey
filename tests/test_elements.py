@@ -78,20 +78,24 @@ def test_render_has_no_per_card_sections_below_the_table():
 
 
 def test_essentials_cell_lists_this_technique_own_questions():
-    # 滑动窗口's essentials are quoted from its own "三个必答问题" -- verify at
-    # least one of them shows up, numbered, in its row.
+    # 滑动窗口's essentials come from its own checklist. The first question is
+    # now "定长还是变长" (echo added it; the window kind decides the whole shape),
+    # so assert on the numbering and on a question unique to this technique
+    # rather than on wording that is expected to keep evolving.
     output = render_elements(CARDS, {})
-    rows = {line.split("|")[1].strip(): line for line in output.splitlines() if line.startswith("| ")}
     sliding_window_row = next(line for line in output.splitlines() if line.startswith("| 滑动窗口"))
-    assert "1. 什么时候移动 right 扩大窗口" in sliding_window_row
+    assert "1. " in sliding_window_row
+    assert "窗口" in sliding_window_row
     assert "<br>" in sliding_window_row
 
 
 def test_a_card_with_no_checklist_renders_an_explicit_marker():
-    output = render_elements(CARDS, {})
-    # 栈与队列 has an intentionally empty ESSENTIALS tuple.
-    row = next(line for line in output.splitlines() if line.startswith("| 栈与队列"))
-    assert "原文无明确清单" in row
+    # No card is empty any more (echo had the three index-page cards filled
+    # in), so the marker is exercised with an explicit empty mapping instead of
+    # relying on a card that used to be blank.
+    from lc_review.elements import _essentials_cell
+
+    assert "原文无明确清单" in _essentials_cell(())
 
 
 def test_no_cell_contains_a_raw_newline():

@@ -28,12 +28,20 @@ _SPAN_CLOSE = r"(?:</span>)?"
 EASY_ENTRY_RE = re.compile(
     _SPAN_OPEN + r"(?<!\d)(\d{1,4})、\s*[A-Za-z][^：\n]{3,80}：\s*" + _SPAN_CLOSE
 )
+# A few entries slip a stray word between the number and "LC" ("10、如果LC 658
+# ..."). Tolerating a short run of non-digits there costs nothing and stops the
+# entry from being dropped without a trace.
 MEDIUM_ENTRY_RE = re.compile(
-    _SPAN_OPEN + r"\d+、\s*LC\s*(\d+)\s*[^：\n]*：\s*" + _SPAN_CLOSE
+    _SPAN_OPEN + r"\d+、\s*[^\dLC\n]{0,4}\s*LC\s*(\d+)\s*[^：\n]*：\s*" + _SPAN_CLOSE
 )
 # Notion's export backslash-escapes the "|" separator on some pages; both
 # spellings must match or every Day heading -- and every entry's day/topic/
 # date -- silently comes back None.
+# Fallback for entries written without the title/body colon. Anchored on the
+# "LC <id>" marker, so it only fires where an entry clearly starts.
+MEDIUM_ENTRY_NO_COLON_RE = re.compile(
+    _SPAN_OPEN + r"\d+、\s*[^\dLC\n]{0,4}\s*LC\s*(\d+)\s*" + _SPAN_CLOSE
+)
 MEDIUM_DAY_RE = re.compile(r"--\s*(Day\s*\d+)\s*\\?\|\s*(.+?)\s*\((\d{4}-\d{2}-\d{2})\)\s*---")
 BR_RE = re.compile(r"<br\s*/?>", re.IGNORECASE)
 
@@ -143,7 +151,13 @@ def parse_easy_page(text: str) -> list[Retrospective]:
 
 
 def parse_medium_page(text: str) -> list[Retrospective]:
-    """Parse ``N、LC 1456 title：body`` entries under ``Day`` headings."""
+    """Parse ``N、LC 1456 title：body`` entries under ``Day`` headings.
+
+    An entry occasionally omits the colon that separates title from body. The
+    strict pattern cannot tell where the title ends without it, so the fallback
+    keeps the title inside the body rather than dropping the entry: a little
+    redundant text is recoverable, a silently missing retrospective is not.
+    """
     day: str | None = None
     topic: str | None = None
     date: str | None = None
@@ -154,7 +168,10 @@ def parse_medium_page(text: str) -> list[Retrospective]:
         if heading is not None:
             day, topic, date = heading.group(1), heading.group(2), heading.group(3)
             continue
-        for problem_id, body in _entries_in_line(MEDIUM_ENTRY_RE, line):
+        entries = _entries_in_line(MEDIUM_ENTRY_RE, line)
+        if not entries:
+            entries = _entries_in_line(MEDIUM_ENTRY_NO_COLON_RE, line)
+        for problem_id, body in entries:
             found.append(
                 Retrospective(
                     int(problem_id), body, "notion-medium", day, topic, date,
