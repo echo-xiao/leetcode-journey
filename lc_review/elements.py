@@ -85,31 +85,7 @@ def suggest_chapter_links(entries: list[ProblemEntry]) -> dict[str, list[tuple[s
 
 
 PASS_THROUGH_BODIES = ("原文未涉及", "待填写")
-CELL_CAP = 60
 _PITFALL_ITEM_RE = re.compile(r"^\d+\.\s", re.MULTILINE)
-
-
-def _distill_cell(text: str) -> str:
-    """Reduce a paragraph-length body to its leading claim for a table cell.
-
-    Cuts at the first 全角句号/分号, strips trailing punctuation, flattens
-    any embedded newline (which would otherwise break the markdown table
-    row), caps the result at roughly ``CELL_CAP`` characters, and escapes
-    ``|`` so the cell cannot be mistaken for a column boundary. The two
-    literal placeholder strings pass through untouched.
-    """
-    if text in PASS_THROUGH_BODIES:
-        return text
-    flattened = text.replace("\r\n", " ").replace("\n", " ")
-    cut = len(flattened)
-    for sep in ("；", "。"):
-        idx = flattened.find(sep)
-        if idx != -1 and idx < cut:
-            cut = idx
-    lead = flattened[:cut].strip(" ，。；：、")
-    if len(lead) > CELL_CAP:
-        lead = lead[:CELL_CAP].rstrip() + "…"
-    return lead.replace("|", "\\|")
 
 
 def _pitfall_count(body: str | None) -> int:
@@ -135,6 +111,23 @@ def _source_links(urls: tuple[str, ...]) -> str:
     return "、".join(f"[原文{i}]({url})" for i, url in enumerate(urls, start=1))
 
 
+NO_CHECKLIST = "原文无明确清单"
+
+
+def _essentials_cell(items: tuple[str, ...]) -> str:
+    """Render one technique's 要素 as a numbered, ``<br>``-joined cell.
+
+    An empty tuple means the source article genuinely states no unifying
+    checklist (see ``lc_review.element_essentials`` for which cards these
+    are and why); that must render as an explicit marker, never a blank
+    cell that could be mistaken for a forgotten entry.
+    """
+    if not items:
+        return NO_CHECKLIST
+    numbered = [f"{i}. {item}" for i, item in enumerate(items, start=1)]
+    return "<br>".join(numbered).replace("|", "\\|")
+
+
 def render_elements(
     cards: tuple[ElementCard, ...],
     links: dict[str, list[tuple[str, str]]],
@@ -142,32 +135,36 @@ def render_elements(
 ) -> str:
     """Emit the sheet as a single markdown table, one row per technique.
 
-    A field with no entry in ``bodies`` stays marked 待填写 rather than
-    being invented; a field whose source genuinely does not cover it should
-    have its body set to the literal string 原文未涉及, not be left out of
-    ``bodies``. Cell text is distilled from the full body (see
-    ``_distill_cell``) so the sheet stays scannable; the full bodies still
-    go into the Anki elements deck via ``lc_review.anki.export_elements``.
+    Each technique gets its own 要素 -- the small set of questions you must
+    answer to write that kind of code -- from
+    ``lc_review.element_essentials.ESSENTIALS``, not the six generic fields
+    in ``FIELDS`` (those still back the Anki elements deck via ``BODIES``
+    and ``lc_review.anki.export_elements``, but no longer drive this sheet).
+    The 典型坑 column shows only a count, sourced from ``bodies``' 典型坑
+    field the same way the previous layout did; the full pitfall text stays
+    in the Anki deck.
     """
+    from lc_review.element_essentials import ESSENTIALS
+
     bodies = bodies or {}
-    table_fields = FIELDS[:-1]  # everything except 典型坑, which gets a count column instead
-    header = ["题型", *table_fields, "典型坑", "来源"]
+    header = ["题型", "要素", "典型坑", "来源"]
     lines = [
         "# 要素表",
         "",
-        "每行对应 labuladong 的一篇框架文；单元格是原文的首句摘要，不自撰。"
-        "典型坑列显示 echo 复盘中标出的问题数，完整坑点见 Anki 要素卡。",
+        "每行对应一种题型；「要素」是写这类代码前必须回答的问题，逐条列出，"
+        "来自原文自己的框架或从原文的坚持中提炼（见 lc_review/element_essentials.py "
+        "里每条的出处说明）。典型坑列显示 echo 复盘中标出的问题数，完整坑点见 Anki 要素卡。",
         "",
         "| " + " | ".join(header) + " |",
         "| " + " | ".join(["---"] * len(header)) + " |",
     ]
     for card in cards:
-        row = [card.name]
-        for field in table_fields:
-            body = bodies.get((card.name, field), "待填写")
-            row.append(_distill_cell(body))
-        row.append(_pitfall_cell(bodies.get((card.name, "典型坑"))))
-        row.append(_source_links(card.sources))
+        row = [
+            card.name,
+            _essentials_cell(ESSENTIALS.get(card.name, ())),
+            _pitfall_cell(bodies.get((card.name, "典型坑"))),
+            _source_links(card.sources),
+        ]
         lines.append("| " + " | ".join(row) + " |")
     lines += ["", "## 章节对应（我方判断，待 echo 复核）", ""]
     any_links = False

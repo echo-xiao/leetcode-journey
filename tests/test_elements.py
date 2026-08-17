@@ -42,26 +42,6 @@ def test_chapter_links_are_suggested_by_keyword_match():
     assert ("11", "二、二叉树") in links["二叉树"]
 
 
-def test_render_marks_bodies_as_unwritten_rather_than_inventing_them():
-    entries = [ProblemEntry("11", "链表、树与回溯", 2, "b", "b", None, "二、二叉树", "§2.1", 0)]
-    output = render_elements(CARDS, suggest_chapter_links(entries))
-    assert "待填写" in output
-    assert all(field in output for field in FIELDS)
-
-
-def test_render_uses_a_supplied_body_but_still_marks_missing_fields_unwritten():
-    # A card can have a real body for one field and nothing for another; the
-    # rendered sheet must show a distilled form of the real text for the
-    # first (its trailing punctuation stripped, since the cell is a table
-    # cell's leading claim, not the full sentence) and fall back to the
-    # explicit 待填写 marker for the second, never a blank.
-    card = CARDS[0]
-    bodies = {(card.name, FIELDS[0]): "真实内容，来自原文。"}
-    output = render_elements(CARDS, {}, bodies)
-    assert "真实内容，来自原文" in output
-    assert "待填写" in output
-
-
 def test_render_emits_exactly_one_table_with_eighteen_data_rows():
     output = render_elements(CARDS, {})
     table_lines = [line for line in output.splitlines() if line.startswith("| ")]
@@ -70,36 +50,42 @@ def test_render_emits_exactly_one_table_with_eighteen_data_rows():
     assert len(table_lines) == 2 + len(CARDS)
     header_cells = [cell.strip() for cell in table_lines[0].strip("|").split("|")]
     assert header_cells[0] == "题型"
+    assert header_cells[1] == "要素"
     assert header_cells[-2] == "典型坑"
     assert header_cells[-1] == "来源"
     separator_cells = table_lines[1].strip("|").split("|")
     assert all(set(cell.strip()) == {"-"} for cell in separator_cells)
 
 
-def test_long_body_is_distilled_to_its_leading_claim_and_capped():
-    long_body = (
-        "第一句话很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长"
-        "；这半句本来就不该出现在结果里"
-    )
-    bodies = {(CARDS[0].name, FIELDS[0]): long_body}
-    output = render_elements(CARDS, {}, bodies)
-    assert "这半句本来就不该出现在结果里" not in output
-    assert "\n" not in "".join(
-        line for line in output.splitlines() if "第一句话" in line
-    )
+def test_render_has_no_per_card_sections_below_the_table():
+    # The old six-field layout expanded each card into its own section; the
+    # new sheet is one table plus the chapter-linkage notes, nothing else.
+    output = render_elements(CARDS, {})
+    for field in ("问题的定义", "主体 / 状态", "不变量", "停止条件 / 边界", "操作顺序"):
+        assert field not in output, f"{field} leaked into the sheet"
 
 
-def test_body_with_a_raw_newline_does_not_break_the_table_row():
-    bodies = {(CARDS[0].name, FIELDS[1]): "第一行说明\n第二行不该独立成行"}
-    output = render_elements(CARDS, {}, bodies)
+def test_essentials_cell_lists_this_technique_own_questions():
+    # 滑动窗口's essentials are quoted from its own "三个必答问题" -- verify at
+    # least one of them shows up, numbered, in its row.
+    output = render_elements(CARDS, {})
+    rows = {line.split("|")[1].strip(): line for line in output.splitlines() if line.startswith("| ")}
+    sliding_window_row = next(line for line in output.splitlines() if line.startswith("| 滑动窗口"))
+    assert "1. 什么时候移动 right 扩大窗口" in sliding_window_row
+    assert "<br>" in sliding_window_row
+
+
+def test_a_card_with_no_checklist_renders_an_explicit_marker():
+    output = render_elements(CARDS, {})
+    # 栈与队列 has an intentionally empty ESSENTIALS tuple.
+    row = next(line for line in output.splitlines() if line.startswith("| 栈与队列"))
+    assert "原文无明确清单" in row
+
+
+def test_no_cell_contains_a_raw_newline():
+    output = render_elements(CARDS, {})
     table_lines = [line for line in output.splitlines() if line.startswith("| ")]
     assert len(table_lines) == 2 + len(CARDS)
-
-
-def test_pipe_inside_a_body_is_escaped():
-    bodies = {(CARDS[0].name, FIELDS[0]): "包含 | 竖线符号的句子"}
-    output = render_elements(CARDS, {}, bodies)
-    assert "\\|" in output
 
 
 def test_pitfall_column_shows_a_count_not_the_pitfall_text():
@@ -119,10 +105,14 @@ def test_pitfall_column_shows_a_dash_when_there_are_no_pitfalls():
         assert cells[-2] == "—"
 
 
-def test_original_body_string_原文未涉及_passes_through_unchanged():
-    bodies = {(CARDS[0].name, FIELDS[1]): "原文未涉及"}
+def test_original_body_string_原文未涉及_counts_as_no_pitfalls():
+    # 典型坑 is the only FIELDS entry render_elements still reads from
+    # bodies; the placeholder string used elsewhere in element_bodies.BODIES
+    # must not be miscounted as a pitfall entry.
+    bodies = {(CARDS[0].name, "典型坑"): "原文未涉及"}
     output = render_elements(CARDS, {}, bodies)
-    assert "原文未涉及" in output
+    row = next(line for line in output.splitlines() if line.startswith(f"| {CARDS[0].name}"))
+    assert "—" in row
 
 
 def test_render_keeps_exactly_one_chapter_linkage_section_below_the_table():
