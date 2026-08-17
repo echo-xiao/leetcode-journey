@@ -185,6 +185,58 @@ def get_submission_code(sub_id):
         return ""
 
 
+def read_existing_description(folder):
+    """Recover a previously fetched problem statement.
+
+    Current layout keeps it in problem.md; older folders kept it inside
+    README_CN.md. Try both so a re-fetch never downgrades a good description
+    to '暂无描述'.
+    """
+    import re as _re
+    for name in ("problem.md", "README_CN.md"):
+        path = f"{folder}/{name}"
+        if not os.path.exists(path):
+            continue
+        with open(path, 'r', encoding='utf-8') as f:
+            content = f.read()
+        m = _re.search(r'## 题目描述\n\n(.+?)(?:\n\n---|\Z)', content, _re.DOTALL)
+        if m and m.group(1).strip() not in ('None', '暂无描述', ''):
+            return m.group(1).strip()
+    return None
+
+
+def write_problem_files(folder, q_id, cn_title, difficulty, tags,
+                        main_cat, sub_cat, description, analysis):
+    """Write the four-file layout for one problem.
+
+    README_CN.md  index (GitHub renders it when the folder is opened)
+    problem.md    problem statement
+    pseudocode.md approach, pseudocode and complexity
+    elements.md   framework slots — only created as a placeholder here;
+                  tools/build_elements.py fills in the per-problem answers.
+    """
+    title = f"{q_id}. {cn_title}"
+    tag_str = " ".join([f"`{t}`" for t in tags])
+    meta = f"**难度**: {difficulty} | **标签**: {tag_str}\n\n**归类**: {main_cat} > {sub_cat}"
+
+    with open(f"{folder}/problem.md", 'w', encoding='utf-8') as f:
+        f.write(f"# {title} · 题目\n\n{meta}\n\n## 题目描述\n\n{description}\n")
+
+    with open(f"{folder}/pseudocode.md", 'w', encoding='utf-8') as f:
+        f.write(f"# {title} · 解题思路与伪代码\n\n{analysis}\n")
+
+    elements_path = f"{folder}/elements.md"
+    if not os.path.exists(elements_path):
+        with open(elements_path, 'w', encoding='utf-8') as f:
+            f.write(f"# {title} · 要素\n\n还没生成，运行 tools/build_elements.py 补上。\n")
+
+    with open(f"{folder}/README_CN.md", 'w', encoding='utf-8') as f:
+        f.write(f"# {title}\n\n{meta}\n\n")
+        f.write("- [题目](problem.md)\n")
+        f.write("- [解题思路与伪代码](pseudocode.md)\n")
+        f.write("- [要素](elements.md)\n")
+
+
 def ai_analyze_all_versions(title, codes_dict):
     """GPT-4o 综合分析所有 AC 版本"""
     code_context = ""
@@ -343,27 +395,12 @@ def main():
             analysis = ai_analyze_all_versions(cn_title, all_codes)
 
             # 3. 写入 Markdown，同时标注分类
-            # 如果已有 README 且描述不为空，保留原有描述
-            existing_desc = None
-            readme_path = f"{folder}/README_CN.md"
-            if os.path.exists(readme_path):
-                with open(readme_path, 'r', encoding='utf-8') as f_existing:
-                    existing_content = f_existing.read()
-                import re as _re
-                m = _re.search(r'## 题目描述\n\n(.+?)\n\n---', existing_content, _re.DOTALL)
-                if m and m.group(1).strip() not in ('None', '暂无描述', ''):
-                    existing_desc = m.group(1).strip()
-
+            existing_desc = read_existing_description(folder)
             new_desc = prob_cn.get('translatedContent') if prob_cn and prob_cn.get('translatedContent') else None
             description = new_desc or existing_desc or '暂无描述'
 
-            with open(readme_path, 'w', encoding='utf-8') as f:
-                tag_str = " ".join([f"`{t}`" for t in tags])
-                f.write(f"# {q_id}. {cn_title}\n\n")
-                f.write(f"**难度**: {difficulty} | **标签**: {tag_str}\n\n")
-                f.write(f"**归类**: {main_cat} > {sub_cat}\n\n")
-                f.write(f"## 题目描述\n\n{description}\n\n---\n")
-                f.write(f"## 解题思路与复盘\n\n{analysis}")
+            write_problem_files(folder, q_id, cn_title, difficulty, tags,
+                                main_cat, sub_cat, description, analysis)
 
             time.sleep(0.5)
 
@@ -386,8 +423,13 @@ def patch_none_descriptions():
     fixed, failed = [], []
 
     for folder in sorted(os.listdir("Problems")):
-        readme_path = f"Problems/{folder}/README_CN.md"
-        if not os.path.exists(readme_path):
+        # The statement lives in problem.md; older folders still keep it in README_CN.md.
+        readme_path = next(
+            (p for p in (f"Problems/{folder}/problem.md", f"Problems/{folder}/README_CN.md")
+             if os.path.exists(p)),
+            None,
+        )
+        if not readme_path:
             continue
         with open(readme_path, "r", encoding="utf-8") as f:
             content = f.read()
@@ -441,7 +483,7 @@ def patch_none_descriptions():
 
         if desc:
             import re as _re
-            updated = _re.sub(r'(## 题目描述\n\n)None(\n\n---)', r'\g<1>' + desc + r'\2', content)
+            updated = _re.sub(r'(## 题目描述\n\n)None(\n\n---|\n*\Z)', r'\g<1>' + desc + r'\2', content)
             with open(readme_path, "w", encoding="utf-8") as f:
                 f.write(updated)
             print("✓")
