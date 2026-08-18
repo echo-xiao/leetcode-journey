@@ -14,6 +14,8 @@ The readers live in ``problem_source`` so the app exporter reads the same way.
 
 from __future__ import annotations
 
+from pathlib import Path
+
 from .problem_source import (
     PROBLEMS,
     REPO,
