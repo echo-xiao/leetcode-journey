@@ -85,6 +85,18 @@ def test_payload_is_versioned_and_sorted_and_has_no_timestamp(fixture_problems):
     assert "generatedAt" not in payload
 
 
+def test_problems_sort_numerically_not_lexically(tmp_path):
+    for name in ("1_a", "2_b", "15_c", "100_d", "1005_e"):
+        folder = tmp_path / name
+        folder.mkdir()
+        (folder / "problem.md").write_text(
+            "# 1. Demo · 题目\n\n**难度**: Easy\n\n## 题目描述\n\nx\n", encoding="utf-8"
+        )
+        (folder / "elements.md").write_text("# 1. Demo · 要素\n", encoding="utf-8")
+    payload = app_export.build_payload(tmp_path, {})
+    assert [p["number"] for p in payload["problems"]] == [1, 2, 15, 100, 1005]
+
+
 def test_write_if_changed_creates_the_file(tmp_path):
     path = tmp_path / "app" / "content.json"
     written = app_export.write_if_changed(path, {"version": 1, "problems": []})

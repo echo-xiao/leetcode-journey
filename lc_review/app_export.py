@@ -78,8 +78,14 @@ def problem_entry(folder: Path, techniques: dict[str, str]) -> dict:
 
 
 def build_payload(problems_dir: Path, techniques: dict[str, str]) -> dict:
-    """The whole file. Problems are sorted by folder name so diffs stay small."""
-    folders = sorted(d for d in problems_dir.iterdir() if d.is_dir())
+    """The whole file. Numeric order is both readable and deterministic, and
+    determinism is what keeps the diffs small."""
+
+    def _sort_key(folder: Path) -> tuple[int, str]:
+        match = _NUMBER_RE.match(folder.name)
+        return (int(match.group(1)) if match else 0, folder.name)
+
+    folders = sorted((d for d in problems_dir.iterdir() if d.is_dir()), key=_sort_key)
     return {
         "version": SCHEMA_VERSION,
         "problems": [problem_entry(folder, techniques) for folder in folders],
