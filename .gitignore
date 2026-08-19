@@ -9,3 +9,8 @@ docs/
 review_state.json
 .superpowers/
 anki/
+
+# Xcode
+app/ios/**/xcuserdata/
+app/ios/**/*.xcuserstate
+app/ios/DerivedData/
