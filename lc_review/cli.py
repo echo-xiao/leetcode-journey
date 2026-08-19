@@ -71,11 +71,17 @@ def export_anki_command() -> None:
     run()
 
 
-def export_app_command() -> None:
-    """Problems/*/ -> app/content.json, which the iOS app downloads."""
+def export_app_command(apply: bool = True) -> None:
+    """Problems/*/ -> app/content.json, which the iOS app downloads.
+
+    ``apply`` defaults to True because the standalone ``export-app``
+    subcommand always writes — it only writes inside the repo, so there is
+    nothing to opt into. ``sync-all`` is the caller that passes ``apply``
+    through so a dry run of the whole pipeline stays dry for this step too.
+    """
     from .app_export import run
 
-    run()
+    run(dry_run=not apply)
 
 
 def sync_all_command(apply: bool) -> None:
@@ -85,7 +91,7 @@ def sync_all_command(apply: bool) -> None:
         ("生成新题的要素答案", lambda: build_answers_command(apply, None)),
         ("复盘写入 Problems/*/review.md", lambda: sync_review_md_command(apply)),
         ("复盘写入 Notion 复盘列", lambda: sync_fupan_command(apply)),
-        ("打包 app 内容 app/content.json", export_app_command),
+        ("打包 app 内容 app/content.json", lambda: export_app_command(apply)),
     )
     for index, (label, step) in enumerate(steps, 1):
         print(f"\n[{index}/{len(steps)}] {label}")

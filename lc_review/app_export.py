@@ -113,14 +113,33 @@ def write_if_changed(path: Path, payload: dict) -> bool:
     return True
 
 
-def run() -> None:
+def run(dry_run: bool = False) -> None:
     from .problem_source import technique_map
 
     payload = build_payload(PROBLEMS, technique_map())
     count = len(payload["problems"])
+
+    if dry_run:
+        # Still build the payload and compare it against disk, just don't
+        # write — a dry run through sync-all must not touch content.json.
+        text = _serialise(payload)
+        on_disk = OUT_PATH.exists()
+        changed = not (on_disk and OUT_PATH.read_text(encoding="utf-8") == text)
+        if not on_disk:
+            verb = "会新建"
+        elif changed:
+            verb = "会更新"
+        else:
+            verb = "不会改动"
+        print(f"[试运行] 内容 {count} 道题，{verb} {OUT_PATH}")
+        return
+
     if write_if_changed(OUT_PATH, payload):
         size = OUT_PATH.stat().st_size / 1024 / 1024
         print(f"内容 {count} 道题 -> {OUT_PATH}（{size:.1f} MB）")
-        print("记得 git add app/content.json 并 push，否则手机上拿到的还是旧的。")
     else:
         print(f"内容 {count} 道题，与磁盘上一致，未改动 {OUT_PATH}")
+    # Printed either way: an unpushed file is just as stale as a never-written
+    # one, and "nothing changed" is exactly the run where this is easiest to
+    # forget.
+    print("记得 git add app/content.json 并 push，否则手机上拿到的还是旧的。")

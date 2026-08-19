@@ -41,30 +41,37 @@ def _row(deck: str, front: str, back: str, tags: str) -> str:
     return "\t".join((deck, clean(front), clean(back), tags))
 
 
+def _elements_row(folder: Path, techniques: dict[str, str]) -> str | None:
+    """One folder's TSV row, or None when it has no answered slots yet."""
+    slots = elements_of(folder)
+    if not slots:
+        return None
+    title = title_of(folder)
+    difficulty, technique = meta_of(folder, techniques)
+    statement = statement_of(folder)
+
+    front = f"<b>{title}</b>"
+    if statement:
+        front += f"<br><br>{statement}"
+    front += "<br><br><i>这道题的要素怎么填？</i>"
+
+    back = f"<b>{technique}</b><br><br>" if technique else ""
+    back += "<br>".join(f"{index}. {slot}" for index, slot in enumerate(slots, 1))
+
+    tags = " ".join(t for t in (technique, difficulty) if t)
+    return _row("LeetCode::要素", front, back, tags)
+
+
 def build_elements_deck() -> list[str]:
     """Front: the problem. Back: how its framework slots get filled."""
-    rows = []
     techniques = _technique_map()
+    rows = []
     for folder in sorted(PROBLEMS.iterdir()):
         if not folder.is_dir():
             continue
-        slots = elements_of(folder)
-        if not slots:
-            continue
-        title = title_of(folder)
-        difficulty, technique = meta_of(folder, techniques)
-        statement = statement_of(folder)
-
-        front = f"<b>{title}</b>"
-        if statement:
-            front += f"<br><br>{statement}"
-        front += "<br><br><i>这道题的要素怎么填？</i>"
-
-        back = f"<b>{technique}</b><br><br>" if technique else ""
-        back += "<br>".join(f"{index}. {slot}" for index, slot in enumerate(slots, 1))
-
-        tags = " ".join(t for t in (technique, difficulty) if t)
-        rows.append(_row("LeetCode::要素", front, back, tags))
+        row = _elements_row(folder, techniques)
+        if row is not None:
+            rows.append(row)
     return rows
 
 
