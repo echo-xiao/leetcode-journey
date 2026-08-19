@@ -25,16 +25,19 @@ Problems/104_maximum-depth-of-binary-tree/
 python3 -m lc_review.cli sync-all --apply
 ```
 
-它按顺序做四件事，顺序不能调换——题目得先存在，复盘才有地方放；
-回顾表的行得先建好，复盘列才写得进去：
+它按顺序做五件事，顺序不能调换——题目得先存在，复盘才有地方放；
+回顾表的行得先建好，复盘列才写得进去；app 的内容包必须最后打包，
+不然打包时 `Problems/*/review.md` 还是上一轮的，手机上拿到的就是旧内容：
 
 1. 拉力扣上新通过的题，生成四件套，并在 Notion「LC 旧题回顾」建行
 2. 给新题生成要素答案（每题一次 Claude 调用）
 3. 把 Notion 上的复盘写进各题的 `review.md`
 4. 把复盘写进「LC 旧题回顾」的复盘列，橙色高亮一并带过去
+5. 把 `Problems/` 打包成 `app/content.json`，供 iOS app 下载
 
-不加 `--apply` 是试运行，只报告会做什么，不写任何东西。四步里有三步写到工作区之外
-（Notion 没有撤销），所以写入是显式的。
+不加 `--apply` 是试运行，只报告会做什么，不写任何东西，包括最后一步的
+`app/content.json`。前四步里有三步写到工作区之外（Notion 没有撤销），
+所以写入是显式的。
 
 单独跑某一步：
 
@@ -55,6 +58,21 @@ python3 -m lc_review.cli export-anki
 一题一张：正面题目，背面这道题的要素怎么填。标签按题型打好，可以只刷某一类。
 
 `anki/` 不进版本库——它是从 `Problems/` 生成的，重跑一条命令就有。
+
+## 手机 app 的内容
+
+```bash
+python3 -m lc_review.cli export-app
+```
+
+生成 `app/content.json`：每道题的题面、要素、伪代码、复盘、真代码打成一个文件，
+iOS app 启动时从 GitHub Raw 拉这一份。已挂进 `sync-all` 的最后一步。
+
+**这个文件必须提交并推送**，和 `anki/` 相反。GitHub Raw 只能服务已经提交的文件，
+所以生成物在这里是个刻意的例外，别把 `app/` 加进 `.gitignore`。文件生成了但没推，
+手机上拿到的就还是旧内容，而且不会有任何报错提示你。
+
+内容没变时命令不会重写文件，所以每天跑 `sync-all` 不会制造空 diff。
 
 ## 需要配置什么
 

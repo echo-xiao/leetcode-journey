@@ -5,15 +5,17 @@ One pipeline, in one direction:
     LeetCode ──sync-new──▶ Problems/ ──build-answers──▶ elements.md
     Notion 复盘页 ──sync-review-md──▶ review.md
                  └──sync-fupan──▶ 「LC 旧题回顾」复盘列
+    Problems/ ──export-app──▶ app/content.json ──▶ the iOS app
 
-``sync-all`` runs all four in the order they depend on each other and is the
+``sync-all`` runs all five in the order they depend on each other and is the
 command to reach for day to day. The order is not cosmetic: a problem has to
-exist locally before its retrospective can be filed next to it, and its review
-row has to exist before the 复盘 column can be written.
+exist locally before its retrospective can be filed next to it, its review
+row has to exist before the 复盘 column can be written, and the app payload has to
+be packed last or it ships the previous run's markdown.
 
-Every command defaults to a dry run. Three of the four write outside the
+Every command defaults to a dry run. Three of the five write outside the
 working tree — into Notion, which has no undo — so writing is opt-in via
-``--apply``.
+``--apply``. The two exporters only write inside the repository.
 """
 
 from __future__ import annotations
@@ -69,6 +71,19 @@ def export_anki_command() -> None:
     run()
 
 
+def export_app_command(apply: bool = True) -> None:
+    """Problems/*/ -> app/content.json, which the iOS app downloads.
+
+    ``apply`` defaults to True because the standalone ``export-app``
+    subcommand always writes — it only writes inside the repo, so there is
+    nothing to opt into. ``sync-all`` is the caller that passes ``apply``
+    through so a dry run of the whole pipeline stays dry for this step too.
+    """
+    from .app_export import run
+
+    run(dry_run=not apply)
+
+
 def sync_all_command(apply: bool) -> None:
     """The day-to-day command: LeetCode -> Problems/ -> Notion, in that order."""
     steps = (
@@ -76,6 +91,7 @@ def sync_all_command(apply: bool) -> None:
         ("生成新题的要素答案", lambda: build_answers_command(apply, None)),
         ("复盘写入 Problems/*/review.md", lambda: sync_review_md_command(apply)),
         ("复盘写入 Notion 复盘列", lambda: sync_fupan_command(apply)),
+        ("打包 app 内容 app/content.json", lambda: export_app_command(apply)),
     )
     for index, (label, step) in enumerate(steps, 1):
         print(f"\n[{index}/{len(steps)}] {label}")
@@ -108,6 +124,9 @@ def main() -> None:
     # Writes only into anki/ inside the repo, so there is nothing to opt into.
     subparsers.add_parser("export-anki", help="导出 Anki 卡片 TSV")
 
+    # Writes only into app/ inside the repo, so there is nothing to opt into.
+    subparsers.add_parser("export-app", help="导出 app 内容 content.json")
+
     args = parser.parse_args()
     if args.command == "sync-all":
         sync_all_command(args.apply)
@@ -121,6 +140,8 @@ def main() -> None:
         sync_fupan_command(args.apply)
     elif args.command == "export-anki":
         export_anki_command()
+    elif args.command == "export-app":
+        export_app_command()
 
 
 if __name__ == "__main__":
