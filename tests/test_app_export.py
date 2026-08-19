@@ -1,3 +1,5 @@
+import json
+
 from lc_review import app_export
 
 TECHNIQUES = {
@@ -81,3 +83,41 @@ def test_payload_is_versioned_and_sorted_and_has_no_timestamp(fixture_problems):
     ]
     # A timestamp would change every day and defeat the write-if-changed check.
     assert "generatedAt" not in payload
+
+
+def test_write_if_changed_creates_the_file(tmp_path):
+    path = tmp_path / "app" / "content.json"
+    written = app_export.write_if_changed(path, {"version": 1, "problems": []})
+    assert written is True
+    assert json.loads(path.read_text(encoding="utf-8")) == {
+        "version": 1,
+        "problems": [],
+    }
+
+
+def test_write_if_changed_is_a_noop_when_identical(tmp_path):
+    path = tmp_path / "content.json"
+    payload = {"version": 1, "problems": [{"id": "1_two-sum"}]}
+    app_export.write_if_changed(path, payload)
+    before = path.stat().st_mtime_ns
+
+    written = app_export.write_if_changed(path, payload)
+
+    assert written is False
+    assert path.stat().st_mtime_ns == before
+
+
+def test_write_if_changed_rewrites_when_content_differs(tmp_path):
+    path = tmp_path / "content.json"
+    app_export.write_if_changed(path, {"version": 1, "problems": []})
+    written = app_export.write_if_changed(
+        path, {"version": 1, "problems": [{"id": "1_two-sum"}]}
+    )
+    assert written is True
+    assert "1_two-sum" in path.read_text(encoding="utf-8")
+
+
+def test_written_json_keeps_chinese_readable(tmp_path):
+    path = tmp_path / "content.json"
+    app_export.write_if_changed(path, {"version": 1, "problems": [{"t": "二叉树"}]})
+    assert "二叉树" in path.read_text(encoding="utf-8")

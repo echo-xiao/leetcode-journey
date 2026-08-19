@@ -12,12 +12,14 @@ freshness is the ETag's job, not the file's.
 
 from __future__ import annotations
 
+import json
 import re
 from pathlib import Path
 
-from .problem_source import elements_of, meta_of, statement_of, title_of
+from .problem_source import PROBLEMS, REPO, elements_of, meta_of, statement_of, title_of
 
 SCHEMA_VERSION = 1
+OUT_PATH = REPO / "app" / "content.json"
 
 # "1005_univalued-binary-tree" -> 1005. Folder names always start with the id.
 _NUMBER_RE = re.compile(r"^(\d+)_")
@@ -82,3 +84,37 @@ def build_payload(problems_dir: Path, techniques: dict[str, str]) -> dict:
         "version": SCHEMA_VERSION,
         "problems": [problem_entry(folder, techniques) for folder in folders],
     }
+
+
+def _serialise(payload: dict) -> str:
+    # ensure_ascii=False keeps the Chinese readable and roughly halves the size
+    # of a file the app downloads on every cold launch.
+    return json.dumps(payload, ensure_ascii=False, indent=1, sort_keys=True) + "\n"
+
+
+def write_if_changed(path: Path, payload: dict) -> bool:
+    """Write the payload only when it differs. Returns whether it wrote.
+
+    Rewriting an identical two-megabyte file on every sync-all would grow the
+    git history for nothing, so an unchanged library must leave the file — and
+    its mtime — alone.
+    """
+    text = _serialise(payload)
+    if path.exists() and path.read_text(encoding="utf-8") == text:
+        return False
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(text, encoding="utf-8")
+    return True
+
+
+def run() -> None:
+    from .problem_source import technique_map
+
+    payload = build_payload(PROBLEMS, technique_map())
+    count = len(payload["problems"])
+    if write_if_changed(OUT_PATH, payload):
+        size = OUT_PATH.stat().st_size / 1024 / 1024
+        print(f"内容 {count} 道题 -> {OUT_PATH}（{size:.1f} MB）")
+        print("记得 git add app/content.json 并 push，否则手机上拿到的还是旧的。")
+    else:
+        print(f"内容 {count} 道题，与磁盘上一致，未改动 {OUT_PATH}")
