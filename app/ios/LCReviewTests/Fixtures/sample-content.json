@@ -1,0 +1,34 @@
+{
+ "version": 1,
+ "problems": [
+  {
+   "difficulty": "Medium",
+   "elements": [
+    "指针类型：左右指针相向而行",
+    "停止条件：left < right 不成立时结束"
+   ],
+   "id": "15_3sum",
+   "number": 15,
+   "pseudocode": "1. 排序\n2. 双指针夹逼",
+   "retrospective": "第一遍忘了去重。==**跳过重复元素那一步漏了。**==",
+   "solutions": [
+    {"code": "def three_sum(nums):\n    return []\n", "name": "solution_1.py"}
+   ],
+   "statement": "给你一个整数数组 nums，找出所有和为 0 的三元组。",
+   "technique": "数组双指针",
+   "title": "15. 三数之和"
+  },
+  {
+   "difficulty": "Easy",
+   "elements": ["函数定义：square(n) 返回 n 的平方"],
+   "id": "9998_square",
+   "number": 9998,
+   "pseudocode": "1. 返回 n * n",
+   "retrospective": "",
+   "solutions": [],
+   "statement": "给你一个整数 n，返回 n 的平方。",
+   "technique": "数学技巧",
+   "title": "9998. 平方"
+  }
+ ]
+}
