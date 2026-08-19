@@ -231,6 +231,102 @@
      "intervalDays": 316.0
     }
    ]
+  },
+  {
+   "sequence": [
+    3,
+    3
+   ],
+   "steps": [
+    {
+     "grade": 3,
+     "elapsedDays": 0,
+     "stability": 2.3065,
+     "difficulty": 2.118103970459016,
+     "intervalDays": 2.0
+    },
+    {
+     "grade": 3,
+     "elapsedDays": 0.5,
+     "stability": 2.3065,
+     "difficulty": 2.111214235785395,
+     "intervalDays": 2.0
+    }
+   ]
+  },
+  {
+   "sequence": [
+    3,
+    3
+   ],
+   "steps": [
+    {
+     "grade": 3,
+     "elapsedDays": 0,
+     "stability": 2.3065,
+     "difficulty": 2.118103970459016,
+     "intervalDays": 2.0
+    },
+    {
+     "grade": 3,
+     "elapsedDays": 0,
+     "stability": 2.3065,
+     "difficulty": 2.111214235785395,
+     "intervalDays": 2.0
+    }
+   ]
+  },
+  {
+   "sequence": [
+    3,
+    3
+   ],
+   "steps": [
+    {
+     "grade": 3,
+     "elapsedDays": 0,
+     "stability": 2.3065,
+     "difficulty": 2.118103970459016,
+     "intervalDays": 2.0
+    },
+    {
+     "grade": 3,
+     "elapsedDays": 1.5,
+     "stability": 7.31530074407728,
+     "difficulty": 2.111214235785395,
+     "intervalDays": 7.0
+    }
+   ]
+  },
+  {
+   "sequence": [
+    3,
+    3,
+    1
+   ],
+   "steps": [
+    {
+     "grade": 3,
+     "elapsedDays": 0,
+     "stability": 2.3065,
+     "difficulty": 2.118103970459016,
+     "intervalDays": 2.0
+    },
+    {
+     "grade": 3,
+     "elapsedDays": 0.5,
+     "stability": 2.3065,
+     "difficulty": 2.111214235785395,
+     "intervalDays": 2.0
+    },
+    {
+     "grade": 1,
+     "elapsedDays": 0.3,
+     "stability": 0.7750839828558984,
+     "difficulty": 7.392238132342694,
+     "intervalDays": 1.0
+    }
+   ]
   }
  ]
 }

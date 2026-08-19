@@ -32,6 +32,15 @@ final class FSRSTests: XCTestCase {
 
     /// The port is only trustworthy if it reproduces the reference
     /// implementation. If this fails, fix FSRS.swift — never the fixture.
+    /// `FSRS.defaultParameters` is what the app actually ships with — the
+    /// rest of this test only exercises `baseline.parameters`, which could
+    /// silently drift from it (a mistyped digit, a stale copy-paste) without
+    /// this line ever noticing.
+    func testDefaultParametersMatchTheBaseline() throws {
+        let baseline = try loadBaseline()
+        XCTAssertEqual(FSRS.defaultParameters, baseline.parameters)
+    }
+
     func testMatchesTheReferenceImplementation() throws {
         let baseline = try loadBaseline()
         let fsrs = FSRS(
@@ -93,6 +102,24 @@ final class FSRSTests: XCTestCase {
             XCTAssertGreaterThanOrEqual(state.difficulty, 1.0)
             XCTAssertLessThanOrEqual(state.difficulty, 10.0)
             XCTAssertGreaterThan(state.stability, 0.0)
+        }
+    }
+
+    /// Reachable through clock skew, a timezone change, or a `lastReview`
+    /// that lands in the future — not just a hostile input. Before the
+    /// short-term/long-term branch existed, `elapsedDays = -0.5` pushed
+    /// retrievability above 1 and collapsed stability toward the floor on a
+    /// correct Good answer, and around -4.9 the long-term formula's `pow` of
+    /// a negative base produced NaN that would have been persisted.
+    func testNegativeElapsedDaysDoesNotProduceNaN() {
+        let fsrs = FSRS()
+        let state = fsrs.initialState(grade: .good)
+
+        for elapsedDays in [-0.5, -10.0] {
+            let next = fsrs.nextState(from: state, grade: .good, elapsedDays: elapsedDays)
+            XCTAssertFalse(next.stability.isNaN, "stability is NaN at elapsedDays \(elapsedDays)")
+            XCTAssertFalse(next.difficulty.isNaN, "difficulty is NaN at elapsedDays \(elapsedDays)")
+            XCTAssertGreaterThan(next.stability, 0, "stability must stay positive at elapsedDays \(elapsedDays)")
         }
     }
 

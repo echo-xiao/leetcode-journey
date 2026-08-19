@@ -18,6 +18,7 @@ Notes on the installed py-fsrs (6.x):
 
 import json
 from datetime import datetime, timedelta, timezone
+from pathlib import Path
 
 from fsrs import Card, Rating, Scheduler
 
@@ -27,6 +28,12 @@ GRADES = {1: Rating.Again, 2: Rating.Hard, 3: Rating.Good}
 # Deliberately includes a long gap (365 days) so the port is pinned on the
 # overdue path, where a wrong sign silently collapses intervals instead of
 # stretching them.
+#
+# The last four cases exist to pin the elapsed-time contract py-fsrs enforces
+# before either forgetting-curve formula runs: gaps under one day route to
+# `_short_term_stability` instead of the long-term formula, and gaps of one
+# day or more get floored to a whole day first. Whole-day gaps ≥ 1 (the first
+# eight cases) can't catch a port that skips either rule.
 SEQUENCES = [
     [(3, 0)],
     [(1, 0)],
@@ -36,6 +43,10 @@ SEQUENCES = [
     [(3, 0), (3, 1), (3, 6), (3, 15)],
     [(3, 0), (3, 1), (2, 3), (1, 2), (3, 5)],
     [(3, 0), (3, 1), (3, 6), (3, 365)],
+    [(3, 0), (3, 0.5)],            # 12-hour gap: short-term path
+    [(3, 0), (3, 0)],              # same instant: short-term path, elapsed 0
+    [(3, 0), (3, 1.5)],            # 1.5-day gap: long-term path, floored to 1
+    [(3, 0), (3, 0.5), (1, 0.3)],  # a lapse (Again) following a sub-day gap
 ]
 
 scheduler = Scheduler(learning_steps=(), relearning_steps=(), enable_fuzzing=False)
@@ -60,7 +71,10 @@ for sequence in SEQUENCES:
         })
     out["cases"].append({"sequence": [g for g, _ in sequence], "steps": steps})
 
-path = "app/ios/LCReviewTests/Fixtures/fsrs-baseline.json"
+# Resolved relative to this script, not the caller's working directory, so
+# running it from any directory (including its own) updates the fixture in
+# place instead of writing a nested app/ios/... tree next to it.
+path = Path(__file__).resolve().parent / "fsrs-baseline.json"
 with open(path, "w", encoding="utf-8") as f:
     json.dump(out, f, ensure_ascii=False, indent=1)
 print(f"wrote {path}: {len(out['cases'])} cases")
