@@ -56,6 +56,21 @@ python3 -m lc_review.cli export-anki
 
 `anki/` 不进版本库——它是从 `Problems/` 生成的，重跑一条命令就有。
 
+## 手机 app 的内容
+
+```bash
+python3 -m lc_review.cli export-app
+```
+
+生成 `app/content.json`：每道题的题面、要素、伪代码、复盘、真代码打成一个文件，
+iOS app 启动时从 GitHub Raw 拉这一份。已挂进 `sync-all` 的最后一步。
+
+**这个文件必须提交并推送**，和 `anki/` 相反。GitHub Raw 只能服务已经提交的文件，
+所以生成物在这里是个刻意的例外，别把 `app/` 加进 `.gitignore`。文件生成了但没推，
+手机上拿到的就还是旧内容，而且不会有任何报错提示你。
+
+内容没变时命令不会重写文件，所以每天跑 `sync-all` 不会制造空 diff。
+
 ## 需要配置什么
 
 `.env`（已在 `.gitignore` 里，不会进版本库）：
