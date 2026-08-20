@@ -74,6 +74,24 @@ iOS app 启动时从 GitHub Raw 拉这一份。已挂进 `sync-all` 的最后一
 
 内容没变时命令不会重写文件，所以每天跑 `sync-all` 不会制造空 diff。
 
+## 手机 app
+
+`app/ios/LCReview.xcodeproj`，SwiftUI，iOS 17 起，零第三方依赖。
+
+Xcode 打开、选自己的 iPhone、Run 就装上了。它启动时从 GitHub Raw 拉
+`app/content.json`，所以加了新题只要 `sync-all` 完再 push 就行，不用重装 app。
+（GitHub Raw 有 CDN 缓存，push 后几分钟才生效。）
+
+复习状态存在手机本地，不上云、不要账号。删掉 app 会丢排期，题目内容不会丢——
+重装后重新下载即可。
+
+跑测试：
+
+```bash
+cd app/ios
+xcodebuild test -scheme LCReview -destination 'platform=iOS Simulator,name=iPhone 12 mini'
+```
+
 ## 需要配置什么
 
 `.env`（已在 `.gitignore` 里，不会进版本库）：

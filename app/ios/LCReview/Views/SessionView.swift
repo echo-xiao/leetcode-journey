@@ -40,13 +40,25 @@ struct SessionView: View {
 
     private var header: some View {
         HStack {
-            // Capped at total: once the last card is graded, `done` already
-            // equals `total`, and `done + 1` would read as "4 / 3" on the
-            // finished screen — a real bug caught by looking at the actual
-            // screenshot, not implied by the brief's literal formula.
-            Text("第 \(min(runner.progress.done + 1, runner.progress.total)) / \(runner.progress.total) 题")
-                .font(Theme.tagFont)
-                .foregroundColor(Theme.secondaryText)
+            // A repeat card is extra work appended past the advertised
+            // length, not the Nth of N — `progress.done` is deliberately
+            // capped at `total`, so the plain fraction would read the same
+            // as the genuinely last card. Naming it "加练" instead keeps the
+            // header truthful about which state this is.
+            //
+            // The remaining case is capped at total: once the last regular
+            // card is graded, `done` already equals `total`, and `done + 1`
+            // would read as "4 / 3" — a real bug caught by looking at the
+            // actual screenshot, not implied by the brief's literal formula.
+            if runner.current?.askOnly != nil {
+                Text("加练一题")
+                    .font(Theme.tagFont)
+                    .foregroundColor(Theme.secondaryText)
+            } else {
+                Text("第 \(min(runner.progress.done + 1, runner.progress.total)) / \(runner.progress.total) 题")
+                    .font(Theme.tagFont)
+                    .foregroundColor(Theme.secondaryText)
+            }
             Spacer()
             Button("结束") { onFinish() }
                 .font(Theme.tagFont)
