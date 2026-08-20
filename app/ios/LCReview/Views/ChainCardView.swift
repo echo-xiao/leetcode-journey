@@ -35,9 +35,9 @@ struct ChainCardView: View {
 
                         Text("#\(problem.technique)")
                             .font(Theme.tagFont)
-                            .foregroundColor(Theme.accent)
-                            .padding(.horizontal, 12)
-                            .padding(.vertical, 5)
+                            .foregroundColor(Theme.tagTextColor)
+                            .padding(.horizontal, 7)
+                            .padding(.vertical, 6)
                             .background(Theme.tagBackground)
                             .clipShape(Capsule())
 
@@ -96,38 +96,26 @@ struct ChainCardView: View {
         }
     }
 
-    /// Code and pseudocode shrink and soft-wrap with a hanging indent —
-    /// never scroll sideways, on this card or anything in it.
+    /// Code and pseudocode scroll horizontally instead of wrapping or
+    /// shrinking — the owner reversed the earlier decision that shrank this
+    /// text to 11pt and soft-wrapped it with a hanging indent. Wrapping a
+    /// code line mid-statement destroys the one thing that makes code
+    /// legible (indentation), and shrinking to fit the worst-case line makes
+    /// every other line unreadably small. Horizontal scroll preserves every
+    /// line's indentation exactly and costs nothing for lines that already
+    /// fit.
     ///
-    /// Each source line is measured for its own leading whitespace, then laid
-    /// out as a fixed-width leading spacer (the indent) plus the trimmed
-    /// remainder. The spacer's width comes from `Theme.codeIndentUnit`, the
-    /// measured advance width of one monospaced character at 11pt, so it
-    /// lines up exactly with the characters above it rather than guessing a
-    /// point value. Because the remainder `Text` starts at that offset, its
-    /// own wrapped continuation lines stay under the spacer too — that's the
-    /// hanging indent, and it's what keeps nested Python readable when a line
-    /// wraps. Blank lines are preserved as blank rows.
+    /// The earlier complaint about this same pattern was that a cut-off line
+    /// read as a rendering bug — nothing told the reader more content was
+    /// off-screen. `CodeStrip` below fixes that: the scroll indicator is
+    /// shown (not hidden), and a soft fade sits over the right edge whenever
+    /// there is more content to scroll to, disappearing once scrolled to the
+    /// end. Only this strip scrolls sideways — the outer page `ScrollView`
+    /// above is untouched and stays vertical-only, so a long line can never
+    /// push the card or the page sideways.
     @ViewBuilder
     private func codeBlock(_ code: String) -> some View {
-        let lines = code.components(separatedBy: "\n")
-        VStack(alignment: .leading, spacing: 4) {
-            ForEach(Array(lines.enumerated()), id: \.offset) { _, line in
-                codeLine(line)
-            }
-        }
-    }
-
-    private func codeLine(_ raw: String) -> some View {
-        let indentColumns = raw.prefix(while: { $0 == " " }).count
-        let trimmed = String(raw.drop(while: { $0 == " " }))
-        return HStack(alignment: .top, spacing: 0) {
-            Color.clear.frame(width: CGFloat(indentColumns) * Theme.codeIndentUnit)
-            Text(trimmed.isEmpty ? " " : trimmed)
-                .font(Theme.codeFont)
-                .lineSpacing(4)
-                .fixedSize(horizontal: false, vertical: true)
-        }
+        CodeStrip(code: code)
     }
 
     @ViewBuilder
@@ -145,4 +133,84 @@ struct ChainCardView: View {
         }
         .transition(.opacity)
     }
+}
+
+/// A single line (or block) of monospaced source that scrolls horizontally
+/// instead of wrapping, with a self-announcing right edge: the system
+/// scroll indicator is shown, and a soft fade covers the right edge for as
+/// long as there's more content to scroll to, disappearing once the strip
+/// is scrolled all the way to its end.
+///
+/// Content width, viewport width, and scroll offset are all read via
+/// `GeometryReader` + `PreferenceKey`, the standard SwiftUI pattern for
+/// tracking a `ScrollView`'s own scroll position — there's no public API for
+/// "am I scrolled to the end" otherwise.
+private struct CodeStrip: View {
+    let code: String
+
+    @State private var contentWidth: CGFloat = 0
+    @State private var viewportWidth: CGFloat = 0
+    @State private var scrollOffsetX: CGFloat = 0
+
+    private var isScrollable: Bool { contentWidth > viewportWidth + 1 }
+    private var isAtEnd: Bool {
+        guard isScrollable else { return true }
+        return scrollOffsetX >= (contentWidth - viewportWidth - 1)
+    }
+
+    var body: some View {
+        ZStack(alignment: .trailing) {
+            ScrollView(.horizontal, showsIndicators: true) {
+                Text(code)
+                    .font(Theme.codeFont)
+                    .lineSpacing(4)
+                    .fixedSize(horizontal: true, vertical: true)
+                    .background(
+                        GeometryReader { contentGeo in
+                            Color.clear
+                                .preference(key: CodeContentWidthKey.self, value: contentGeo.size.width)
+                                .preference(
+                                    key: CodeScrollOffsetKey.self,
+                                    value: contentGeo.frame(in: .named("codeStrip")).minX
+                                )
+                        }
+                    )
+            }
+            .coordinateSpace(name: "codeStrip")
+            .background(
+                GeometryReader { outerGeo in
+                    Color.clear
+                        .preference(key: CodeViewportWidthKey.self, value: outerGeo.size.width)
+                }
+            )
+            .onPreferenceChange(CodeContentWidthKey.self) { contentWidth = $0 }
+            .onPreferenceChange(CodeViewportWidthKey.self) { viewportWidth = $0 }
+            .onPreferenceChange(CodeScrollOffsetKey.self) { scrollOffsetX = -$0 }
+
+            if isScrollable && !isAtEnd {
+                LinearGradient(
+                    colors: [Theme.cardBackground.opacity(0), Theme.cardBackground],
+                    startPoint: .leading,
+                    endPoint: .trailing
+                )
+                .frame(width: 24)
+                .allowsHitTesting(false)
+            }
+        }
+    }
+}
+
+private struct CodeContentWidthKey: PreferenceKey {
+    static var defaultValue: CGFloat = 0
+    static func reduce(value: inout CGFloat, nextValue: () -> CGFloat) { value = nextValue() }
+}
+
+private struct CodeViewportWidthKey: PreferenceKey {
+    static var defaultValue: CGFloat = 0
+    static func reduce(value: inout CGFloat, nextValue: () -> CGFloat) { value = nextValue() }
+}
+
+private struct CodeScrollOffsetKey: PreferenceKey {
+    static var defaultValue: CGFloat = 0
+    static func reduce(value: inout CGFloat, nextValue: () -> CGFloat) { value = nextValue() }
 }
