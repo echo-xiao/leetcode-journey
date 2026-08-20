@@ -95,4 +95,104 @@ final class SummaryTests: XCTestCase {
         XCTAssertEqual(cells.last?.count, 2)
         XCTAssertEqual(cells.dropLast().last?.count, 1)
     }
+
+    // MARK: - DST transitions
+
+    // Every test above pins the calendar to Asia/Shanghai, which has not
+    // observed daylight saving since 1991 — so none of them can exercise a
+    // DST transition even though the streak is documented as walking
+    // calendar days one at a time. The app runs on Calendar.current, and on
+    // a device in the United States that means two transitions a year: a
+    // 23-hour day every spring and a 25-hour day every fall. These tests
+    // pin to America/Los_Angeles instead and sit directly on those days.
+
+    private var losAngelesCalendar: Calendar = {
+        var calendar = Calendar(identifier: .gregorian)
+        calendar.timeZone = TimeZone(identifier: "America/Los_Angeles")!
+        return calendar
+    }()
+
+    private lazy var losAngelesSummary = Summary(calendar: losAngelesCalendar)
+
+    private func laDay(_ year: Int, _ month: Int, _ day: Int, hour: Int = 12) -> Date {
+        losAngelesCalendar.date(from: DateComponents(
+            year: year, month: month, day: day, hour: hour
+        ))!
+    }
+
+    /// Hours of real time between the start of `date`'s day and the start
+    /// of the next, per the calendar under test. 24 on an ordinary day, 23
+    /// on the day clocks spring forward, 25 on the day they fall back.
+    private func dayLengthInHours(_ date: Date, calendar: Calendar) -> Double {
+        let start = calendar.startOfDay(for: date)
+        let next = calendar.date(byAdding: .day, value: 1, to: start)!
+        return next.timeIntervalSince(start) / 3600
+    }
+
+    func testSpringForwardDayIsTwentyThreeHoursInLosAngeles() {
+        // Ground truth, asked of the calendar itself rather than assumed:
+        // proves 2026-03-08 really is the transition day before the streak
+        // test below leans on it.
+        XCTAssertEqual(
+            dayLengthInHours(laDay(2026, 3, 8), calendar: losAngelesCalendar), 23,
+            "2026-03-08 must be the spring-forward 23-hour day in America/Los_Angeles for the test below to prove anything"
+        )
+    }
+
+    func testFallBackDayIsTwentyFiveHoursInLosAngeles() {
+        XCTAssertEqual(
+            dayLengthInHours(laDay(2026, 11, 1), calendar: losAngelesCalendar), 25,
+            "2026-11-01 must be the fall-back 25-hour day in America/Los_Angeles for the test below to prove anything"
+        )
+    }
+
+    func testStreakSurvivesSpringForwardTransition() {
+        let logs = [laDay(2026, 3, 7), laDay(2026, 3, 8), laDay(2026, 3, 9)].map { log($0) }
+        XCTAssertEqual(
+            losAngelesSummary.streak(logs: logs, now: laDay(2026, 3, 9)), 3,
+            "a 23-hour day must count as one day of the streak, not zero and not two"
+        )
+    }
+
+    func testStreakSurvivesFallBackTransition() {
+        let logs = [laDay(2026, 10, 31), laDay(2026, 11, 1), laDay(2026, 11, 2)].map { log($0) }
+        XCTAssertEqual(
+            losAngelesSummary.streak(logs: logs, now: laDay(2026, 11, 2)), 3,
+            "a 25-hour day must count as one day of the streak, not zero and not two"
+        )
+    }
+
+    func testHeatmapCellCountSurvivesSpringForwardTransition() {
+        let transitionDay = laDay(2026, 3, 8)
+        let cells = losAngelesSummary.heatmap(
+            logs: [log(transitionDay)], startDay: laDay(2020, 1, 1), now: laDay(2026, 3, 15), days: 90
+        )
+        XCTAssertEqual(cells.count, 90, "the window must still be exactly 90 cells across a 23-hour day")
+        XCTAssertEqual(
+            Set(cells.map(\.day)).count, 90,
+            "the 23-hour day must be neither skipped nor duplicated into two cells"
+        )
+        let transitionCell = cells.first { $0.day == losAngelesCalendar.startOfDay(for: transitionDay) }
+        XCTAssertEqual(
+            transitionCell?.count, 1,
+            "the review logged on the transition day must land in that day's cell"
+        )
+    }
+
+    func testHeatmapCellCountSurvivesFallBackTransition() {
+        let transitionDay = laDay(2026, 11, 1)
+        let cells = losAngelesSummary.heatmap(
+            logs: [log(transitionDay)], startDay: laDay(2020, 1, 1), now: laDay(2026, 11, 8), days: 90
+        )
+        XCTAssertEqual(cells.count, 90, "the window must still be exactly 90 cells across a 25-hour day")
+        XCTAssertEqual(
+            Set(cells.map(\.day)).count, 90,
+            "the 25-hour day must be neither skipped nor duplicated into two cells"
+        )
+        let transitionCell = cells.first { $0.day == losAngelesCalendar.startOfDay(for: transitionDay) }
+        XCTAssertEqual(
+            transitionCell?.count, 1,
+            "the review logged on the transition day must land in that day's cell"
+        )
+    }
 }
