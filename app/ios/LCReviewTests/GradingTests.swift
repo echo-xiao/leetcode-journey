@@ -103,4 +103,30 @@ final class GradingTests: XCTestCase {
         XCTAssertEqual(after.consecutiveGood, 0)
         XCTAssertEqual(log?.isRepeat, true, "but it is real work and belongs in the heatmap")
     }
+
+    func testARepeatWithNoPriorStateDoesNotBecomeAFirstGrade() {
+        let (state, log) = grading.apply(
+            grade: .good, to: nil, problemID: "15_3sum", track: .elements,
+            isRepeat: true, now: now
+        )
+
+        XCTAssertEqual(state.reviewCount, 0, "a repeat must never be counted as a real review")
+        XCTAssertNil(state.lastReview, "a repeat must never schedule the card")
+        XCTAssertFalse(state.inMistakeBank, "a repeat must never move the mistake bank")
+        XCTAssertEqual(state.consecutiveGood, 0)
+        XCTAssertEqual(log?.isRepeat, true, "the repeat is still real work and belongs in the heatmap")
+    }
+
+    func testAgainGoodHardGoodLeavesTheBankWithHardAsANoOp() {
+        var state = freshState(grade: .again)
+        let grades: [Grade] = [.good, .hard, .good]
+        for (index, grade) in grades.enumerated() {
+            state = grading.apply(
+                grade: grade, to: state, problemID: "15_3sum", track: .elements,
+                isRepeat: false, now: now.addingTimeInterval(Double(index + 1) * 86_400)
+            ).state
+        }
+        XCTAssertFalse(state.inMistakeBank, "an intervening Hard must not break the Good streak")
+        XCTAssertEqual(state.consecutiveGood, 2)
+    }
 }

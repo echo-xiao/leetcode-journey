@@ -28,7 +28,19 @@ struct Grading {
         // is real work, so it is logged, but it neither reschedules the card
         // nor counts toward leaving the mistake bank: answering correctly two
         // minutes after seeing the answer is not evidence of anything.
-        if isRepeat, let state = existing {
+        //
+        // This branch is taken on `isRepeat` alone, never conditional on
+        // `existing`. A repeat is only ever queued after a real grade on the
+        // same track, so `existing` is expected to be present. Guarding
+        // rather than falling through matters because the fall-through path
+        // would treat the repeat as a first-ever grade: it would schedule
+        // the card, count the review, and move the mistake bank -- exactly
+        // what this branch exists to prevent.
+        if isRepeat {
+            let state = existing ?? CardState(
+                problemID: problemID, track: track,
+                stability: 0, difficulty: 0, due: now
+            )
             return (state, log)
         }
 

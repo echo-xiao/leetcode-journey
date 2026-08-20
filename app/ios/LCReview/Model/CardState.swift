@@ -14,9 +14,12 @@ final class CardState {
     var due: Date
     var lastReview: Date?
     var reviewCount: Int
-    /// Entered on 不会, left only after two consecutive 会.
+    /// Entered on 不会, left once `consecutiveGood` reaches
+    /// `Grading.goodStreakToLeaveBank`.
     var inMistakeBank: Bool
-    /// Counts toward leaving the bank. In-session repeats never touch it.
+    /// Counts toward leaving the bank. Good advances it, Again resets it to
+    /// zero, and Hard leaves it untouched -- so a Hard between two Goods
+    /// does not break the run. In-session repeats never touch it.
     var consecutiveGood: Int
 
     init(
