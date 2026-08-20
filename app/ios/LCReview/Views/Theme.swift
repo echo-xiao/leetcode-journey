@@ -1,4 +1,5 @@
 import SwiftUI
+import UIKit
 
 /// The whole visual vocabulary, in one place.
 ///
@@ -42,6 +43,25 @@ enum Theme {
     static let titleFont = Font.system(size: 21, weight: .semibold)
     static let bodyFont = Font.system(size: 17)
     static let bodyLineSpacing: CGFloat = 7
-    static let tagFont = Font.system(size: 13)
-    static let codeFont = Font.system(size: 13, design: .monospaced)
+
+    /// The quiet meta line at the top of the card (difficulty + number) —
+    /// flomo's timestamp equivalent. Orientation, not content, so it's the
+    /// smallest and greyest text on the card.
+    static let metaFont = Font.system(size: 12)
+
+    /// The technique tag, now a pill at the top of the card rather than grey
+    /// text at the bottom — the brightest thing on the card, same as flomo's
+    /// blue-lavender tag, just in the app's teal-green accent.
+    static let tagFont = Font.system(size: 13, weight: .medium)
+    static let tagBackground = accent.opacity(0.14)
+
+    static let codeFont = Font.system(size: 11, design: .monospaced)
+
+    /// Advance width of one monospaced character at `codeFont`'s size,
+    /// measured rather than guessed, so a code line's hanging indent lines up
+    /// exactly with the characters above it.
+    static let codeIndentUnit: CGFloat = {
+        let font = UIFont.monospacedSystemFont(ofSize: 11, weight: .regular)
+        return (" " as NSString).size(withAttributes: [.font: font]).width
+    }()
 }
