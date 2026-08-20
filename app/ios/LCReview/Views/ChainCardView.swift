@@ -2,9 +2,17 @@ import SwiftUI
 
 /// One problem, opened as far as `revealed`.
 ///
-/// Layers are appended to the same card rather than replacing it, so after the
-/// last tap the whole chain is on one scrollable page and can be read back
-/// from the top.
+/// Each layer is its own card — one card per source file — stacked
+/// vertically and linked by a short dashed connector, "beads on a string"
+/// rather than one continuous scrolling slab. A card that has no content
+/// (an empty retrospective, a problem with no solutions yet) is simply never
+/// drawn, and no orphan connector is drawn for it either. The meta line, tag
+/// pill and title identify the *problem*, not any one layer, so they live on
+/// the first card only.
+///
+/// When `revealed` advances, the newly revealed card is scrolled into view
+/// and animated — without that, tapping past the last visible card produces
+/// no on-screen change and reads as an unresponsive tap.
 struct ChainCardView: View {
     let problem: Problem
     let revealed: Layer
@@ -27,73 +35,132 @@ struct ChainCardView: View {
                 Theme.pageBackground
                     .ignoresSafeArea()
 
-                ScrollView {
-                    VStack(alignment: .leading, spacing: Theme.sectionSpacing) {
-                        Text("\(problem.difficulty) · #\(problem.number)")
-                            .font(Theme.metaFont)
-                            .foregroundColor(Theme.secondaryText)
+                ScrollViewReader { proxy in
+                    ScrollView {
+                        VStack(spacing: 0) {
+                            card(id: Self.statementID) { statementContent }
 
-                        Text("#\(problem.technique)")
-                            .font(Theme.tagFont)
-                            .foregroundColor(Theme.tagTextColor)
-                            .padding(.horizontal, 7)
-                            .padding(.vertical, 6)
-                            .background(Theme.tagBackground)
-                            .clipShape(Capsule())
+                            if revealed >= .elements {
+                                connector
+                                labeledCard(id: Self.elementsID, label: "要素") {
+                                    elementsContent
+                                }
+                            }
 
-                        Text(problem.title)
-                            .font(Theme.titleFont)
-                            .foregroundColor(Theme.primaryText)
+                            if revealed >= .pseudocode {
+                                connector
+                                labeledCard(id: Self.pseudocodeID, label: "伪代码") {
+                                    codeBlock(problem.pseudocode)
+                                }
+                            }
 
-                        Text(problem.statement)
-                            .font(Theme.bodyFont)
-                            .lineSpacing(Theme.bodyLineSpacing)
-                            .foregroundColor(Theme.primaryText)
+                            if revealed >= .retrospective, !problem.retrospective.isEmpty {
+                                connector
+                                labeledCard(id: Self.retrospectiveID, label: "上次卡在哪") {
+                                    HighlightedText(markdown: problem.retrospective)
+                                }
+                            }
 
-                        if revealed >= .elements {
-                            section("要素") {
-                                VStack(alignment: .leading, spacing: 10) {
-                                    ForEach(Array(problem.elements.enumerated()), id: \.offset) { index, slot in
-                                        Text("\(index + 1). \(slot)")
-                                            .font(Theme.bodyFont)
-                                            .lineSpacing(Theme.bodyLineSpacing)
+                            if revealed >= .solutions {
+                                ForEach(Array(problem.solutions.enumerated()), id: \.offset) { index, solution in
+                                    connector
+                                    labeledCard(id: Self.solutionID(index), label: solution.name) {
+                                        codeBlock(solution.code)
                                     }
                                 }
                             }
                         }
-
-                        if revealed >= .pseudocode {
-                            section("伪代码") {
-                                codeBlock(problem.pseudocode)
-                            }
-                        }
-
-                        if revealed >= .retrospective, !problem.retrospective.isEmpty {
-                            section("上次卡在哪") {
-                                HighlightedText(markdown: problem.retrospective)
-                            }
-                        }
-
-                        if revealed >= .solutions {
-                            ForEach(problem.solutions, id: \.name) { solution in
-                                section(solution.name) {
-                                    codeBlock(solution.code)
-                                }
-                            }
+                        .padding(.vertical, 12)
+                    }
+                    .frame(width: geo.size.width, height: geo.size.height)
+                    .clipped()
+                    .onChange(of: revealed) { _, newValue in
+                        guard let id = scrollTarget(for: newValue) else { return }
+                        withAnimation(.easeInOut(duration: 0.3)) {
+                            proxy.scrollTo(id, anchor: .top)
                         }
                     }
-                    .frame(maxWidth: .infinity, alignment: .leading)
-                    .padding(Theme.cardPadding)
-                    .background(Theme.cardBackground)
-                    .clipShape(RoundedRectangle(cornerRadius: Theme.cardCornerRadius, style: .continuous))
-                    .shadow(color: .black.opacity(0.05), radius: 12, y: 4)
-                    .padding(.horizontal, 16)
-                    .padding(.vertical, 12)
                 }
-                .frame(width: geo.size.width, height: geo.size.height)
-                .clipped()
             }
         }
+    }
+
+    // MARK: Card identity, for `ScrollViewReader`
+
+    private static let statementID = "statement"
+    private static let elementsID = "elements"
+    private static let pseudocodeID = "pseudocode"
+    private static let retrospectiveID = "retrospective"
+    private static func solutionID(_ index: Int) -> String { "solution-\(index)" }
+
+    /// Which card, if any, just became visible as `revealed` advanced to
+    /// `layer` — nil when the step produced no new card (an empty
+    /// retrospective) or needs no scroll (the statement is on screen from
+    /// the start). When several solution cards appear at once, only the
+    /// first is targeted: that's the new content the reveal introduced,
+    /// immediately below whatever card was last on screen.
+    private func scrollTarget(for layer: Layer) -> String? {
+        switch layer {
+        case .statement: return nil
+        case .elements: return Self.elementsID
+        case .pseudocode: return Self.pseudocodeID
+        case .retrospective: return problem.retrospective.isEmpty ? nil : Self.retrospectiveID
+        case .solutions: return problem.solutions.isEmpty ? nil : Self.solutionID(0)
+        }
+    }
+
+    // MARK: Card contents
+
+    private var statementContent: some View {
+        VStack(alignment: .leading, spacing: Theme.sectionSpacing) {
+            Text("\(problem.difficulty) · #\(problem.number)")
+                .font(Theme.metaFont)
+                .foregroundColor(Theme.secondaryText)
+
+            Text("#\(problem.technique)")
+                .font(Theme.tagFont)
+                .foregroundColor(Theme.tagTextColor)
+                .padding(.horizontal, 7)
+                .padding(.vertical, 6)
+                .background(Theme.tagBackground)
+                .clipShape(Capsule())
+
+            Text(problem.title)
+                .font(Theme.titleFont)
+                .foregroundColor(Theme.primaryText)
+
+            Text(problem.statement)
+                .font(Theme.bodyFont)
+                .lineSpacing(Theme.bodyLineSpacing)
+                .foregroundColor(Theme.primaryText)
+        }
+    }
+
+    private var elementsContent: some View {
+        VStack(alignment: .leading, spacing: 10) {
+            ForEach(Array(problem.elements.enumerated()), id: \.offset) { index, slot in
+                Text("\(index + 1). \(slot)")
+                    .font(Theme.bodyFont)
+                    .lineSpacing(Theme.bodyLineSpacing)
+            }
+        }
+    }
+
+    /// The dashed link between two adjacent cards, centred in the available
+    /// width. Short by design — a small gap, not a long stretch — so the
+    /// chain reads as beads close together rather than cards floating far
+    /// apart.
+    private var connector: some View {
+        Path { path in
+            path.move(to: .zero)
+            path.addLine(to: CGPoint(x: 0, y: Theme.connectorHeight))
+        }
+        .stroke(
+            Theme.secondaryText,
+            style: StrokeStyle(lineWidth: Theme.connectorLineWidth, lineCap: .round, dash: Theme.connectorDashPattern)
+        )
+        .frame(width: Theme.connectorLineWidth, height: Theme.connectorHeight)
+        .frame(maxWidth: .infinity)
     }
 
     /// Code and pseudocode scroll horizontally instead of wrapping or
@@ -118,20 +185,43 @@ struct ChainCardView: View {
         CodeStrip(code: code)
     }
 
+    /// One card: padded content on the flomo card background, rounded
+    /// corners, a soft shadow, and a stable `id` so `ScrollViewReader` can
+    /// target it. Every layer of the chain — statement, 要素, 伪代码, 复盘,
+    /// each solution file — renders through this one wrapper, which is what
+    /// makes them read as identical beads on the same string rather than as
+    /// different kinds of thing.
     @ViewBuilder
-    private func section<Content: View>(
-        _ label: String, @ViewBuilder content: () -> Content
+    private func card<Content: View>(
+        id: String, @ViewBuilder content: () -> Content
     ) -> some View {
-        VStack(alignment: .leading, spacing: 12) {
-            Divider().opacity(0.5)
-            Text(label)
-                .font(Theme.tagFont)
-                .foregroundColor(Theme.secondaryText)
-            content()
-                .foregroundColor(Theme.primaryText)
-                .frame(maxWidth: .infinity, alignment: .leading)
+        content()
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .padding(Theme.cardPadding)
+            .background(Theme.cardBackground)
+            .clipShape(RoundedRectangle(cornerRadius: Theme.cardCornerRadius, style: .continuous))
+            .shadow(color: .black.opacity(0.05), radius: 12, y: 4)
+            .padding(.horizontal, 16)
+            .id(id)
+            .transition(.opacity)
+    }
+
+    /// A `card` with a section label above its content — every card past
+    /// the first (which carries the problem's own title instead).
+    @ViewBuilder
+    private func labeledCard<Content: View>(
+        id: String, label: String, @ViewBuilder content: () -> Content
+    ) -> some View {
+        card(id: id) {
+            VStack(alignment: .leading, spacing: 12) {
+                Text(label)
+                    .font(Theme.tagFont)
+                    .foregroundColor(Theme.secondaryText)
+                content()
+                    .foregroundColor(Theme.primaryText)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+            }
         }
-        .transition(.opacity)
     }
 }
 

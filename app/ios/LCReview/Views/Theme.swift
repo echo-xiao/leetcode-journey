@@ -95,4 +95,14 @@ enum Theme {
     /// earlier decision to shrink it to 11pt. Tied to `bodyFont`'s point
     /// value (16) rather than a second literal, so the two can't drift apart.
     static let codeFont = Font.system(size: 16, design: .monospaced)
+
+    /// The dashed vertical line connecting one chain card to the next —
+    /// "beads on a string" rather than one continuous slab. Deliberately
+    /// short: a long stretch would read as empty space, not a link between
+    /// two adjacent cards. Colour is `secondaryText`, the same quiet grey
+    /// already used for meta lines and section labels, so it reads as
+    /// structural rather than as content.
+    static let connectorHeight: CGFloat = 22
+    static let connectorLineWidth: CGFloat = 1.5
+    static let connectorDashPattern: [CGFloat] = [4, 4]
 }
