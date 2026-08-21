@@ -14,7 +14,7 @@ final class ContentDecodingTests: XCTestCase {
 
     func testDecodesEveryLayerOfTheChain() throws {
         let payload = try loadSample()
-        XCTAssertEqual(payload.version, 1)
+        XCTAssertEqual(payload.version, 2)
         XCTAssertEqual(payload.problems.count, 2)
 
         let first = payload.problems[0]
@@ -23,7 +23,8 @@ final class ContentDecodingTests: XCTestCase {
         XCTAssertEqual(first.title, "15. 三数之和")
         XCTAssertEqual(first.technique, "数组双指针")
         XCTAssertEqual(first.elements.count, 2)
-        XCTAssertTrue(first.pseudocode.contains("双指针夹逼"))
+        XCTAssertTrue(first.pseudocode.contains { $0.kind == .code && $0.text.contains("双指针夹逼") })
+        XCTAssertTrue(first.pseudocode.contains { $0.kind == .heading && $0.text == "1. 核心本质" })
         XCTAssertEqual(first.solutions.first?.name, "solution_1.py")
     }
 

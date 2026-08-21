@@ -14,17 +14,116 @@ from __future__ import annotations
 
 import json
 import re
+import textwrap
 from pathlib import Path
 
 from .problem_source import PROBLEMS, REPO, elements_of, meta_of, statement_of, title_of
 
-SCHEMA_VERSION = 1
+SCHEMA_VERSION = 2
 OUT_PATH = REPO / "app" / "content.json"
 
 # "1005_univalued-binary-tree" -> 1005. Folder names always start with the id.
 _NUMBER_RE = re.compile(r"^(\d+)_")
 # "solution_10.py" must sort after "solution_2.py", which string order gets wrong.
 _SOLUTION_RE = re.compile(r"^solution_(\d+)\.py$")
+
+# pseudocode.md parsing: turn a hand-written "article" (headings, prose,
+# one fenced pseudocode block, a complexity section) into typed blocks the
+# app can render with the right typography for each kind. See
+# `_pseudocode_blocks` for the block shapes.
+_HEADING_RE = re.compile(r"^(#{2,})\s*(.*)$")
+_TITLE_RE = re.compile(r"^#\s+.*$")
+_FENCE_RE = re.compile(r"^\s*```")
+_BOLD_RE = re.compile(r"\*\*(.+?)\*\*")
+_INLINE_CODE_RE = re.compile(r"`([^`]+)`")
+_LATEX_RE = re.compile(r"\$([^$]+)\$")
+_BULLET_RE = re.compile(r"^(\s*)-\s+")
+
+
+def _clean_text_line(line: str) -> str:
+    """Strip markdown emphasis/code/math markers from one prose line.
+
+    Order matters: bullets first (so a bolded bullet like "- **X**" still
+    gets its dash swapped before the bold markers are stripped), then bold,
+    then inline code, then LaTeX delimiters.
+    """
+    line = _BULLET_RE.sub(lambda m: m.group(1) + "• ", line)
+    line = _BOLD_RE.sub(lambda m: m.group(1), line)
+    line = _INLINE_CODE_RE.sub(lambda m: m.group(1), line)
+    line = _LATEX_RE.sub(lambda m: m.group(1), line)
+    return line
+
+
+def _pseudocode_blocks(text: str) -> list[dict]:
+    """Parse a pseudocode.md body (title line already stripped) into blocks.
+
+    - `##`+ headings become {"kind": "heading"} with the hashes removed.
+    - A lone `# ` line is a second copy of the document title some articles
+      carry in the body; it repeats the problem name, so it is dropped.
+    - Fenced ``` blocks become {"kind": "code"}, dedented but with their
+      internal (relative) indentation intact — some articles nest the fence
+      inside a bullet, which indents the fence markers but not the meaning
+      of the pseudocode's own indentation.
+    - Everything else is prose: consecutive non-blank lines join into one
+      {"kind": "text"} block, cleaned of markdown markers; a blank line
+      starts a new block.
+    """
+    lines = text.splitlines()
+    blocks: list[dict] = []
+    paragraph: list[str] = []
+
+    def flush() -> None:
+        if paragraph:
+            cleaned = "\n".join(paragraph).strip()
+            if cleaned:
+                blocks.append({"kind": "text", "text": cleaned})
+            paragraph.clear()
+
+    i = 0
+    n = len(lines)
+    while i < n:
+        line = lines[i]
+
+        if _FENCE_RE.match(line):
+            flush()
+            i += 1
+            code_lines: list[str] = []
+            while i < n and not _FENCE_RE.match(lines[i]):
+                code_lines.append(lines[i])
+                i += 1
+            i += 1  # skip the closing fence
+            code = textwrap.dedent("\n".join(code_lines)).strip("\n")
+            if code:
+                blocks.append({"kind": "code", "text": code})
+            continue
+
+        heading_match = _HEADING_RE.match(line)
+        if heading_match:
+            flush()
+            _, rest = heading_match.groups()
+            blocks.append({"kind": "heading", "text": rest.strip()})
+            i += 1
+            continue
+
+        if _TITLE_RE.match(line):
+            flush()
+            i += 1
+            continue
+
+        if not line.strip():
+            flush()
+            i += 1
+            continue
+
+        paragraph.append(_clean_text_line(line))
+        i += 1
+
+    flush()
+    return blocks
+
+
+def _pseudocode_of(folder: Path) -> list[dict]:
+    return _pseudocode_blocks(_body_after_heading(folder / "pseudocode.md"))
 
 
 def _body_after_heading(path: Path) -> str:
@@ -68,7 +167,7 @@ def problem_entry(folder: Path, techniques: dict[str, str]) -> dict:
         # examples off 130 of the 402 problems.
         "statement": statement_of(folder, limit=None),
         "elements": elements_of(folder),
-        "pseudocode": _body_after_heading(folder / "pseudocode.md"),
+        "pseudocode": _pseudocode_of(folder),
         # Empty for the 66 problems with no review.md. The ==marked== spans are
         # passed through untouched; the app renders them as highlights, and they
         # are the part of a retrospective worth seeing.

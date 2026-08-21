@@ -38,7 +38,8 @@ final class ContentStoreTests: XCTestCase {
         let problems = ids.map {
             Problem(
                 id: $0, number: 1, title: $0, difficulty: "Easy", technique: "贪心",
-                statement: "s", elements: ["e"], pseudocode: "p",
+                statement: "s", elements: ["e"],
+                pseudocode: [PseudocodeBlock(kind: .text, text: "p")],
                 retrospective: "", solutions: []
             )
         }

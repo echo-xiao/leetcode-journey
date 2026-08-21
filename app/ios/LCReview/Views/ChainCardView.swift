@@ -50,7 +50,7 @@ struct ChainCardView: View {
                             if revealed >= .pseudocode {
                                 connector
                                 labeledCard(id: Self.pseudocodeID, label: "伪代码") {
-                                    codeBlock(problem.pseudocode)
+                                    pseudocodeContent
                                 }
                             }
 
@@ -61,12 +61,13 @@ struct ChainCardView: View {
                                 }
                             }
 
-                            if revealed >= .solutions {
-                                ForEach(Array(problem.solutions.enumerated()), id: \.offset) { index, solution in
-                                    connector
-                                    labeledCard(id: Self.solutionID(index), label: solution.name) {
-                                        codeBlock(solution.code)
-                                    }
+                            // Only the first solution is shown — the owner
+                            // decided extra solution cards added scroll
+                            // length without adding anything worth reviewing.
+                            if revealed >= .solutions, let solution = problem.solutions.first {
+                                connector
+                                labeledCard(id: Self.solutionID(0), label: solution.name) {
+                                    codeBlock(solution.code)
                                 }
                             }
                         }
@@ -161,6 +162,31 @@ struct ChainCardView: View {
         )
         .frame(width: Theme.connectorLineWidth, height: Theme.connectorHeight)
         .frame(maxWidth: .infinity)
+    }
+
+    /// A `pseudocode.md` article, rendered block by block instead of as one
+    /// monospaced blob: `heading` blocks get the same small grey label style
+    /// already used for section labels, `text` blocks are normal body type
+    /// that wraps like any other prose, and only `code` blocks go into the
+    /// horizontally-scrolling `CodeStrip` — prose must never scroll sideways,
+    /// only the pseudocode itself should.
+    private var pseudocodeContent: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            ForEach(Array(problem.pseudocode.enumerated()), id: \.offset) { _, block in
+                switch block.kind {
+                case .heading:
+                    Text(block.text)
+                        .font(Theme.tagFont)
+                        .foregroundColor(Theme.secondaryText)
+                case .text:
+                    Text(block.text)
+                        .font(Theme.bodyFont)
+                        .lineSpacing(Theme.bodyLineSpacing)
+                case .code:
+                    codeBlock(block.text)
+                }
+            }
+        }
     }
 
     /// Code and pseudocode scroll horizontally instead of wrapping or

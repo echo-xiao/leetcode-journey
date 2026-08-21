@@ -10,7 +10,8 @@ final class SessionBuilderTests: XCTestCase {
         Problem(
             id: id, number: Int(id.prefix(while: \.isNumber)) ?? 0, title: id,
             difficulty: "Medium", technique: technique, statement: "s",
-            elements: ["e"], pseudocode: "p", retrospective: "", solutions: []
+            elements: ["e"], pseudocode: [PseudocodeBlock(kind: .text, text: "p")],
+            retrospective: "", solutions: []
         )
     }
 
