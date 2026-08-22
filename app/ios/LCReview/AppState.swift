@@ -13,6 +13,13 @@ final class AppState: ObservableObject {
     @Published private(set) var loadFailed = false
     @Published var activeRunner: SessionRunner?
 
+    /// Mirrors `AppSettings.sessionLength`. Published so the home screen's
+    /// rows redraw the moment the settings sheet writes a new value — the
+    /// underlying SwiftData model isn't itself observable, so without this
+    /// mirror `homeEntries` would only recompute the next time some other
+    /// `@Published` property happened to change.
+    @Published private(set) var sessionLength: Int
+
     private let store: ContentStore
     private let context: ModelContext
     private let builder = SessionBuilder()
@@ -22,6 +29,7 @@ final class AppState: ObservableObject {
     init(store: ContentStore, context: ModelContext) {
         self.store = store
         self.context = context
+        self.sessionLength = Self.fetchOrCreateSettings(context: context).sessionLength
     }
 
     // MARK: - Content
@@ -40,7 +48,13 @@ final class AppState: ObservableObject {
     /// It is saved immediately: without that, a second access before the next
     /// save would fetch nothing and insert a duplicate, and the start day —
     /// which the heatmap is drawn against — would quietly move.
-    var settings: AppSettings {
+    var settings: AppSettings { Self.fetchOrCreateSettings(context: context) }
+
+    /// A `static` twin of `settings` so `init` can seed `sessionLength`
+    /// before `self` exists — Swift won't let a designated initializer call
+    /// an instance computed property until every stored property has a
+    /// value.
+    private static func fetchOrCreateSettings(context: ModelContext) -> AppSettings {
         if let existing = try? context.fetch(FetchDescriptor<AppSettings>()).first {
             return existing
         }
@@ -48,6 +62,16 @@ final class AppState: ObservableObject {
         context.insert(created)
         try? context.save()
         return created
+    }
+
+    /// Writes the new session length to SwiftData and republishes it. Takes
+    /// effect the next time a session is built — `activeRunner`'s queue was
+    /// already fixed at start time, so a session in progress is deliberately
+    /// left alone.
+    func updateSessionLength(_ newValue: Int) {
+        settings.sessionLength = newValue
+        try? context.save()
+        sessionLength = newValue
     }
 
     // MARK: - Home
@@ -68,7 +92,7 @@ final class AppState: ObservableObject {
     }
 
     var homeEntries: [HomeEntry] {
-        let length = settings.sessionLength
+        let length = sessionLength
         let states = allStates
         var entries: [HomeEntry] = []
 
@@ -105,7 +129,7 @@ final class AppState: ObservableObject {
 
     func startSession(scope: SessionScope) {
         let queue = builder.build(
-            scope: scope, length: settings.sessionLength,
+            scope: scope, length: sessionLength,
             problems: problems, states: allStates, now: .now
         )
         activeRunner = SessionRunner(

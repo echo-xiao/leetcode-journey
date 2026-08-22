@@ -20,7 +20,11 @@ struct HomeView: View {
     let streak: Int
     let cells: [HeatmapCell]
     let entries: [HomeEntry]
+    let sessionLength: Int
     let onStart: (SessionScope) -> Void
+    let onChangeSessionLength: (Int) -> Void
+
+    @State private var showSettings = false
 
     var body: some View {
         ScrollView {
@@ -35,6 +39,26 @@ struct HomeView: View {
             .padding(16)
         }
         .background(Theme.pageBackground)
+        // A plain grey gear, not a labelled button: the session list below is
+        // the screen's real entry point, and settings is a single knob most
+        // visits never need to touch.
+        .overlay(alignment: .topTrailing) {
+            Button {
+                showSettings = true
+            } label: {
+                Image(systemName: "gearshape")
+                    .font(.system(size: 17))
+                    .foregroundColor(Theme.secondaryText)
+                    .padding(20)
+            }
+        }
+        .sheet(isPresented: $showSettings) {
+            SettingsView(
+                sessionLength: sessionLength,
+                onChange: onChangeSessionLength,
+                onDone: { showSettings = false }
+            )
+        }
     }
 
     private var counters: some View {
