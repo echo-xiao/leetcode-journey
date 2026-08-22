@@ -22,7 +22,7 @@ struct SessionView: View {
                 ChainCardView(problem: problem, revealed: runner.revealed)
                     .contentShape(Rectangle())
                     .onTapGesture { runner.reveal() }
-                    .highPriorityGesture(swipe)
+                    .simultaneousGesture(swipe)
                     .id(runner.index)
                     .transition(.opacity)
             } else {
