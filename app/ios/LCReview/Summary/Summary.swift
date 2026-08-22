@@ -1,17 +1,5 @@
 import Foundation
 
-/// One square in the heatmap.
-///
-/// `isBeforeStart` is not the same as `count == 0`. A day before the app
-/// existed is drawn blank; a day the app existed and nothing happened is drawn
-/// as the palest shade. Collapsing the two would tell you that you skipped
-/// days you could not possibly have used.
-struct HeatmapCell: Equatable {
-    let day: Date
-    let count: Int
-    let isBeforeStart: Bool
-}
-
 /// Everything the home screen's numbers are derived from.
 ///
 /// Counts are in grades, not problems: walking one chain end to end is two
@@ -73,11 +61,8 @@ struct Summary {
         return (0..<days).reversed().compactMap { offset in
             guard let day = calendar.date(byAdding: .day, value: -offset, to: today)
             else { return nil }
-            return HeatmapCell(
-                day: day,
-                count: counts[day] ?? 0,
-                isBeforeStart: day < start
-            )
+            _ = start
+            return HeatmapCell(day: day, count: counts[day] ?? 0)
         }
     }
 }

@@ -76,17 +76,6 @@ final class SummaryTests: XCTestCase {
         XCTAssertEqual(cells.last?.day, calendar.startOfDay(for: day(2026, 8, 18)))
     }
 
-    func testDaysBeforeTheStartDayAreMarkedBlank() {
-        let cells = summary.heatmap(
-            logs: [], startDay: day(2026, 8, 10), now: day(2026, 8, 18), days: 90
-        )
-        // The window ends on 8/18 and the start day is 8/10, so 8/10...8/18 —
-        // nine days — are real and the other 81 predate the app.
-        let blank = cells.filter(\.isBeforeStart)
-        XCTAssertEqual(blank.count, 81, "the app cannot claim days that predate it")
-        XCTAssertFalse(cells.last!.isBeforeStart)
-    }
-
     func testHeatmapCarriesPerDayCounts() {
         let logs = [log(day(2026, 8, 18)), log(day(2026, 8, 18)), log(day(2026, 8, 17))]
         let cells = summary.heatmap(

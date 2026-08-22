@@ -44,7 +44,7 @@ struct HeatmapView: View {
                     VStack(spacing: gap) {
                         ForEach(Array(week.enumerated()), id: \.offset) { _, cell in
                             RoundedRectangle(cornerRadius: 2.5, style: .continuous)
-                                .fill(cell.isBeforeStart ? Color.clear : Theme.heatmapColor(count: cell.count))
+                                .fill(Theme.heatmapColor(count: cell.count))
                                 .frame(width: side, height: side)
                         }
                     }
