@@ -1,13 +1,18 @@
 import SwiftUI
 
-/// One session: swipe sideways to change problems, tap to open the next layer.
+/// One session: tap to open the next layer, grade to move on.
+///
+/// There are no sideways gestures. Tapping only ever looks further down
+/// the chain and the grade bar is the only exit from a problem, so nothing
+/// here competes with the card's own scroll -- which is what made the card
+/// stiff to scroll when a swipe recognizer outranked it.
 struct SessionView: View {
     let problems: [Problem]
     /// Observed, not owned: the runner outlives this view inside AppState, and
     /// a @StateObject here would silently create a second one.
     @ObservedObject var runner: SessionRunner
-    /// (problemID, track, grade, isRepeat)
-    let onGrade: (String, Track, Grade, Bool) -> Void
+    /// (problemID, grade, isRepeat)
+    let onGrade: (String, Grade, Bool) -> Void
     let onFinish: () -> Void
 
     private var currentProblem: Problem? {
@@ -22,15 +27,18 @@ struct SessionView: View {
                 ChainCardView(problem: problem, revealed: runner.revealed)
                     .contentShape(Rectangle())
                     .onTapGesture { runner.reveal() }
-                    .simultaneousGesture(swipe)
                     .id(runner.index)
                     .transition(.opacity)
             } else {
                 finished
             }
-            if runner.pendingGrade() != nil {
+            // Always on screen from the moment the problem opens, pinned
+            // below the scrolling card. Nothing has to be revealed first:
+            // deciding you know a problem before looking is the more
+            // honest self-assessment, and it is the only way out either
+            // way.
+            if runner.current != nil {
                 GradeBar(onGrade: grade)
-                    .transition(.move(edge: .bottom))
             }
         }
         .background(Theme.pageBackground)
@@ -50,7 +58,7 @@ struct SessionView: View {
             // card is graded, `done` already equals `total`, and `done + 1`
             // would read as "4 / 3" — a real bug caught by looking at the
             // actual screenshot, not implied by the brief's literal formula.
-            if runner.current?.askOnly != nil {
+            if runner.current?.isRepeat == true {
                 Text("加练一题")
                     .font(Theme.tagFont)
                     .foregroundColor(Theme.secondaryText)
@@ -81,28 +89,9 @@ struct SessionView: View {
         }
     }
 
-    private var swipe: some Gesture {
-        DragGesture(minimumDistance: 40)
-            .onEnded { value in
-                guard abs(value.translation.width) > abs(value.translation.height) else { return }
-                if value.translation.width < 0 {
-                    runner.advance()
-                } else {
-                    // A look back, not a redo: the card reopens as far as it
-                    // was left and nothing already answered is asked again.
-                    runner.goBack()
-                }
-            }
-    }
-
     private func grade(_ grade: Grade) {
-        guard let step = runner.current, let track = runner.pendingGrade() else { return }
-        onGrade(step.problemID, track, grade, step.askOnly != nil)
-        runner.record(grade: grade)
-        // A repeat asks one layer and is done; move on rather than leaving a
-        // dead card on screen.
-        if step.askOnly != nil {
-            runner.advance()
-        }
+        guard let step = runner.current else { return }
+        onGrade(step.problemID, grade, step.isRepeat)
+        runner.grade(grade)
     }
 }

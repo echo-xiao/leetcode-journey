@@ -15,13 +15,11 @@ struct Grading {
         grade: Grade,
         to existing: CardState?,
         problemID: String,
-        track: Track,
         isRepeat: Bool,
         now: Date
     ) -> (state: CardState, log: ReviewLog?) {
         let log = ReviewLog(
-            problemID: problemID, track: track, grade: grade,
-            isRepeat: isRepeat, timestamp: now
+            problemID: problemID, grade: grade, isRepeat: isRepeat, timestamp: now
         )
 
         // An in-session repeat is short-term repetition inside one sitting. It
@@ -31,22 +29,20 @@ struct Grading {
         //
         // This branch is taken on `isRepeat` alone, never conditional on
         // `existing`. A repeat is only ever queued after a real grade on the
-        // same track, so `existing` is expected to be present. Guarding
+        // same problem, so `existing` is expected to be present. Guarding
         // rather than falling through matters because the fall-through path
         // would treat the repeat as a first-ever grade: it would schedule
         // the card, count the review, and move the mistake bank -- exactly
         // what this branch exists to prevent.
         if isRepeat {
             let state = existing ?? CardState(
-                problemID: problemID, track: track,
-                stability: 0, difficulty: 0, due: now
+                problemID: problemID, stability: 0, difficulty: 0, due: now
             )
             return (state, log)
         }
 
         let state = existing ?? CardState(
-            problemID: problemID, track: track,
-            stability: 0, difficulty: 0, due: now
+            problemID: problemID, stability: 0, difficulty: 0, due: now
         )
 
         let memory: MemoryState

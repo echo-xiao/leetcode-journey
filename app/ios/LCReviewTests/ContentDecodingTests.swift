@@ -42,13 +42,10 @@ final class ContentDecodingTests: XCTestCase {
         XCTAssertTrue(second.solutions.isEmpty)
     }
 
-    func testLayerAdvancesThroughTheChainAndKnowsItsTrack() {
+    func testLayerAdvancesThroughTheChain() {
         XCTAssertEqual(Layer.statement.next, .elements)
-        XCTAssertEqual(Layer.solutions.next, nil)
-        XCTAssertEqual(Layer.elements.track, .elements)
-        XCTAssertEqual(Layer.pseudocode.track, .pseudocode)
-        XCTAssertNil(Layer.retrospective.track)
-        XCTAssertNil(Layer.solutions.track)
+        XCTAssertEqual(Layer.solutions.next, nil, "the chain ends; tapping past it is a no-op")
+        XCTAssertTrue(Layer.statement < Layer.solutions)
     }
 
     func testGradeHasExactlyThreeCases() {

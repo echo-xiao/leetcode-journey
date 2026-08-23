@@ -1,14 +1,15 @@
 import Foundation
 import SwiftData
 
-/// One track of one problem: its FSRS state plus what the mistake bank needs.
+/// One problem: its FSRS state plus what the mistake bank needs.
 ///
-/// `trackRaw` rather than `Track` because SwiftData stores primitives; `track`
-/// is the accessor everything else uses.
+/// One row per problem, not per layer. The elements and the pseudocode used
+/// to be scheduled separately, on the grounds that they are forgotten at
+/// different rates; they now share one interval, which is the cost the owner
+/// chose to pay for grading a problem once instead of twice.
 @Model
 final class CardState {
     var problemID: String
-    var trackRaw: String
     var stability: Double
     var difficulty: Double
     var due: Date
@@ -24,7 +25,6 @@ final class CardState {
 
     init(
         problemID: String,
-        track: Track,
         stability: Double,
         difficulty: Double,
         due: Date,
@@ -34,7 +34,6 @@ final class CardState {
         consecutiveGood: Int = 0
     ) {
         self.problemID = problemID
-        self.trackRaw = track.rawValue
         self.stability = stability
         self.difficulty = difficulty
         self.due = due
@@ -43,8 +42,6 @@ final class CardState {
         self.inMistakeBank = inMistakeBank
         self.consecutiveGood = consecutiveGood
     }
-
-    var track: Track { Track(rawValue: trackRaw) ?? .elements }
 
     var memory: MemoryState {
         get { MemoryState(stability: stability, difficulty: difficulty) }
