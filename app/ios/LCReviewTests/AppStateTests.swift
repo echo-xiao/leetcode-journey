@@ -139,4 +139,74 @@ final class AppStateTests: XCTestCase {
             "the write must land in SwiftData, not just in the in-memory mirror"
         )
     }
+
+    // MARK: - Refreshing content on foreground
+
+    func testARefreshDoesNotFlashTheLoadingStateOverExistingContent() async throws {
+        let state = try await makeState(problemCount: 5)
+        XCTAssertFalse(state.isLoading)
+
+        await state.loadContent()
+
+        XCTAssertFalse(state.isLoading, "a refresh must not put the spinner back over a full screen")
+        XCTAssertEqual(state.problems.count, 5)
+    }
+
+    func testAFailedRefreshKeepsWhatIsAlreadyOnScreen() async throws {
+        let container = try ModelContainer(
+            for: CardState.self, ReviewLog.self, AppSettings.self,
+            configurations: ModelConfiguration(isStoredInMemoryOnly: true)
+        )
+        let problems = [
+            Problem(
+                id: "1", number: 1, title: "p1", difficulty: "Easy",
+                technique: "贪心", statement: "s", elements: ["e"],
+                pseudocode: [PseudocodeBlock(kind: .text, text: "p")],
+                retrospective: "", solutions: [], solvedAt: nil
+            )
+        ]
+        let good = try JSONEncoder().encode(ContentPayload(version: 3, problems: problems))
+        let transport = SwitchableTransport(data: good)
+        let state = AppState(
+            store: ContentStore(
+                transport: transport,
+                cacheURL: FileManager.default.temporaryDirectory
+                    .appendingPathComponent(UUID().uuidString)
+            ),
+            activity: ActivityStore(
+                transport: StubActivityTransport(),
+                cacheURL: FileManager.default.temporaryDirectory
+                    .appendingPathComponent(UUID().uuidString)
+                    .appendingPathComponent("activity.json")
+            ),
+            context: ModelContext(container)
+        )
+        await state.loadContent()
+        XCTAssertEqual(state.problems.count, 1)
+
+        // Now the network goes away, as it does on a foreground in a lift.
+        await transport.breakIt()
+        await state.loadContent()
+
+        XCTAssertEqual(
+            state.problems.count, 1,
+            "a moment offline must not empty the home screen"
+        )
+        XCTAssertFalse(state.loadFailed)
+    }
+}
+
+private actor SwitchableTransport: ContentTransport {
+    private var data: Data
+    private var broken = false
+
+    init(data: Data) { self.data = data }
+
+    func breakIt() { broken = true }
+
+    func fetch(etag: String?) async throws -> ContentFetchResult {
+        struct Offline: Error {}
+        if broken { throw Offline() }
+        return .updated(data: data, etag: nil)
+    }
 }
