@@ -84,6 +84,19 @@ def export_app_command(apply: bool = True) -> None:
     run(dry_run=not apply)
 
 
+def backfill_ac_times_command(apply: bool, limit: int | None) -> None:
+    """A one-off: ask LeetCode for the accepted-at date of older problems.
+
+    Not part of ``sync-all``. Every problem downloaded from now on gets its
+    date for free, so this is only for the library that predates the field,
+    and running it on a schedule would be several hundred pointless
+    requests a day.
+    """
+    from .backfill_ac_times import run
+
+    run(dry_run=not apply, limit=limit)
+
+
 def sync_all_command(apply: bool) -> None:
     """The day-to-day command: LeetCode -> Problems/ -> Notion, in that order."""
     steps = (
@@ -127,6 +140,12 @@ def main() -> None:
     # Writes only into app/ inside the repo, so there is nothing to opt into.
     subparsers.add_parser("export-app", help="导出 app 内容 content.json")
 
+    backfill = subparsers.add_parser(
+        "backfill-ac-times", help="一次性：补齐老题的力扣通过时间"
+    )
+    backfill.add_argument("--apply", action="store_true", help="实际请求并写入")
+    backfill.add_argument("--limit", type=int, help="只处理前 N 道，用来先试水")
+
     args = parser.parse_args()
     if args.command == "sync-all":
         sync_all_command(args.apply)
@@ -142,6 +161,8 @@ def main() -> None:
         export_anki_command()
     elif args.command == "export-app":
         export_app_command()
+    elif args.command == "backfill-ac-times":
+        backfill_ac_times_command(args.apply, args.limit)
 
 
 if __name__ == "__main__":

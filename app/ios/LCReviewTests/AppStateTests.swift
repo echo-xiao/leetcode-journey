@@ -31,7 +31,7 @@ final class AppStateTests: XCTestCase {
                 id: "\(i)", number: i, title: "p\(i)", difficulty: "Easy",
                 technique: "贪心", statement: "s", elements: ["e"],
                 pseudocode: [PseudocodeBlock(kind: .text, text: "p")],
-                retrospective: "", solutions: []
+                retrospective: "", solutions: [], solvedAt: nil
             )
         }
         let payload = ContentPayload(version: 1, problems: problems)

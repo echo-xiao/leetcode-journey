@@ -207,3 +207,22 @@ def test_pseudocode_with_no_fence_still_produces_sensible_blocks(fixture_problem
     assert "**" not in joined
     assert "`" not in joined
     assert "$" not in joined
+
+
+def test_entry_carries_the_solved_date_when_the_index_has_one(fixture_problems):
+    entry = app_export.problem_entry(
+        fixture_problems / "9999_fixture-long",
+        TECHNIQUES,
+        ac_times={"9999_fixture-long": 1_787_184_000},
+    )
+    assert entry["solvedAt"] == 1_787_184_000
+
+
+def test_entry_solved_date_is_null_when_the_index_has_none(fixture_problems):
+    # Every problem downloaded before the index existed lands here until the
+    # backfill runs. Null rather than 0: zero is a real date (1970) and would
+    # sort as the oldest problem in the library rather than as unknown.
+    entry = app_export.problem_entry(
+        fixture_problems / "9999_fixture-long", TECHNIQUES, ac_times={}
+    )
+    assert entry["solvedAt"] is None

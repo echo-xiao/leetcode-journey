@@ -40,6 +40,11 @@ struct Problem: Codable, Identifiable, Hashable {
     let pseudocode: [PseudocodeBlock]
     let retrospective: String
     let solutions: [Solution]
+    /// When this problem was last accepted on leetcode.com, in unix
+    /// seconds. Optional because the index behind it is filled in by a
+    /// backfill that can be interrupted, and because a problem the fetch
+    /// could not answer for is genuinely unknown rather than very old.
+    let solvedAt: Int?
 }
 
 /// The whole downloaded file.
