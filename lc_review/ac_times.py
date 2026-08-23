@@ -40,6 +40,53 @@ def latest_ac_timestamp(submissions: list[dict]) -> int | None:
     return max(stamps) if stamps else None
 
 
+def folder_for_slug(slug: str, folder_names: list[str]) -> str | None:
+    """`3sum` -> `15_3sum`. None for a problem not downloaded yet.
+
+    Matching on the part after the number rather than on a substring: `3sum`
+    is a substring of `15_3sum` but also of `18_4sum`-adjacent names, and a
+    wrong match would move another problem's date.
+    """
+    suffix = "_" + slug
+    for name in folder_names:
+        if name.endswith(suffix):
+            return name
+    return None
+
+
+def merge_recent(
+    submissions: list[dict], index: dict[str, int], folder_names: list[str]
+) -> int:
+    """Fold LeetCode's recent-accepted list into the index. Returns how many
+    dates moved.
+
+    Only ever moves a date forward. The recent list is capped at twenty
+    entries and can report an older pass than the one already recorded; taking
+    it would make a problem look staler than it is and push it back up the
+    queue.
+
+    A problem that is not in the library yet is skipped rather than recorded
+    against a folder that does not exist. `sync_new` downloads it and records
+    its date in the same pass.
+    """
+    changed = 0
+    for submission in submissions:
+        slug = submission.get("titleSlug")
+        if not slug:
+            continue
+        folder = folder_for_slug(slug, folder_names)
+        if folder is None:
+            continue
+        try:
+            stamp = int(submission.get("timestamp"))
+        except (TypeError, ValueError):
+            continue
+        if stamp > index.get(folder, 0):
+            index[folder] = stamp
+            changed += 1
+    return changed
+
+
 def load(path: Path | None = None) -> dict[str, int]:
     """The index, or an empty one if it does not exist yet.
 

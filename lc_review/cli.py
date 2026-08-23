@@ -84,6 +84,18 @@ def export_app_command(apply: bool = True) -> None:
     run(dry_run=not apply)
 
 
+def refresh_ac_times_command(apply: bool) -> None:
+    """Move the accepted-at date forward for problems solved again recently.
+
+    One request, so it rides along in ``sync-all`` before the content is
+    packed. Without it, re-solving a problem already in the library leaves it
+    looking as stale as the day it was first solved.
+    """
+    from .refresh_ac_times import run
+
+    run(dry_run=not apply)
+
+
 def backfill_ac_times_command(apply: bool, limit: int | None) -> None:
     """A one-off: ask LeetCode for the accepted-at date of older problems.
 
@@ -100,6 +112,7 @@ def backfill_ac_times_command(apply: bool, limit: int | None) -> None:
 def sync_all_command(apply: bool) -> None:
     """The day-to-day command: LeetCode -> Problems/ -> Notion, in that order."""
     steps = (
+        ("刷新最近重刷题目的通过时间", lambda: refresh_ac_times_command(apply)),
         ("拉取新 AC 题并在 Notion 建行", lambda: sync_new_command(apply, None)),
         ("生成新题的要素答案", lambda: build_answers_command(apply, None)),
         ("复盘写入 Problems/*/review.md", lambda: sync_review_md_command(apply)),
@@ -140,6 +153,11 @@ def main() -> None:
     # Writes only into app/ inside the repo, so there is nothing to opt into.
     subparsers.add_parser("export-app", help="导出 app 内容 content.json")
 
+    refresh = subparsers.add_parser(
+        "refresh-ac-times", help="刷新最近重刷题目的通过时间"
+    )
+    refresh.add_argument("--apply", action="store_true", help="实际写入")
+
     backfill = subparsers.add_parser(
         "backfill-ac-times", help="一次性：补齐老题的力扣通过时间"
     )
@@ -161,6 +179,8 @@ def main() -> None:
         export_anki_command()
     elif args.command == "export-app":
         export_app_command()
+    elif args.command == "refresh-ac-times":
+        refresh_ac_times_command(args.apply)
     elif args.command == "backfill-ac-times":
         backfill_ac_times_command(args.apply, args.limit)
 
