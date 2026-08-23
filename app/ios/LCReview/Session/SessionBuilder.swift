@@ -5,6 +5,10 @@ enum SessionScope: Equatable {
     case all
     case technique(String)
     case mistakes
+    /// Problems solved on LeetCode within the last `withinDays` days, or the
+    /// whole library when nil. The only scope ordered by when a problem was
+    /// solved rather than by when it is due.
+    case recent(withinDays: Int?)
 }
 
 /// Picks which problems a session contains, and in what order.
@@ -34,11 +38,24 @@ struct SessionBuilder {
                 return problem.technique == name
             case .mistakes:
                 return byProblem[problem.id]?.contains(where: \.inMistakeBank) ?? false
+            case .recent(let withinDays):
+                // A problem with no known date is left out rather than
+                // ordered by a date it does not have. This entry is about
+                // dates; a problem without one has nothing to say here.
+                guard let solvedAt = problem.solvedAt else { return false }
+                guard let withinDays else { return true }
+                let cutoff = now.addingTimeInterval(-Double(withinDays) * 86_400)
+                return Date(timeIntervalSince1970: TimeInterval(solvedAt)) >= cutoff
             }
         }
 
         let ordered: [Problem]
-        if scope == .mistakes {
+        if case .recent = scope {
+            // Deliberately blind to the schedule. Asking for "what I just
+            // solved" and being handed the most overdue card instead would
+            // make the entry pointless, so FSRS does not get a vote here.
+            ordered = candidates.sorted { solvedRank($0) > solvedRank($1) }
+        } else if scope == .mistakes {
             // Due dates are irrelevant here: the point is what was failed, not
             // what is scheduled. Most recent failure first.
             ordered = candidates.sorted { left, right in

@@ -114,6 +114,7 @@ struct RootView: View {
                     streak: state.activityStreak,
                     cells: state.heatmapCells,
                     entries: state.homeEntries,
+                    sections: state.homeSections,
                     sessionLength: state.sessionLength,
                     activityStatus: state.activityStatus,
                     onStart: { state.startSession(scope: $0) },

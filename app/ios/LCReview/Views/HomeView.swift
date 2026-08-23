@@ -9,6 +9,21 @@ struct HomeEntry: Identifiable, Equatable {
     let scope: SessionScope
 }
 
+/// One branch of the home screen's tree: a way of choosing what to practise.
+///
+/// A branch either has children or an explanation of why it has none. The two
+/// are exclusive: an entry with no data shows a sentence saying what is
+/// missing, because an empty list is indistinguishable from a broken one.
+struct HomeSection: Identifiable, Equatable {
+    let id: String
+    let label: String
+    /// How many problems the whole branch covers, or nil when there is no
+    /// data behind it yet.
+    let total: Int?
+    let children: [HomeEntry]
+    let unavailable: String?
+}
+
 /// Three numbers, the heatmap, and the list of sessions.
 ///
 /// Rows advertise session length, never how much is overdue. Opening an app to
@@ -19,13 +34,18 @@ struct HomeView: View {
     let totalReviews: Int
     let streak: Int
     let cells: [HeatmapCell]
+    /// The rows that stand on their own, above the tree.
     let entries: [HomeEntry]
+    let sections: [HomeSection]
     let sessionLength: Int
     let activityStatus: ActivityStatus
     let onStart: (SessionScope) -> Void
     let onChangeSessionLength: (Int) -> Void
 
     @State private var showSettings = false
+    /// Only one branch is open at a time. Four open branches is thirty-odd
+    /// rows, which is the long list this screen exists to replace.
+    @State private var openSection: String? = "technique"
 
     var body: some View {
         ScrollView {
@@ -40,6 +60,7 @@ struct HomeView: View {
                     HeatmapView(cells: cells)
                 }
                 list
+                tree
             }
             .padding(Theme.cardPadding)
             .background(Theme.cardBackground)
@@ -137,5 +158,101 @@ struct HomeView: View {
                 }
             }
         }
+    }
+
+    // MARK: - The tree
+
+    private var tree: some View {
+        VStack(alignment: .leading, spacing: 2) {
+            ForEach(sections) { section in
+                branch(section)
+            }
+        }
+    }
+
+    @ViewBuilder
+    private func branch(_ section: HomeSection) -> some View {
+        let isOpen = openSection == section.id
+
+        Button {
+            // Tapping the open branch closes it: with one branch open at a
+            // time there would otherwise be no way back to a short screen.
+            openSection = isOpen ? nil : section.id
+        } label: {
+            HStack(spacing: 10) {
+                Text("#")
+                    .font(.system(size: 15, weight: .semibold))
+                    .foregroundColor(isOpen ? Theme.accent : Theme.secondaryText)
+                    .frame(width: 16)
+                Text(section.label)
+                    .font(Theme.bodyFont)
+                    .foregroundColor(Theme.primaryText)
+                Spacer()
+                if let total = section.total {
+                    Text("\(total)")
+                        .font(Theme.tagFont)
+                        .foregroundColor(Theme.secondaryText)
+                        .monospacedDigit()
+                }
+                Image(systemName: "chevron.right")
+                    .font(.system(size: 12, weight: .semibold))
+                    .foregroundColor(Theme.secondaryText.opacity(0.6))
+                    .rotationEffect(.degrees(isOpen ? 90 : 0))
+            }
+            .padding(.vertical, 12)
+            .contentShape(Rectangle())
+        }
+        .buttonStyle(.plain)
+
+        if isOpen {
+            if let missing = section.unavailable {
+                Text(missing)
+                    .font(.system(size: 12))
+                    .foregroundColor(Theme.secondaryText)
+                    .fixedSize(horizontal: false, vertical: true)
+                    .padding(.leading, 26)
+                    .padding(.bottom, 10)
+            } else {
+                VStack(alignment: .leading, spacing: 0) {
+                    ForEach(section.children) { child in
+                        childRow(child)
+                    }
+                }
+                .padding(.leading, 26)
+                .padding(.bottom, 6)
+                // The hairline is the tree: it is what says these rows belong
+                // to the branch above rather than to the screen.
+                .overlay(alignment: .leading) {
+                    Rectangle()
+                        .fill(Theme.secondaryText.opacity(0.18))
+                        .frame(width: 1)
+                        .padding(.leading, 7)
+                        .padding(.vertical, 4)
+                }
+            }
+        }
+    }
+
+    private func childRow(_ child: HomeEntry) -> some View {
+        Button {
+            onStart(child.scope)
+        } label: {
+            HStack(spacing: 10) {
+                Text("#")
+                    .font(.system(size: 13, weight: .semibold))
+                    .foregroundColor(Theme.secondaryText.opacity(0.7))
+                    .frame(width: 14)
+                Text(child.label)
+                    .font(Theme.bodyFont)
+                    .foregroundColor(Theme.primaryText)
+                Spacer()
+                Text("\(child.count) 题")
+                    .font(Theme.tagFont)
+                    .foregroundColor(Theme.secondaryText)
+            }
+            .padding(.vertical, 10)
+            .contentShape(Rectangle())
+        }
+        .buttonStyle(.plain)
     }
 }
