@@ -6,6 +6,8 @@
 1146_greatest-common-divisor-of-strings	数学技巧
 1149_intersection-of-three-sorted-arrays	数组双指针
 11_container-with-most-water	数组双指针
+125_valid-palindrome	数组双指针
+128_longest-consecutive-sequence	数学技巧
 1321_get-equal-substrings-within-budget	滑动窗口
 1421_find-numbers-with-even-number-of-digits	数学技巧
 1445_number-of-sub-arrays-of-size-k-and-average-greater-than-or-equal-to-threshold	滑动窗口
@@ -40,10 +42,13 @@
 2032_largest-odd-number-in-string	贪心
 2102_find-the-middle-index-in-array	前缀和与差分
 2134_maximize-the-confusion-of-an-exam	滑动窗口
+217_contains-duplicate	数学技巧
 2199_two-furthest-houses-with-different-colors	数组双指针
 219_contains-duplicate-ii	滑动窗口
+220_contains-duplicate-iii	滑动窗口
 2211_k-radius-subarray-averages	滑动窗口
 238_product-of-array-except-self	前缀和与差分
+242_valid-anagram	数学技巧
 2442_number-of-arithmetic-triplets	数组双指针
 2459_minimum-hours-of-training-to-win-a-competition	贪心
 2524_largest-positive-integer-that-exists-with-its-negative	数组双指针
@@ -56,6 +61,7 @@
 2712_find-the-maximum-number-of-marked-indices	贪心
 2714_left-and-right-sum-differences	前缀和与差分
 2715_k-items-with-the-maximum-sum	贪心
+271_encode-and-decode-strings	数组双指针
 2767_maximum-sum-with-exactly-k-elements	数学技巧
 277_find-the-celebrity	数学技巧
 2786_find-the-longest-semi-repetitive-substring	滑动窗口
@@ -69,8 +75,10 @@
 338_counting-bits	动态规划
 33_search-in-rotated-sorted-array	二分搜索
 345_reverse-vowels-of-a-string	数组双指针
+347_top-k-frequent-elements	堆（优先级队列）
 3616_make-array-elements-equal-to-zero	前缀和与差分
 367_valid-perfect-square	二分搜索
+36_valid-sudoku	数学技巧
 3702_maximum-subarray-with-equal-products	滑动窗口
 3704_count-partitions-with-even-sum-difference	前缀和与差分
 374_guess-number-higher-or-lower	二分搜索
@@ -78,8 +86,10 @@
 3790_fruits-into-baskets-ii	贪心
 400_nth-digit	数学技巧
 413_arithmetic-slices	滑动窗口
+42_trapping-rain-water	数组双指针
 441_arranging-coins	二分搜索
 456_132-pattern	单调栈
+49_group-anagrams	数学技巧
 524_longest-word-in-dictionary-through-deleting	数组双指针
 594_longest-harmonious-subsequence	滑动窗口
 611_valid-triangle-number	数组双指针
