@@ -215,4 +215,75 @@ final class SessionBuilderTests: XCTestCase {
             "\"fresh\" was graded and is not due for a month, so it drops behind the unseen one"
         )
     }
+
+    // MARK: - 按最近刷
+
+    func testRecentScopeIsOrderedByWhenItWasSolvedNewestFirst() {
+        let problems = [
+            problem("old", solvedDaysAgo: 400),
+            problem("yesterday", solvedDaysAgo: 1),
+            problem("week", solvedDaysAgo: 6),
+        ]
+
+        let session = builder.build(
+            scope: .recent(withinDays: nil), length: 10,
+            problems: problems, states: [], now: now
+        )
+
+        XCTAssertEqual(session.map(\.id), ["yesterday", "week", "old"])
+    }
+
+    func testRecentScopeIgnoresTheScheduleOnPurpose() {
+        // This is the one scope where FSRS does not decide the order. Asking
+        // for "what I just solved" and getting the most overdue card instead
+        // would make the entry pointless.
+        let problems = [
+            problem("yesterday", solvedDaysAgo: 1),
+            problem("ancient", solvedDaysAgo: 900),
+        ]
+        let states = [
+            state("yesterday", dueOffsetDays: 30, lastReviewOffsetDays: -1),
+            state("ancient", dueOffsetDays: -300, lastReviewOffsetDays: -300),
+        ]
+
+        let session = builder.build(
+            scope: .recent(withinDays: nil), length: 10,
+            problems: problems, states: states, now: now
+        )
+
+        XCTAssertEqual(session.map(\.id), ["yesterday", "ancient"])
+    }
+
+    func testRecentScopeHonoursItsWindow() {
+        let problems = [
+            problem("d1", solvedDaysAgo: 1),
+            problem("d20", solvedDaysAgo: 20),
+            problem("d200", solvedDaysAgo: 200),
+        ]
+
+        let week = builder.build(
+            scope: .recent(withinDays: 7), length: 10,
+            problems: problems, states: [], now: now
+        )
+        let month = builder.build(
+            scope: .recent(withinDays: 30), length: 10,
+            problems: problems, states: [], now: now
+        )
+
+        XCTAssertEqual(week.map(\.id), ["d1"])
+        XCTAssertEqual(month.map(\.id), ["d1", "d20"])
+    }
+
+    func testRecentScopeSkipsProblemsWithNoKnownDate() {
+        // Ordering by a date they do not have would put them somewhere
+        // arbitrary. Leaving them out is honest: this entry is about dates.
+        let problems = [problem("known", solvedDaysAgo: 3), problem("unknown")]
+
+        let session = builder.build(
+            scope: .recent(withinDays: nil), length: 10,
+            problems: problems, states: [], now: now
+        )
+
+        XCTAssertEqual(session.map(\.id), ["known"])
+    }
 }

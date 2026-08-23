@@ -105,13 +105,17 @@ final class AppState: ObservableObject {
     }
 
     var totalReviews: Int { summary.totalReviews(logs: allLogs) }
+    /// The rows above the tree: what you start without choosing a lens.
+    ///
+    /// 错题 only appears when there is something in it. A row that is always
+    /// there and usually says zero trains you to stop reading the screen.
     var homeEntries: [HomeEntry] {
-        let length = sessionLength
         let states = allStates
         var entries: [HomeEntry] = []
 
         let mistakes = builder.build(
-            scope: .mistakes, length: length, problems: problems, states: states, now: .now
+            scope: .mistakes, length: sessionLength, problems: problems,
+            states: states, now: .now
         )
         if !mistakes.isEmpty {
             entries.append(
@@ -120,23 +124,77 @@ final class AppState: ObservableObject {
         }
 
         let all = builder.build(
-            scope: .all, length: length, problems: problems, states: states, now: .now
+            scope: .all, length: sessionLength, problems: problems, states: states, now: .now
         )
         entries.append(HomeEntry(id: "all", label: "全部", count: all.count, scope: .all))
+        return entries
+    }
 
+    /// The four ways of choosing what to practise, as a tree.
+    ///
+    /// Two of them have no data behind them yet and say so. Shipping them as
+    /// empty lists would read as broken; naming what is missing is how the
+    /// screen stays honest about its own gaps.
+    var homeSections: [HomeSection] {
+        [techniqueSection, recentSection, companySection, problemSetSection]
+    }
+
+    private var techniqueSection: HomeSection {
         // Ordered by how much of the library each technique covers, so the
         // ones echo actually practises sit at the top.
-        let techniques = Dictionary(grouping: problems, by: \.technique)
+        let grouped = Dictionary(grouping: problems, by: \.technique)
+            .filter { !$0.key.isEmpty }
             .sorted { $0.value.count > $1.value.count }
-        for (name, group) in techniques where !name.isEmpty {
-            entries.append(
-                HomeEntry(
-                    id: name, label: name,
-                    count: min(length, group.count), scope: .technique(name)
-                )
+        let children = grouped.map { name, group in
+            HomeEntry(
+                id: "technique-\(name)", label: name,
+                count: min(sessionLength, group.count), scope: .technique(name)
             )
         }
-        return entries
+        return HomeSection(
+            id: "technique", label: "按类别刷",
+            total: problems.count, children: children, unavailable: nil
+        )
+    }
+
+    private var recentSection: HomeSection {
+        let windows: [(String, Int?)] = [
+            ("这周过的", 7), ("最近 30 天", 30), ("最近 90 天", 90), ("从最新往回刷", nil),
+        ]
+        let states = allStates
+        let children = windows.compactMap { label, days -> HomeEntry? in
+            let queue = builder.build(
+                scope: .recent(withinDays: days), length: sessionLength,
+                problems: problems, states: states, now: .now
+            )
+            // A window with nothing in it is dropped rather than shown as
+            // zero: it is a slice of time, not a category, and an empty slice
+            // is not a thing you can start.
+            guard !queue.isEmpty else { return nil }
+            return HomeEntry(
+                id: "recent-\(days.map(String.init) ?? "all")", label: label,
+                count: queue.count, scope: .recent(withinDays: days)
+            )
+        }
+        return HomeSection(
+            id: "recent", label: "按最近刷",
+            total: problems.filter { $0.solvedAt != nil }.count,
+            children: children, unavailable: nil
+        )
+    }
+
+    private var companySection: HomeSection {
+        HomeSection(
+            id: "company", label: "按公司刷", total: nil, children: [],
+            unavailable: "力扣的公司标签是会员专属，仓库里没有这份数据。"
+        )
+    }
+
+    private var problemSetSection: HomeSection {
+        HomeSection(
+            id: "problemset", label: "按题库刷", total: nil, children: [],
+            unavailable: "题目只按题型分组，还没有题单归属（LC75、热题 100）。"
+        )
     }
 
     // MARK: - Sessions
