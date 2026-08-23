@@ -21,6 +21,7 @@ struct HomeView: View {
     let cells: [HeatmapCell]
     let entries: [HomeEntry]
     let sessionLength: Int
+    let activityStatus: ActivityStatus
     let onStart: (SessionScope) -> Void
     let onChangeSessionLength: (Int) -> Void
 
@@ -30,7 +31,14 @@ struct HomeView: View {
         ScrollView {
             VStack(alignment: .leading, spacing: 24) {
                 counters
-                HeatmapView(cells: cells)
+                VStack(alignment: .leading, spacing: 8) {
+                    if let note = activityNote {
+                        Text(note)
+                            .font(.system(size: 11))
+                            .foregroundColor(Theme.secondaryText)
+                    }
+                    HeatmapView(cells: cells)
+                }
                 list
             }
             .padding(Theme.cardPadding)
@@ -60,6 +68,28 @@ struct HomeView: View {
             )
         }
     }
+
+    /// Nothing at all when the data is current: a line that is always
+    /// there stops being read. The two failure cases must not share
+    /// wording -- "old data" and "no data" look identical as an empty
+    /// grid, and reading one as the other means reading three blank
+    /// months as time you wasted.
+    private var activityNote: String? {
+        switch activityStatus {
+        case .fresh:
+            return nil
+        case .stale(let asOf):
+            return "数据截至 \(Self.noteFormatter.string(from: asOf))"
+        case .unavailable:
+            return "暂时拿不到 LeetCode 数据"
+        }
+    }
+
+    private static let noteFormatter: DateFormatter = {
+        let formatter = DateFormatter()
+        formatter.dateFormat = "M月d日"
+        return formatter
+    }()
 
     private var counters: some View {
         HStack(spacing: 0) {

@@ -32,6 +32,10 @@ struct LCReviewApp: App {
                         transport: HTTPContentTransport(),
                         cacheURL: ContentStore.defaultCacheURL()
                     ),
+                    activity: ActivityStore(
+                        transport: HTTPActivityTransport(),
+                        cacheURL: ActivityStore.defaultCacheURL()
+                    ),
                     context: ModelContext(container)
                 )
             )
@@ -86,6 +90,7 @@ struct DataStoreFailedView: View {
 
 struct RootView: View {
     @EnvironmentObject private var state: AppState
+    @Environment(\.scenePhase) private var scenePhase
 
     var body: some View {
         Group {
@@ -108,16 +113,27 @@ struct RootView: View {
                 HomeView(
                     problemCount: state.problems.count,
                     totalReviews: state.totalReviews,
-                    streak: state.streak,
+                    streak: state.activityStreak,
                     cells: state.heatmapCells,
                     entries: state.homeEntries,
                     sessionLength: state.sessionLength,
+                    activityStatus: state.activityStatus,
                     onStart: { state.startSession(scope: $0) },
                     onChangeSessionLength: { state.updateSessionLength($0) }
                 )
             }
         }
-        .task { await state.loadContent() }
+        .task {
+            await state.loadContent()
+            await state.loadActivity()
+        }
+        // Content is fetched once per launch; the calendar is fetched
+        // again on every return to the foreground, because it is the only
+        // thing on this screen that changes while the app is closed.
+        .onChange(of: scenePhase) { _, phase in
+            guard phase == .active else { return }
+            Task { await state.loadActivity() }
+        }
     }
 
     private var retry: some View {
