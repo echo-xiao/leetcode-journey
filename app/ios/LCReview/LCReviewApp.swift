@@ -126,12 +126,19 @@ struct RootView: View {
             await state.loadContent()
             await state.loadActivity()
         }
-        // Content is fetched once per launch; the calendar is fetched
-        // again on every return to the foreground, because it is the only
-        // thing on this screen that changes while the app is closed.
+        // Both are refreshed on every return to the foreground. Content used
+        // to be fetched once per launch, on the grounds that the package is
+        // megabytes; but it is fetched conditionally, so an unchanged library
+        // costs one 304 and no body. Paying that to avoid the alternative --
+        // solving a problem on LeetCode, syncing it, and not finding it in
+        // the app until you remember to kill the process -- is the right
+        // trade.
         .onChange(of: scenePhase) { _, phase in
             guard phase == .active else { return }
-            Task { await state.loadActivity() }
+            Task {
+                await state.loadContent()
+                await state.loadActivity()
+            }
         }
     }
 

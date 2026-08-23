@@ -44,9 +44,20 @@ final class AppState: ObservableObject {
 
     // MARK: - Content
 
+    /// Called on launch and again on every return to the foreground.
+    ///
+    /// The spinner is only for a cold start. Once there are problems on
+    /// screen a refresh happens behind them: the fetch is conditional, so it
+    /// usually costs a 304 and nothing else, and flashing a loading state
+    /// over a screen that already has content reads as a bug.
     func loadContent() async {
-        isLoading = true
-        problems = await store.load()
+        let isFirstLoad = problems.isEmpty
+        if isFirstLoad { isLoading = true }
+        let fetched = await store.load()
+        // An empty result on a refresh is a failed fetch, not an empty
+        // library. Keeping what is on screen is right either way, and it also
+        // means a moment offline cannot wipe the home screen.
+        if !fetched.isEmpty { problems = fetched }
         loadFailed = problems.isEmpty
         isLoading = false
     }
