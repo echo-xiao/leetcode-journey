@@ -1,83 +1,17 @@
 import Foundation
 
-/// One square in the heatmap.
+/// The one number on the home screen that still comes from this app's own
+/// records.
 ///
-/// `isBeforeStart` is not the same as `count == 0`. A day before the app
-/// existed is drawn blank; a day the app existed and nothing happened is drawn
-/// as the palest shade. Collapsing the two would tell you that you skipped
-/// days you could not possibly have used.
-struct HeatmapCell: Equatable {
-    let day: Date
-    let count: Int
-    let isBeforeStart: Bool
-}
-
-/// Everything the home screen's numbers are derived from.
-///
-/// Counts are in grades, not problems: walking one chain end to end is two
-/// grades, and the heatmap is a picture of work done.
+/// The heatmap and the streak used to be derived here too, from ReviewLog.
+/// They now come from LeetCode (see `ActivityStore`), which is what the grid
+/// on the home screen is a picture of. This is deliberately not merged into
+/// that: how much reviewing happened inside this app is the one thing
+/// LeetCode has no idea about, and dropping it would leave the app with no
+/// record of ever having been used.
 struct Summary {
 
-    static let heatmapWindowDays = 90
-
-    let calendar: Calendar
-
-    init(calendar: Calendar = .current) {
-        self.calendar = calendar
-    }
-
+    /// Counted in grades, not problems: walking one chain end to end is two
+    /// grades. A repeat counts too -- going back over a problem is work.
     func totalReviews(logs: [ReviewLog]) -> Int { logs.count }
-
-    func dailyCounts(logs: [ReviewLog]) -> [Date: Int] {
-        var counts: [Date: Int] = [:]
-        for log in logs {
-            counts[calendar.startOfDay(for: log.timestamp), default: 0] += 1
-        }
-        return counts
-    }
-
-    /// Consecutive days ending today or yesterday.
-    ///
-    /// Today with no reviews yet does not break it — otherwise the number
-    /// would read zero every morning until the first card of the day.
-    func streak(logs: [ReviewLog], now: Date) -> Int {
-        let counts = dailyCounts(logs: logs)
-        guard !counts.isEmpty else { return 0 }
-
-        let today = calendar.startOfDay(for: now)
-        var cursor = today
-        if counts[cursor] == nil {
-            guard let yesterday = calendar.date(byAdding: .day, value: -1, to: today),
-                  counts[yesterday] != nil
-            else { return 0 }
-            cursor = yesterday
-        }
-
-        var length = 0
-        while counts[cursor] != nil {
-            length += 1
-            guard let previous = calendar.date(byAdding: .day, value: -1, to: cursor)
-            else { break }
-            cursor = previous
-        }
-        return length
-    }
-
-    func heatmap(
-        logs: [ReviewLog], startDay: Date, now: Date, days: Int = Summary.heatmapWindowDays
-    ) -> [HeatmapCell] {
-        let counts = dailyCounts(logs: logs)
-        let today = calendar.startOfDay(for: now)
-        let start = calendar.startOfDay(for: startDay)
-
-        return (0..<days).reversed().compactMap { offset in
-            guard let day = calendar.date(byAdding: .day, value: -offset, to: today)
-            else { return nil }
-            return HeatmapCell(
-                day: day,
-                count: counts[day] ?? 0,
-                isBeforeStart: day < start
-            )
-        }
-    }
 }

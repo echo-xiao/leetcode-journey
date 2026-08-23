@@ -20,14 +20,24 @@ final class AppState: ObservableObject {
     /// `@Published` property happened to change.
     @Published private(set) var sessionLength: Int
 
+    /// The heatmap, the streak, and how much to trust them. All three
+    /// come from LeetCode and arrive from one fetch, so they are
+    /// published together and never disagree about which snapshot they
+    /// belong to.
+    @Published private(set) var heatmapCells: [HeatmapCell] = []
+    @Published private(set) var activityStreak = 0
+    @Published private(set) var activityStatus: ActivityStatus = .unavailable
+
     private let store: ContentStore
+    private let activity: ActivityStore
     private let context: ModelContext
     private let builder = SessionBuilder()
     private let grading = Grading(fsrs: FSRS())
     private let summary = Summary()
 
-    init(store: ContentStore, context: ModelContext) {
+    init(store: ContentStore, activity: ActivityStore, context: ModelContext) {
         self.store = store
+        self.activity = activity
         self.context = context
         self.sessionLength = Self.fetchOrCreateSettings(context: context).sessionLength
     }
@@ -39,6 +49,16 @@ final class AppState: ObservableObject {
         problems = await store.load()
         loadFailed = problems.isEmpty
         isLoading = false
+    }
+
+    /// Refreshed on every foreground, not on a timer and not by a pull
+    /// gesture: the app is opened a handful of times a day, and a heatmap
+    /// is retrospective enough that a few hours of lag costs nothing.
+    func loadActivity() async {
+        let snapshot = await activity.load(now: .now)
+        heatmapCells = snapshot.cells
+        activityStreak = snapshot.streak
+        activityStatus = snapshot.status
     }
 
     // MARK: - Settings
@@ -58,7 +78,7 @@ final class AppState: ObservableObject {
         if let existing = try? context.fetch(FetchDescriptor<AppSettings>()).first {
             return existing
         }
-        let created = AppSettings(startDay: Calendar.current.startOfDay(for: .now))
+        let created = AppSettings()
         context.insert(created)
         try? context.save()
         return created
@@ -85,12 +105,6 @@ final class AppState: ObservableObject {
     }
 
     var totalReviews: Int { summary.totalReviews(logs: allLogs) }
-    var streak: Int { summary.streak(logs: allLogs, now: .now) }
-
-    var heatmapCells: [HeatmapCell] {
-        summary.heatmap(logs: allLogs, startDay: settings.startDay, now: .now)
-    }
-
     var homeEntries: [HomeEntry] {
         let length = sessionLength
         let states = allStates

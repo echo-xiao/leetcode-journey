@@ -13,6 +13,14 @@ final class AppStateTests: XCTestCase {
         }
     }
 
+    /// Always fails. These tests are about session length, and the
+    /// calendar is a separate path: if a broken calendar could change a
+    /// session assertion, that would itself be the bug.
+    private struct StubActivityTransport: ActivityTransport {
+        struct Offline: Error {}
+        func fetch(year: Int) async throws -> ActivityYear { throw Offline() }
+    }
+
     private func makeState(problemCount: Int = 30) async throws -> AppState {
         let container = try ModelContainer(
             for: CardState.self, ReviewLog.self, AppSettings.self,
@@ -33,6 +41,12 @@ final class AppStateTests: XCTestCase {
                 transport: FixedTransport(data: data),
                 cacheURL: FileManager.default.temporaryDirectory
                     .appendingPathComponent(UUID().uuidString)
+            ),
+            activity: ActivityStore(
+                transport: StubActivityTransport(),
+                cacheURL: FileManager.default.temporaryDirectory
+                    .appendingPathComponent(UUID().uuidString)
+                    .appendingPathComponent("activity.json")
             ),
             context: ModelContext(container)
         )
@@ -96,6 +110,12 @@ final class AppStateTests: XCTestCase {
                 cacheURL: FileManager.default.temporaryDirectory
                     .appendingPathComponent(UUID().uuidString)
             ),
+            activity: ActivityStore(
+                transport: StubActivityTransport(),
+                cacheURL: FileManager.default.temporaryDirectory
+                    .appendingPathComponent(UUID().uuidString)
+                    .appendingPathComponent("activity.json")
+            ),
             context: ModelContext(container)
         )
         first.updateSessionLength(20)
@@ -105,6 +125,12 @@ final class AppStateTests: XCTestCase {
                 transport: FixedTransport(data: Data()),
                 cacheURL: FileManager.default.temporaryDirectory
                     .appendingPathComponent(UUID().uuidString)
+            ),
+            activity: ActivityStore(
+                transport: StubActivityTransport(),
+                cacheURL: FileManager.default.temporaryDirectory
+                    .appendingPathComponent(UUID().uuidString)
+                    .appendingPathComponent("activity.json")
             ),
             context: ModelContext(container)
         )
