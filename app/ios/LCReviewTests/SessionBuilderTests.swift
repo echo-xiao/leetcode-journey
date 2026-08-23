@@ -6,12 +6,17 @@ final class SessionBuilderTests: XCTestCase {
     private let builder = SessionBuilder()
     private let now = Date(timeIntervalSince1970: 1_800_000_000)
 
-    private func problem(_ id: String, technique: String = "数组双指针") -> Problem {
+    private func problem(
+        _ id: String, technique: String = "数组双指针", solvedDaysAgo: Double? = nil
+    ) -> Problem {
         Problem(
             id: id, number: Int(id.prefix(while: \.isNumber)) ?? 0, title: id,
             difficulty: "Medium", technique: technique, statement: "s",
             elements: ["e"], pseudocode: [PseudocodeBlock(kind: .text, text: "p")],
-            retrospective: "", solutions: []
+            retrospective: "", solutions: [],
+            solvedAt: solvedDaysAgo.map {
+                Int(now.addingTimeInterval(-$0 * 86_400).timeIntervalSince1970)
+            }
         )
     }
 
@@ -156,5 +161,58 @@ final class SessionBuilderTests: XCTestCase {
             scope: .mistakes, length: 10, problems: problems, states: states, now: now
         )
         XCTAssertEqual(session.map(\.id), ["recent", "old"])
+    }
+
+    func testNeverReviewedProblemsLeadWithTheMostRecentlySolvedFirst() {
+        // Every problem in the library starts here: no CardState at all, so
+        // they are all equally "maximally overdue". Without a tiebreak the
+        // order falls out of the array, which means a problem solved
+        // yesterday sits behind one solved in 2017.
+        let problems = [
+            problem("old", solvedDaysAgo: 900),
+            problem("yesterday", solvedDaysAgo: 1),
+            problem("lastmonth", solvedDaysAgo: 30),
+        ]
+
+        let session = builder.build(
+            scope: .all, length: 3, problems: problems, states: [], now: now
+        )
+
+        XCTAssertEqual(session.map(\.id), ["yesterday", "lastmonth", "old"])
+    }
+
+    func testAProblemWithNoSolvedDateSortsAfterOnesThatHaveIt() {
+        // Unknown is not the same as ancient. A problem the backfill could
+        // not answer for should not jump the queue, and should not be
+        // ordered against a real date as if it were 1970.
+        let problems = [
+            problem("unknown"),
+            problem("old", solvedDaysAgo: 900),
+        ]
+
+        let session = builder.build(
+            scope: .all, length: 2, problems: problems, states: [], now: now
+        )
+
+        XCTAssertEqual(session.map(\.id), ["old", "unknown"])
+    }
+
+    func testAnActualDueDateStillOutranksRecency() {
+        // Recency only breaks ties among problems with no history. Once a
+        // problem has been graded, FSRS owns when it comes back.
+        let problems = [
+            problem("graded", solvedDaysAgo: 900),
+            problem("fresh", solvedDaysAgo: 1),
+        ]
+        let states = [state("fresh", dueOffsetDays: 30, lastReviewOffsetDays: -1)]
+
+        let session = builder.build(
+            scope: .all, length: 2, problems: problems, states: states, now: now
+        )
+
+        XCTAssertEqual(
+            session.map(\.id), ["graded", "fresh"],
+            "\"fresh\" was graded and is not due for a month, so it drops behind the unseen one"
+        )
     }
 }

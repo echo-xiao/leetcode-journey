@@ -17,9 +17,10 @@ import re
 import textwrap
 from pathlib import Path
 
+from . import ac_times
 from .problem_source import PROBLEMS, REPO, elements_of, meta_of, statement_of, title_of
 
-SCHEMA_VERSION = 2
+SCHEMA_VERSION = 3
 OUT_PATH = REPO / "app" / "content.json"
 
 # "1005_univalued-binary-tree" -> 1005. Folder names always start with the id.
@@ -153,9 +154,12 @@ def _solutions(folder: Path) -> list[dict]:
     ]
 
 
-def problem_entry(folder: Path, techniques: dict[str, str]) -> dict:
+def problem_entry(
+    folder: Path, techniques: dict[str, str], ac_times: dict[str, int] | None = None
+) -> dict:
     """One problem, with every layer of the chain the app reveals."""
     difficulty, technique = meta_of(folder, techniques)
+    ac_times = ac_times or {}
     number_match = _NUMBER_RE.match(folder.name)
     return {
         "id": folder.name,
@@ -173,6 +177,11 @@ def problem_entry(folder: Path, techniques: dict[str, str]) -> dict:
         # are the part of a retrospective worth seeing.
         "retrospective": _body_after_heading(folder / "review.md"),
         "solutions": _solutions(folder),
+        # When this problem was last accepted on LeetCode, or null if the
+        # index does not know yet. Null rather than 0, because 0 is a real
+        # date (1970) and would sort as the oldest problem in the library
+        # instead of as unknown.
+        "solvedAt": ac_times.get(folder.name),
     }
 
 
@@ -185,9 +194,12 @@ def build_payload(problems_dir: Path, techniques: dict[str, str]) -> dict:
         return (int(match.group(1)) if match else 0, folder.name)
 
     folders = sorted((d for d in problems_dir.iterdir() if d.is_dir()), key=_sort_key)
+    solved = ac_times.load()
     return {
         "version": SCHEMA_VERSION,
-        "problems": [problem_entry(folder, techniques) for folder in folders],
+        "problems": [
+            problem_entry(folder, techniques, solved) for folder in folders
+        ],
     }
 
 

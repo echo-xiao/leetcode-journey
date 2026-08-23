@@ -48,7 +48,12 @@ struct SessionBuilder {
             let due = candidates.filter { dueDate(byProblem[$0.id], now: now) <= now }
             let notYetDue = candidates.filter { dueDate(byProblem[$0.id], now: now) > now }
             // Most overdue first, then top up with the least recently touched.
-            ordered = due.sorted { dueDate(byProblem[$0.id], now: now) < dueDate(byProblem[$1.id], now: now) }
+            ordered = due.sorted { left, right in
+                let leftDue = dueDate(byProblem[left.id], now: now)
+                let rightDue = dueDate(byProblem[right.id], now: now)
+                if leftDue != rightDue { return leftDue < rightDue }
+                return solvedRank(left) > solvedRank(right)
+            }
                 + notYetDue.sorted { lastReview(byProblem[$0.id]) < lastReview(byProblem[$1.id]) }
         }
 
@@ -68,6 +73,24 @@ struct SessionBuilder {
     private func dueDate(_ states: [CardState]?, now: Date) -> Date {
         guard let states, !states.isEmpty else { return .distantPast }
         return states.map(\.due).min() ?? .distantPast
+    }
+
+    /// Breaks the tie between problems that have never been reviewed here.
+    ///
+    /// All of them share `.distantPast` as a due date, so without this the
+    /// order falls out of the array -- which is problem number -- and a
+    /// problem solved on LeetCode yesterday queues behind one solved in 2017.
+    /// Sorting by the accepted-at date descending puts the freshest first,
+    /// which is what "review yesterday's problems today" asks for.
+    ///
+    /// It only ever decides ties. Once a problem has been graded it has a real
+    /// due date, and FSRS owns when it comes back.
+    ///
+    /// A problem with no known date ranks below every problem that has one:
+    /// unknown is not the same as ancient, and `Int.min` keeps it from being
+    /// compared as though it were 1970.
+    private func solvedRank(_ problem: Problem) -> Int {
+        problem.solvedAt ?? Int.min
     }
 
     private func lastReview(_ states: [CardState]?) -> Date {

@@ -14,6 +14,8 @@ from __future__ import annotations
 import os
 from pathlib import Path
 
+from . import ac_times
+
 REPO = Path(__file__).resolve().parent.parent
 PROBLEMS = REPO / "Problems"
 
@@ -129,6 +131,12 @@ def run(dry_run: bool = True, limit: int | None = None) -> list[dict]:
             folder.mkdir(parents=True, exist_ok=True)
 
             subs = fetcher.get_all_ac_submissions(slug)
+            # Free here: this response was fetched for the code anyway, and
+            # it carries the timestamps. Recorded before the code is even
+            # written out, so a problem whose code fetch fails still leaves
+            # no half-written date behind -- the folder is skipped below and
+            # the next run retries the whole problem.
+            solved_at = ac_times.latest_ac_timestamp(subs)
             codes: dict[str, str] = {}
             for index, sub in enumerate(subs):
                 code = fetcher.get_submission_code(sub["id"])
@@ -148,6 +156,8 @@ def run(dry_run: bool = True, limit: int | None = None) -> list[dict]:
             fetcher.write_problem_files(
                 str(folder), q_id, title, difficulty, tags, main_cat, sub_cat, description, analysis
             )
+            if solved_at is not None:
+                ac_times.record(folder.name, solved_at)
             downloaded.append(
                 {"question_id": q_id, "slug": slug, "title": title, "folder": folder.name}
             )
