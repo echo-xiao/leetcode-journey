@@ -24,7 +24,11 @@ struct ActivitySnapshot: Equatable {
 /// missed is drawn exactly like a day with no submissions.
 actor ActivityStore {
 
-    static let windowDays = 90
+    /// Half a year. The grid shows as many week columns as the screen
+    /// can hold and drops the rest, so this is an upper bound rather
+    /// than what is drawn. It costs nothing to ask for: the API answers
+    /// per year regardless of the range wanted.
+    static let windowDays = 182
 
     private let transport: ActivityTransport
     private let cacheURL: URL
