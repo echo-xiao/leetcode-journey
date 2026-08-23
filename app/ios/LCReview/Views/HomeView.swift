@@ -45,7 +45,7 @@ struct HomeView: View {
     @State private var showSettings = false
     /// Only one branch is open at a time. Four open branches is thirty-odd
     /// rows, which is the long list this screen exists to replace.
-    @State private var openSection: String? = "technique"
+    @State private var openSection: String? = "recent"
 
     var body: some View {
         ScrollView {

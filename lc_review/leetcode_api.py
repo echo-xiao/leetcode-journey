@@ -121,6 +121,31 @@ def get_all_ac_questions(session):
 
 
 
+def get_recent_ac_submissions(username, limit=20):
+    """The most recent accepted submissions, newest first.
+
+    Public: no cookie needed, the same way the profile calendar is. LeetCode
+    caps the response at twenty however large `limit` is, which is why this
+    refreshes recent activity rather than replacing the backfill.
+    """
+    query = """
+    query recentAcSubmissions($username: String!, $limit: Int!) {
+      recentAcSubmissionList(username: $username, limit: $limit) {
+        id title titleSlug timestamp
+      }
+    }
+    """
+    resp = requests.post(
+        f"{BASE_URL_EN}/graphql",
+        json={"query": query, "variables": {"username": username, "limit": limit}},
+        headers={"Content-Type": "application/json", "Referer": BASE_URL_EN,
+                 "User-Agent": session.headers["User-Agent"]},
+        timeout=15,
+    )
+    data = resp.json()
+    return (data.get("data") or {}).get("recentAcSubmissionList") or []
+
+
 def get_problem_details(slug):
     """跨站获取元数据与中文内容"""
     q_meta = """

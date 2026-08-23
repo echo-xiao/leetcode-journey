@@ -1192,6 +1192,81 @@
   {
    "difficulty": "Medium",
    "elements": [
+    "数学结构：本题不涉及数学公式或结论，核心是把行/列/宫格的重复检测转化成集合查重问题，属于计数结构应用而非数学推导",
+    "枚举范围：枚举范围就是固定的9x9=81个格子各遍历一次，宫格编号用(r//3)*3+(c//3)计算，不存在可缩小的枚举空间",
+    "数值边界：数值都是1-9的字符/数字，不涉及大数运算，不会溢出也不需要取模"
+   ],
+   "id": "36_valid-sudoku",
+   "number": 36,
+   "pseudocode": [
+    {
+     "kind": "heading",
+     "text": "1. 一句话核心逻辑"
+    },
+    {
+     "kind": "text",
+     "text": "用哈希集合（或等价的计数结构）分别记录每行、每列、每个 3×3 宫格中已出现的数字，遍历棋盘时若发现重复则判定无效。"
+    },
+    {
+     "kind": "heading",
+     "text": "2. 综合思路"
+    },
+    {
+     "kind": "text",
+     "text": "虽然本题只给出一个版本，但该类题目的 AC 实现通常可归纳为以下几种等价思路："
+    },
+    {
+     "kind": "text",
+     "text": "• 哈希集合法（本版本）：为每行、每列、每个宫格各建一个 set()，遍历过程中检查当前数字是否已存在于对应集合中。\n• 二维数组/计数矩阵法：用 int[9][9] 的计数数组代替集合，rows[r][num]++，通过计数是否 >1 判断重复，避免哈希开销。\n• 位运算（bitmask）法：用一个整数的 9 位表示 1-9 是否出现，通过位与操作 (mask >> num) & 1 判断重复，效率更高、空间更省。\n• 一次遍历合并判断法：将行、列、宫格的标记合并为一个字符串键（如 f\"{val}_row{r}\"），存入同一个 set 中，通过字符串是否重复判断冲突，代码更简洁但性能略低。"
+    },
+    {
+     "kind": "text",
+     "text": "这些思路本质相同：用某种结构记录已出现的数字并检测冲突，区别仅在于数据结构的选择（set/数组/位运算）。"
+    },
+    {
+     "kind": "heading",
+     "text": "3. 全量伪代码"
+    },
+    {
+     "kind": "code",
+     "text": "函数 判断数独是否有效(board):\n    初始化 9 个行记录结构 rows[0..8]\n    初始化 9 个列记录结构 cols[0..8]\n    初始化 9 个宫格记录结构 boxes[0..8]\n\n    对每个格子 (r, c) 遍历棋盘:\n        val = board[r][c]\n        如果 val 是 '.':\n            跳过\n\n        计算宫格编号 box = (r // 3) * 3 + (c // 3)\n\n        如果 val 已存在于 rows[r]:\n            返回 False\n        否则:\n            将 val 加入 rows[r]\n\n        如果 val 已存在于 cols[c]:\n            返回 False\n        否则:\n            将 val 加入 cols[c]\n\n        如果 val 已存在于 boxes[box]:\n            返回 False\n        否则:\n            将 val 加入 boxes[box]\n\n    返回 True"
+    },
+    {
+     "kind": "text",
+     "text": "（若采用计数数组或位运算实现，仅将“集合添加/查询”替换为“计数自增并检查是否>1”或“位运算置位并检查是否已置位”，整体流程一致。）"
+    },
+    {
+     "kind": "heading",
+     "text": "4. 复杂度"
+    },
+    {
+     "kind": "text",
+     "text": "设棋盘大小为固定的 9 \\times 9（更一般地记 n=9）："
+    },
+    {
+     "kind": "text",
+     "text": "• 时间复杂度：O(n^2)，需要遍历所有 81 个格子各一次。\n• 空间复杂度：O(n^2)，需要维护 27 个大小不超过 9 的集合（或等价的计数/位结构），整体为常数级 O(1)（相对于输入规模固定时）。"
+    },
+    {
+     "kind": "text",
+     "text": "即：\n$$\n\\text{时间复杂度} = O(n^2), \\quad \\text{空间复杂度} = O(n^2) \\; (\\text{固定 9×9 时视为 } O(1))\n$$"
+    }
+   ],
+   "retrospective": "",
+   "solutions": [
+    {
+     "code": "class Solution:\n    def isValidSudoku(self, board: List[List[str]]) -> bool:\n        n = len(board)\n        rows = []\n        cols = []\n        boxes = []\n        \n        for i in range(0, n):\n            rows.append(set())\n            cols.append(set())\n            boxes.append(set())\n\n        for r in range(0, n):\n            for c in range(0, n):\n                val = board[r][c]\n                if val == \".\":\n                    continue\n                box = (r//3)*3 + c//3\n\n                if val not in rows[r]: \n                    rows[r].add(val)\n                else:\n                    return False\n\n                if val not in cols[c]: \n                    cols[c].add(val)\n                else:\n                    return False\n\n                if val not in boxes[box]: \n                    boxes[box].add(val)\n                else:\n                    return False\n\n        return True\n\n",
+     "name": "solution_1.py"
+    }
+   ],
+   "solvedAt": 1787259793,
+   "statement": "请你判断一个 9 x 9 的数独是否有效。只需要 根据以下规则 ，验证已经填入的数字是否有效即可。\n\n数字 1-9 在每一行只能出现一次。\n\n数字 1-9 在每一列只能出现一次。\n\n数字 1-9 在每一个以粗实线分隔的 3x3 宫内只能出现一次。（请参考示例图）\n\n注意：\n\n一个有效的数独（部分已被填充）不一定是可解的。\n\n只需要根据以上规则，验证已经填入的数字是否有效即可。\n\n空白格用 '.' 表示。\n\n示例 1：\n\n输入：board =\n[[\"5\",\"3\",\".\",\".\",\"7\",\".\",\".\",\".\",\".\"]\n,[\"6\",\".\",\".\",\"1\",\"9\",\"5\",\".\",\".\",\".\"]\n,[\".\",\"9\",\"8\",\".\",\".\",\".\",\".\",\"6\",\".\"]\n,[\"8\",\".\",\".\",\".\",\"6\",\".\",\".\",\".\",\"3\"]\n,[\"4\",\".\",\".\",\"8\",\".\",\"3\",\".\",\".\",\"1\"]\n,[\"7\",\".\",\".\",\".\",\"2\",\".\",\".\",\".\",\"6\"]\n,[\".\",\"6\",\".\",\".\",\".\",\".\",\"2\",\"8\",\".\"]\n,[\".\",\".\",\".\",\"4\",\"1\",\"9\",\".\",\".\",\"5\"]\n,[\".\",\".\",\".\",\".\",\"8\",\".\",\".\",\"7\",\"9\"]]\n输出：true\n\n示例 2：\n\n输入：board =\n[[\"8\",\"3\",\".\",\".\",\"7\",\".\",\".\",\".\",\".\"]\n,[\"6\",\".\",\".\",\"1\",\"9\",\"5\",\".\",\".\",\".\"]\n,[\".\",\"9\",\"8\",\".\",\".\",\".\",\".\",\"6\",\".\"]\n,[\"8\",\".\",\".\",\".\",\"6\",\".\",\".\",\".\",\"3\"]\n,[\"4\",\".\",\".\",\"8\",\".\",\"3\",\".\",\".\",\"1\"]\n,[\"7\",\".\",\".\",\".\",\"2\",\".\",\".\",\".\",\"6\"]\n,[\".\",\"6\",\".\",\".\",\".\",\".\",\"2\",\"8\",\".\"]\n,[\".\",\".\",\".\",\"4\",\"1\",\"9\",\".\",\".\",\"5\"]\n,[\".\",\".\",\".\",\".\",\"8\",\".\",\".\",\"7\",\"9\"]]\n输出：false\n解释：除了第一行的第一个数字从 5 改为 8 以外，空格内其他数字均与 示例1 相同。 但由于位于左上角的 3x3 宫内有两个 8 存在, 因此这个数独是无效的。",
+   "technique": "数学技巧",
+   "title": "36. 有效的数独"
+  },
+  {
+   "difficulty": "Medium",
+   "elements": [
     "路径：path列表，记录当前已经选入组合的数字（可重复使用同一个数）",
     "选择列表：candidates数组里下标从start到末尾的所有数，即当前数还能继续选自己或之后的数",
     "结束条件：target减到0时把path加入结果集并返回，target小于0时直接返回不再往下搜",
@@ -1292,6 +1367,85 @@
    "statement": "给定一个候选人编号的集合 candidates 和一个目标数 target ，找出 candidates 中所有可以使数字和为 target 的组合。\n\ncandidates 中的每个数字在每个组合中只能使用 一次 。\n\n注意：解集不能包含重复的组合。\n\n示例 1:\n\n输入: candidates = [10,1,2,7,6,1,5], target = 8,\n输出:\n[\n[1,1,6],\n[1,2,5],\n[1,7],\n[2,6]\n]\n\n示例 2:\n\n输入: candidates = [2,5,2,1,2], target = 5,\n输出:\n[\n[1,2,2],\n[5]\n]",
    "technique": "回溯",
    "title": "40. 组合总和 II"
+  },
+  {
+   "difficulty": "Hard",
+   "elements": [
+    "指针类型：用左右指针相向而行，left从0出发、right从n-1出发，向中间收缩来接雨水",
+    "slow 含义：本题不涉及快慢指针，因为解法是相向双指针，不存在写入位置的slow指针",
+    "停止条件：循环条件是left < right，当左右指针相遇时停止"
+   ],
+   "id": "42_trapping-rain-water",
+   "number": 42,
+   "pseudocode": [
+    {
+     "kind": "heading",
+     "text": "1. 一句话直击本质"
+    },
+    {
+     "kind": "text",
+     "text": "每个位置能接的雨水量 = min(左侧最高柱, 右侧最高柱) - 当前柱高，将所有位置累加即为答案。"
+    },
+    {
+     "kind": "heading",
+     "text": "2. 综合思路"
+    },
+    {
+     "kind": "text",
+     "text": "两个版本本质上都是基于\"木桶效应\"（接水量取决于较矮的一侧），但在空间优化上采取了不同策略："
+    },
+    {
+     "kind": "text",
+     "text": "• 版本2：动态规划（前后缀分解）\n  预先计算每个位置左侧的最大值数组 left[] 和右侧的最大值数组 right[]，再遍历一次利用公式求解。思路直观，但需要 O(n) 额外数组空间。"
+    },
+    {
+     "kind": "text",
+     "text": "• 版本1：双指针（空间优化）\n  利用双指针 left、right 从两端向中间收缩，动态维护 maxleft 和 maxright。\n  核心贪心思想：若 maxleft <= maxright，则左指针处的接水量必然由 maxleft 决定（因为右边必然存在比 maxleft 更高的挡板），从而避免了预先存储整个数组，将空间复杂度优化至 O(1)。"
+    },
+    {
+     "kind": "heading",
+     "text": "3. 全量伪代码"
+    },
+    {
+     "kind": "heading",
+     "text": "解法一：前后缀最大值法（DP）"
+    },
+    {
+     "kind": "code",
+     "text": "函数 trap(height):\n    n = 数组长度\n    初始化 left_max[n], right_max[n] 数组\n\n    // 正向遍历，计算每个位置左边的最大值\n    当前最大值 = 0\n    对于 i 从 0 到 n-1:\n        当前最大值 = max(当前最大值, height[i])\n        left_max[i] = 当前最大值\n\n    // 反向遍历，计算每个位置右边的最大值\n    当前最大值 = 0\n    对于 i 从 n-1 到 0:\n        当前最大值 = max(当前最大值, height[i])\n        right_max[i] = 当前最大值\n\n    // 汇总结果\n    res = 0\n    对于 i 从 0 到 n-1:\n        木桶短板 = min(left_max[i], right_max[i])\n        res += 木桶短板 - height[i]\n\n    返回 res"
+    },
+    {
+     "kind": "heading",
+     "text": "解法二：双指针法"
+    },
+    {
+     "kind": "code",
+     "text": "函数 trap(height):\n    left = 0, right = n - 1\n    maxleft = 0, maxright = 0\n    res = 0\n\n    当 left < right 时循环:\n        更新 maxleft = max(maxleft, height[left])\n        更新 maxright = max(maxright, height[right])\n\n        如果 maxleft <= maxright:\n            // 左边的最大值是决定短板的关键\n            res += maxleft - height[left]\n            left 右移一位\n        否则:\n            // 右边的最大值是决定短板的关键\n            res += maxright - height[right]\n            right 左移一位\n\n    返回 res"
+    },
+    {
+     "kind": "heading",
+     "text": "4. 复杂度"
+    },
+    {
+     "kind": "text",
+     "text": "| 解法 | 时间复杂度 | 空间复杂度 |\n| :--- | :--- | :--- |\n| 版本2 (DP前后缀) | O(n) | O(n) (存储两个辅助数组) |\n| 版本1 (双指针) | O(n) | O(1) (仅使用常数个变量) |"
+    }
+   ],
+   "retrospective": "",
+   "solutions": [
+    {
+     "code": "class Solution:\n    def trap(self, height: List[int]) -> int:\n        n = len(height)\n        left, right = 0, n-1\n        res = 0\n        maxleft, maxright = 0, 0\n        while left < right:\n            maxleft = max(maxleft, height[left])\n            maxright = max(maxright, height[right])\n            if maxleft <= maxright:\n                res += (maxleft - height[left])\n                left += 1\n            else:\n                res += (maxright - height[right])\n                right -= 1\n        return res",
+     "name": "solution_1.py"
+    },
+    {
+     "code": "class Solution:\n    def trap(self, height: List[int]) -> int:\n        \n        n = len(height)\n        maxleft = 0\n        left = [0] * n\n        for i in range(0, n):\n            maxleft = max(maxleft, height[i])\n            left[i] = maxleft\n        \n        maxright = 0\n        right = [0] * n\n        for j in range(n-1, -1, -1):\n            maxright = max(maxright, height[j])\n            right[j] = maxright\n        \n        res = 0\n        minheight = 0\n        for i in range(0, n):\n            minheight = min(left[i], right[i])\n            res += (minheight - height[i])\n        return res",
+     "name": "solution_2.py"
+    }
+   ],
+   "solvedAt": 1787449061,
+   "statement": "给定 n 个非负整数表示每个宽度为 1 的柱子的高度图，计算按此排列的柱子，下雨之后能接多少雨水。\n\n示例 1：\n\n输入：height = [0,1,0,2,1,0,1,3,2,1,2,1]\n输出：6\n解释：上面是由数组 [0,1,0,2,1,0,1,3,2,1,2,1] 表示的高度图，在这种情况下，可以接 6 个单位的雨水（蓝色部分表示雨水）。\n\n示例 2：\n\n输入：height = [4,2,0,3,2,5]\n输出：9",
+   "technique": "数组双指针",
+   "title": "42. 接雨水"
   },
   {
    "difficulty": "Medium",
@@ -1400,6 +1554,81 @@
    "statement": "给定一个可包含重复数字的序列 nums ，按任意顺序 返回所有不重复的全排列。\n\n示例 1：\n\n输入：nums = [1,1,2]\n输出：\n[[1,1,2],\n[1,2,1],\n[2,1,1]]\n\n示例 2：\n\n输入：nums = [1,2,3]\n输出：[[1,2,3],[1,3,2],[2,1,3],[2,3,1],[3,1,2],[3,2,1]]",
    "technique": "回溯",
    "title": "47. 全排列 II"
+  },
+  {
+   "difficulty": "Medium",
+   "elements": [
+    "数学结构：数学结构是等价类划分：同一组字母异位词的字符集合完全相同，排序后或计数后的表示必然一致，用这个规范化表示作为哈希键就能把等价的字符串归到一起。",
+    "枚举范围：本题不涉及枚举缩放范围，因为不是在数值区间里搜索，而是遍历一遍字符串数组和每个字符串内部字符即可，没有sqrt(n)或质因数分解这类优化点。",
+    "数值边界：本题不涉及数值溢出或取模，因为处理的是字符串排序或字符计数，没有大数运算，计数最多也就是字符串长度这种量级，不会溢出。"
+   ],
+   "id": "49_group-anagrams",
+   "number": 49,
+   "pseudocode": [
+    {
+     "kind": "heading",
+     "text": "1. 一句话直击本质"
+    },
+    {
+     "kind": "text",
+     "text": "将每个字符串转换为\"排序后字符串\"或\"字符计数签名\"作为哈希表的键，把互为字母异位词的字符串聚合到同一个桶中。"
+    },
+    {
+     "kind": "heading",
+     "text": "2. 综合思路"
+    },
+    {
+     "kind": "text",
+     "text": "字母异位词分组的核心是找到一种规范化表示（canonical form），使得互为异位词的字符串映射到同一个键。常见的两种思路："
+    },
+    {
+     "kind": "text",
+     "text": "• 思路一：排序法（本题所用）\n  对每个字符串的字符进行排序，排序后的字符串完全相同即互为异位词。用排序结果作为哈希表的 key，将原字符串归入对应的 value 列表。"
+    },
+    {
+     "kind": "text",
+     "text": "• 思路二：计数法（未在本代码中出现，但为常见 AC 解法）\n  统计每个字符串中 26 个小写字母的出现次数，将计数元组（或拼接成字符串）作为 key。此法避免排序开销，适合字符集较小的场景。"
+    },
+    {
+     "kind": "text",
+     "text": "两种思路本质相同：都是\"求规范形式 + 哈希分组\"，区别仅在于规范化方式（排序 vs 计数）。"
+    },
+    {
+     "kind": "heading",
+     "text": "3. 全量伪代码"
+    },
+    {
+     "kind": "code",
+     "text": "函数 groupAnagrams(strs):\n    初始化空哈希表 count  // key: 规范化字符串, value: 原字符串列表\n\n    对 strs 中每个字符串 s:\n        // 方式一：排序法\n        key = 将 s 的字符排序后拼接成新字符串\n\n        // 方式二（可选变体）：计数法\n        // key = 统计 s 中每个字母出现次数，组成长度为26的计数数组或元组\n\n        如果 key 不在 count 中:\n            count[key] = [s]      // 新建列表\n        否则:\n            count[key].append(s)  // 加入已有列表\n\n    返回 count 中所有 value 组成的列表"
+    },
+    {
+     "kind": "heading",
+     "text": "4. 复杂度"
+    },
+    {
+     "kind": "text",
+     "text": "设字符串数组长度为 n，字符串平均长度为 k。"
+    },
+    {
+     "kind": "text",
+     "text": "排序法：\n• 时间复杂度：O(n \\cdot k \\log k)（每个字符串排序耗时 O(k\\log k)）\n• 空间复杂度：O(n \\cdot k)（哈希表存储所有字符串及键）"
+    },
+    {
+     "kind": "text",
+     "text": "计数法：\n• 时间复杂度：O(n \\cdot k)（统计字符次数为线性）\n• 空间复杂度：O(n \\cdot k)"
+    }
+   ],
+   "retrospective": "",
+   "solutions": [
+    {
+     "code": "class Solution:\n    def groupAnagrams(self, strs: List[str]) -> List[List[str]]:\n        count = {}\n        for s in strs:\n            key = \"\".join(sorted(s))\n            if key not in count:\n                count[key] = [s]\n            else:\n                count[key].append(s)\n        return list(count.values())\n            \n            ",
+     "name": "solution_1.py"
+    }
+   ],
+   "solvedAt": 1787256833,
+   "statement": "给你一个字符串数组，请你将 字母异位词 组合在一起。可以按任意顺序返回结果列表。\n\n示例 1:\n\n输入: strs = [\"eat\", \"tea\", \"tan\", \"ate\", \"nat\", \"bat\"]\n\n输出: [[\"bat\"],[\"nat\",\"tan\"],[\"ate\",\"eat\",\"tea\"]]\n\n解释：\n\n在 strs 中没有字符串可以通过重新排列来形成 \"bat\"。\n\n字符串 \"nat\" 和 \"tan\" 是字母异位词，因为它们可以重新排列以形成彼此。\n\n字符串 \"ate\" ，\"eat\" 和 \"tea\" 是字母异位词，因为它们可以重新排列以形成彼此。\n\n示例 2:\n\n输入: strs = [\"\"]\n\n输出: [[\"\"]]\n\n示例 3:\n\n输入: strs = [\"a\"]\n\n输出: [[\"a\"]]",
+   "technique": "数学技巧",
+   "title": "49. 字母异位词分组"
   },
   {
    "difficulty": "Medium",
@@ -4150,6 +4379,172 @@
    "title": "121. 买卖股票的最佳时机"
   },
   {
+   "difficulty": "Easy",
+   "elements": [
+    "指针类型：用左右指针相向而行，left从clean开头、right从clean结尾向中间靠拢比较字符",
+    "slow 含义：本题不涉及，因为本题不是快慢指针场景，不存在原地写入数组的操作",
+    "停止条件：当left>=right时停止，也就是左右指针相遇或交错时结束比较，此时若中途没发现字符不等就返回True"
+   ],
+   "id": "125_valid-palindrome",
+   "number": 125,
+   "pseudocode": [
+    {
+     "kind": "heading",
+     "text": "1. 核心逻辑"
+    },
+    {
+     "kind": "text",
+     "text": "过滤非字母数字字符并统一大小写后，使用双指针从两端向中间比较，判断字符序列是否对称。"
+    },
+    {
+     "kind": "heading",
+     "text": "2. 综合思路"
+    },
+    {
+     "kind": "text",
+     "text": "两个版本采用完全相同的算法思路，均分为两个阶段："
+    },
+    {
+     "kind": "text",
+     "text": "• 预处理阶段：遍历原字符串，利用 isalnum() 过滤出字母和数字字符，并统一转换为小写，生成一个只包含有效字符的\"干净字符串\"。\n• 判断阶段：使用双指针（左指针从头、右指针从尾）向中间靠拢，逐一比较对应位置字符是否相等。"
+    },
+    {
+     "kind": "text",
+     "text": "两版本的差异仅在于字符串拼接写法（+= vs +）和判断分支顺序（先判断不等 vs 先判断相等），核心算法逻辑完全一致，未出现递归、栈等其他解法变体。"
+    },
+    {
+     "kind": "heading",
+     "text": "3. 全量伪代码"
+    },
+    {
+     "kind": "code",
+     "text": "函数 isPalindrome(s):\n    初始化 clean 为空字符串\n\n    // 第一阶段：过滤与标准化\n    对 s 中的每个字符 c:\n        如果 c 是字母或数字:\n            将 c 转为小写并追加到 clean\n\n    // 第二阶段：双指针判断回文\n    left ← 0\n    right ← clean 长度 - 1\n\n    当 left < right 时:\n        如果 clean[left] 不等于 clean[right]:\n            返回 False\n        否则:\n            left ← left + 1\n            right ← right - 1\n\n    返回 True"
+    },
+    {
+     "kind": "heading",
+     "text": "4. 复杂度"
+    },
+    {
+     "kind": "text",
+     "text": "• 时间复杂度：O(n)，其中 n 为字符串长度。过滤阶段遍历一次字符串，双指针比较阶段最多遍历 n/2 次。"
+    },
+    {
+     "kind": "text",
+     "text": "• 空间复杂度：O(n)，需要额外的 clean 字符串存储过滤后的字符（原地双指针本身仅需 O(1) 辅助空间，但因预处理生成了新字符串，故整体为线性空间）。"
+    }
+   ],
+   "retrospective": "",
+   "solutions": [
+    {
+     "code": "class Solution:\n    def isPalindrome(self, s: str) -> bool:\n        \n        clean = \"\"\n        for c in s:\n            if c.isalnum():\n                clean += c.lower()\n        \n        left = 0\n        right = len(clean)-1\n        while left < right:\n            if clean[left] != clean[right]:\n                return False\n            else:\n                left += 1\n                right -= 1\n        return True",
+     "name": "solution_1.py"
+    },
+    {
+     "code": "class Solution:\n    def isPalindrome(self, s: str) -> bool:\n        clean = \"\"\n        for c in s:\n            if c.isalnum():\n                clean = clean + c.lower()\n        \n        left = 0\n        right = len(clean)-1\n        while left < right:\n            if clean[left] == clean[right]:\n                left += 1\n                right -= 1\n            else:\n                return False\n        return True",
+     "name": "solution_2.py"
+    }
+   ],
+   "solvedAt": 1787262689,
+   "statement": "如果在将所有大写字符转换为小写字符、并移除所有非字母数字字符之后，短语正着读和反着读都一样。则可以认为该短语是一个 回文串 。\n\n字母和数字都属于字母数字字符。\n\n给你一个字符串 s，如果它是 回文串 ，返回 true ；否则，返回 false 。\n\n示例 1：\n\n输入: s = \"A man, a plan, a canal: Panama\"\n输出：true\n解释：\"amanaplanacanalpanama\" 是回文串。\n\n示例 2：\n\n输入：s = \"race a car\"\n输出：false\n解释：\"raceacar\" 不是回文串。\n\n示例 3：\n\n输入：s = \" \"\n输出：true\n解释：在移除非字母数字字符之后，s 是一个空字符串 \"\" 。\n由于空字符串正着反着读都一样，所以是回文串。",
+   "technique": "数组双指针",
+   "title": "125. 验证回文串"
+  },
+  {
+   "difficulty": "Medium",
+   "elements": [
+    "数学结构：利用「连续序列起点」这个性质：一个数num只有在num-1不存在于集合中时才可能是某段连续序列的开头，靠这个性质避免重复统计同一段序列，从而保证整体线性时间。",
+    "枚举范围：只需遍历去重后的集合（用set存num），且只对满足num-1不在集合中的num做向后扩展（查num+1,num+2...），不是起点的数字直接跳过，不用每个数都往后扫。",
+    "数值边界：数组元素是int范围内的普通整数，长度和count都是普通计数，不会溢出也不需要取模，本题不涉及边界处理问题。"
+   ],
+   "id": "128_longest-consecutive-sequence",
+   "number": 128,
+   "pseudocode": [
+    {
+     "kind": "heading",
+     "text": "1. 一句话直击本质"
+    },
+    {
+     "kind": "text",
+     "text": "将数组去重后判断每个数是否为某段连续序列的\"起点\"（即其前驱不存在），再向后扩展统计长度，从而在保证整体线性时间的前提下求出最长连续序列长度。"
+    },
+    {
+     "kind": "heading",
+     "text": "2. 综合思路"
+    },
+    {
+     "kind": "text",
+     "text": "题目的 AC 解法可归纳为两大类："
+    },
+    {
+     "kind": "text",
+     "text": "思路一：哈希集合（Set）+ 边界判断（版本1、3）\n• 将 nums 存入哈希集合，实现 O(1) 查询。\n• 遍历集合中每个数字，只有当它是一个连续序列的起点（即 num-1 不在集合中）时，才向后扩展查找 num+1, num+2, ... 是否存在，统计长度。\n• 这样保证每个数字最多被访问两次（一次作为遍历元素，一次作为扩展元素），从而达到 O(n) 总时间复杂度。"
+    },
+    {
+     "kind": "text",
+     "text": "思路二：排序 + 线性扫描（版本2、4）\n• 先对数组排序。\n• 遍历排序后的数组，比较相邻元素：\n  • 若相等，跳过（去重）。\n  • 若相差 1，长度 length += 1。\n  • 否则（不连续），重置 length = 1。\n• 用 maxlen 记录过程中的最大长度。\n• 该方法实现简单，但因排序，时间复杂度为 O(n \\log n)。"
+    },
+    {
+     "kind": "text",
+     "text": "两种思路本质相同：都是找到连续段并统计长度，区别在于查找相邻数字的方式（哈希 O(1) vs 排序有序遍历）。"
+    },
+    {
+     "kind": "heading",
+     "text": "3. 全量伪代码"
+    },
+    {
+     "kind": "heading",
+     "text": "解法一：哈希集合法"
+    },
+    {
+     "kind": "code",
+     "text": "函数 最长连续序列(nums):\n    若 nums 为空: 返回 0\n    将 nums 转为集合 seen  // 自动去重，支持O(1)查找\n    maxlen ← 0\n    对 seen 中每个数字 num:\n        如果 (num - 1) 不在 seen 中:   // 确保是序列起点\n            length ← 1\n            cur ← num\n            当 (cur + 1) 在 seen 中:\n                length ← length + 1\n                cur ← cur + 1\n            maxlen ← max(maxlen, length)\n    返回 maxlen"
+    },
+    {
+     "kind": "heading",
+     "text": "解法二：排序扫描法"
+    },
+    {
+     "kind": "code",
+     "text": "函数 最长连续序列(nums):\n    若 nums 为空: 返回 0\n    对 nums 进行排序\n    length ← 1\n    maxlen ← 1\n    对 i 从 1 到 len(nums)-1:\n        如果 nums[i] == nums[i-1]:\n            继续（跳过重复元素）\n        否则如果 nums[i] == nums[i-1] + 1:\n            length ← length + 1\n        否则:\n            length ← 1\n        maxlen ← max(maxlen, length)\n    返回 maxlen"
+    },
+    {
+     "kind": "heading",
+     "text": "4. 复杂度"
+    },
+    {
+     "kind": "text",
+     "text": "解法一（哈希集合法，版本1、3）：\n• 时间复杂度：O(n)（每个元素最多被访问常数次）\n• 空间复杂度：O(n)（额外的哈希集合存储）"
+    },
+    {
+     "kind": "text",
+     "text": "解法二（排序扫描法，版本2、4）：\n• 时间复杂度：O(n \\log n)（排序主导）\n• 空间复杂度：O(\\log n) 或 O(n)（取决于排序算法实现，如快排递归栈或 Timsort 辅助空间；若不计排序内部开销，则额外空间为 O(1)）"
+    }
+   ],
+   "retrospective": "",
+   "solutions": [
+    {
+     "code": "class Solution:\n    def longestConsecutive(self, nums: List[int]) -> int:\n        \n        seen = set(nums)\n        maxlen = 0\n        for i in seen:\n            if i-1 in seen:\n                continue\n            length = 1\n            cur = i\n            while cur+1 in seen:\n                length += 1\n                cur += 1\n            maxlen = max(maxlen, length)\n        return maxlen",
+     "name": "solution_1.py"
+    },
+    {
+     "code": "class Solution:\n    def longestConsecutive(self, nums: List[int]) -> int:\n        if not nums:\n            return 0\n            \n        nums.sort()\n        length = 1\n        maxlen = 1\n        for i in range(1, len(nums)):\n            if nums[i] == nums[i-1]:\n                continue\n            elif nums[i] == nums[i-1] + 1:\n                length += 1\n            else:\n                length = 1\n            maxlen = max(maxlen, length)\n        return maxlen",
+     "name": "solution_2.py"
+    },
+    {
+     "code": "class Solution:\n    def longestConsecutive(self, nums: List[int]) -> int:\n        \n        seen = set(nums)\n        maxlen = 0\n        for j in seen:\n            if j-1 not in seen:\n                length = 1\n                cur = j\n                while cur + 1 in seen:\n                    length += 1\n                    cur += 1\n                maxlen = max(maxlen, length)\n        return maxlen",
+     "name": "solution_3.py"
+    },
+    {
+     "code": "class Solution:\n    def longestConsecutive(self, nums: List[int]) -> int:\n        nums.sort()\n        maxlen = 1\n        length = 1\n        \n        if not nums:\n            return 0\n        for i in range(0, len(nums)):\n            if nums[i] == nums[i-1]:\n                pass\n            elif nums[i] == nums[i-1] + 1:\n                length += 1\n                maxlen = max(length, maxlen)\n            else:\n                length = 1\n        return maxlen",
+     "name": "solution_4.py"
+    }
+   ],
+   "solvedAt": 1787243128,
+   "statement": "给定一个未排序的整数数组 nums ，找出数字连续的最长序列（不要求序列元素在原数组中连续）的长度。\n\n请你设计并实现时间复杂度为 O(n) 的算法解决此问题。\n\n示例 1：\n\n输入：nums = [100,4,200,1,3,2]\n输出：4\n解释：最长数字连续序列是 [1, 2, 3, 4]。它的长度为 4。\n\n示例 2：\n\n输入：nums = [0,3,7,2,5,8,4,6,0,1]\n输出：9\n\n示例 3：\n\n输入：nums = [1,0,1,2]\n输出：3",
+   "technique": "数学技巧",
+   "title": "128. 最长连续序列"
+  },
+  {
    "difficulty": "Medium",
    "elements": [
     "函数定义：dfs(node, currSum)：node 是当前节点，currSum 是从根走到 node 父节点时累积出来的数字，返回值是以 node 为根的这棵子树里所有根到叶路径数字之和。",
@@ -6291,6 +6686,89 @@
   {
    "difficulty": "Easy",
    "elements": [
+    "数学结构：本题不涉及数学结构，用的是哈希集合的唯一性特征而不是数学公式或数论性质",
+    "枚举范围：本题不涉及枚举范围缩减，需要对数组从头到尾逐个元素遍历一次，不能只看部分范围",
+    "数值边界：本题不涉及数值边界问题，元素只用于哈希集合的存在性判断，不涉及数值计算、溢出或取模"
+   ],
+   "id": "217_contains-duplicate",
+   "number": 217,
+   "pseudocode": [
+    {
+     "kind": "heading",
+     "text": "1. 一句话直击本质"
+    },
+    {
+     "kind": "text",
+     "text": "利用哈希集合的唯一性特征，在一次遍历中检测数组中是否存在重复出现的元素。"
+    },
+    {
+     "kind": "heading",
+     "text": "2. 综合思路"
+    },
+    {
+     "kind": "text",
+     "text": "针对本题，常见的 AC 解法主要有以下几类思路："
+    },
+    {
+     "kind": "text",
+     "text": "• 哈希集合法（本题采用）：边遍历边将元素插入 set，插入前先检查该元素是否已存在，一旦发现重复立即返回 True，兼顾时间效率与提前终止的优化。\n• 排序法（对比思路）：先对数组排序，再遍历比较相邻元素是否相等，若相等则存在重复。此法时间复杂度为 O(n\\log n)，但空间复杂度可优化至 O(1)（原地排序）。\n• 集合大小比较法（对比思路）：直接比较 len(set(nums)) 与 len(nums) 是否相等，若不相等说明存在重复。此法代码简洁，但无法提前终止，且需要额外遍历构建整个集合。"
+    },
+    {
+     "kind": "text",
+     "text": "本题给出的版本 1 属于哈希集合法，且做了提前返回的优化（一旦发现重复立刻终止，无需遍历完整个数组）。"
+    },
+    {
+     "kind": "heading",
+     "text": "3. 全量伪代码"
+    },
+    {
+     "kind": "code",
+     "text": "函数 判断是否存在重复元素(数组 nums):\n    初始化空集合 seen\n\n    对于 nums 中的每一个元素 i:\n        如果 i 已经存在于 seen 中:\n            返回 True   # 发现重复，提前终止\n\n        将 i 加入 seen 中\n\n    返回 False   # 遍历结束仍未发现重复"
+    },
+    {
+     "kind": "text",
+     "text": "（其他等价思路伪代码，作为对比补充）"
+    },
+    {
+     "kind": "code",
+     "text": "# 排序法\n函数 判断是否存在重复元素_排序版(数组 nums):\n    对 nums 进行原地排序\n\n    对于 i 从 0 到 len(nums)-2:\n        如果 nums[i] 等于 nums[i+1]:\n            返回 True\n\n    返回 False"
+    },
+    {
+     "kind": "code",
+     "text": "# 集合大小比较法\n函数 判断是否存在重复元素_集合版(数组 nums):\n    返回 (集合(nums) 的长度) 不等于 (nums 的长度)"
+    },
+    {
+     "kind": "heading",
+     "text": "4. 复杂度"
+    },
+    {
+     "kind": "text",
+     "text": "版本 1（哈希集合法，本题实现）：\n• 时间复杂度：O(n)，其中 n 为数组长度，每个元素的插入与查找操作均摊为 O(1)\n• 空间复杂度：O(n)，最坏情况下集合需存储所有 n 个不重复元素"
+    },
+    {
+     "kind": "text",
+     "text": "排序法（对比）：\n• 时间复杂度：O(n\\log n)，主要由排序决定\n• 空间复杂度：O(1) 或 O(\\log n)（取决于排序算法的实现，如原地快排的递归栈开销）"
+    },
+    {
+     "kind": "text",
+     "text": "集合大小比较法（对比）：\n• 时间复杂度：O(n)\n• 空间复杂度：O(n)"
+    }
+   ],
+   "retrospective": "",
+   "solutions": [
+    {
+     "code": "class Solution:\n    def containsDuplicate(self, nums: List[int]) -> bool:\n        seen = set()\n        for i in nums:\n            if i in seen:\n                return True\n            seen.add(i)\n        return False",
+     "name": "solution_1.py"
+    }
+   ],
+   "solvedAt": 1787110772,
+   "statement": "给你一个整数数组 nums 。如果任一值在数组中出现 至少两次 ，返回 true ；如果数组中每个元素互不相同，返回 false 。\n\n示例 1：\n\n输入：nums = [1,2,3,1]\n\n输出：true\n\n解释：\n\n元素 1 在下标 0 和 3 出现。\n\n示例 2：\n\n输入：nums = [1,2,3,4]\n\n输出：false\n\n解释：\n\n所有元素都不同。\n\n示例 3：\n\n输入：nums = [1,1,1,3,3,4,3,2,4,2]\n\n输出：true",
+   "technique": "数学技巧",
+   "title": "217. 存在重复元素"
+  },
+  {
+   "difficulty": "Easy",
+   "elements": [
     "定长还是变长：定长，窗口就是当前下标 j 往前数 k 个元素（集合大小最多 k）。",
     "进窗口更新：每次循环 right（即 j）都往右挪一格，把 nums[j] 加进 seen 集合，除此之外不需要维护别的量。",
     "出窗口时机：当 seen 里元素个数超过 k 时，把离开窗口的 nums[j-k] 从集合里删掉，集合大小回到 k。",
@@ -6320,7 +6798,7 @@
      "text": "4. 复杂度：\n   • 时间复杂度：O(n)，其中 n 是数组 nums 的长度，因为每个元素最多被添加和移除集合一次。\n   • 空间复杂度：O(\\min(n, k))，因为集合 seen 的大小最多为 k。"
     }
    ],
-   "retrospective": "1. 这个里面有一个典型的问题 abs(i-j)≤ k的问题，定义了一个固定大小的领域或者窗口，一般来说可以分成三种情况：找特定的值是否存在、找相邻元素、找窗口内最大/最小值，这个是找特定的值是否存在，所以直接用哈希就好了。\n2. 为什么这个里面无法第一眼看出来是滑动窗口；因为读懂题不等于知道怎么下手，通常是因为这个是一步直接跳到了最优解，最优解是想出来的，不是看出来的；首先写暴力解\n3. 然后换掉内循环，把条件 j - i <= k 挪一下变成 i >= j - k，那内层就是：在 [j-k, j-1] 这段里，有没有一个位置的值等于 nums[j]\n4. 然后这个循环里面的状态不会写（不变量是什么）；不变量其实是说，走到j的时候，我手边应该有什么东西才能够立刻回答问题？装的是j前面的最近k个，不变量就是包理解内层循环扫的那段东西，只不过换成方便查看的形式；内层扫什么，拿这个范围干什么；\n5. 状态里面的顺序也不会写；循环体里面的顺序，不能违反的就一条，查的时候，seen里面必须恰好是窗口的元素，不多不少；修、查、加，不变量是啥->把过期状态踢出去、让不变量成立->用状态回答问题->把nums[j]并进去，给下一轮用。",
+   "retrospective": "这个里面有一个典型的问题 abs(i-j)≤ k的问题，定义了一个固定大小的领域或者窗口，一般来说可以分成三种情况：找特定的值是否存在、找相邻元素、找窗口内最大/最小值，这个是找特定的值是否存在，所以直接用哈希就好了。（尼玛但是我为啥还是做错了）",
    "solutions": [
     {
      "code": "class Solution(object):\n    def containsNearbyDuplicate(self, nums, k):\n\n\n        seen = set()\n        for j in range(0, len(nums)):\n            if nums[j] in seen:\n                return True\n            else:\n                seen.add(nums[j])\n            \n            if len(seen) > k:\n                seen.remove(nums[j-k])\n        return False\n\n\n        # 两种解法，一种哈希表法，一种是滑动窗口\n\n\n\n                ",
@@ -6347,6 +6825,90 @@
    "statement": "给你一个整数数组 nums 和一个整数 k ，判断数组中是否存在两个 不同的索引 i 和 j ，满足 nums[i] == nums[j] 且 abs(i - j) <= k 。如果存在，返回 true ；否则，返回 false 。\n\n示例 1：\n\n输入：nums = [1,2,3,1], k = 3\n输出：true\n\n示例 2：\n\n输入：nums = [1,0,1,1], k = 1\n输出：true\n\n示例 3：\n\n输入：nums = [1,2,3,1,2,3], k = 2\n输出：false",
    "technique": "滑动窗口",
    "title": "219. 存在重复元素 II"
+  },
+  {
+   "difficulty": "Hard",
+   "elements": [
+    "定长还是变长：定长窗口，窗口大小固定为indexDiff（按下标差限制，最多同时维护indexDiff个元素）",
+    "进窗口更新：每处理一个新元素x（下标i）就把它加入窗口：算出它的桶号b=x//(valueDiff+1)，存入buckets[b]=x",
+    "出窗口时机：当i>=indexDiff时，要把下标i-indexDiff对应的旧元素从buckets里删除（把它所在的桶清空），以保证窗口内只保留最近indexDiff个下标的元素",
+    "记结果时机：在插入新元素之前先检查：自身桶b、左桶b-1、右桶b+1是否已有值且与x的差<=valueDiff，一旦满足立即返回True，遍历完都没命中则返回False"
+   ],
+   "id": "220_contains-duplicate-iii",
+   "number": 220,
+   "pseudocode": [
+    {
+     "kind": "heading",
+     "text": "1. 一句话直击本质"
+    },
+    {
+     "kind": "text",
+     "text": "滑动窗口 + 桶排序（分桶）：将值域按 valueDiff+1 分桶，只需比较当前元素与相邻桶内元素，即可在 O(1) 判断是否存在满足值差和下标差条件的重复元素。"
+    },
+    {
+     "kind": "heading",
+     "text": "2. 综合思路"
+    },
+    {
+     "kind": "text",
+     "text": "本题的常见 AC 解法主要有两类："
+    },
+    {
+     "kind": "text",
+     "text": "思路一：桶（Bucket）+ 滑动窗口（本题代码采用）\n• 把值域按宽度 w = valueDiff + 1 分桶：bucket_id = x // w。\n• 保证：只要两个数落在同一个桶，其差值必然 <= valueDiff。\n• 维护一个大小为 indexDiff 的滑动窗口（用哈希表存储 桶号 -> 值），每个桶最多存一个值（因为一旦同桶出现两个数就已经满足条件，直接返回 True）。\n• 对于新元素，只需检查：自身桶、左邻桶、右邻桶，共 3 个桶是否有满足条件的值。\n• 窗口滑出范围时删除对应的旧桶记录。"
+    },
+    {
+     "kind": "text",
+     "text": "思路二：有序集合（TreeMap / SortedList）+ 滑动窗口（另一种常见 AC 写法，思路对比）\n• 维护一个大小为 indexDiff 的有序集合（如 Java TreeMap，Python 用 SortedList）。\n• 对每个新元素 x，在有序结构中二分查找是否存在值在 [x-valueDiff, x+valueDiff] 区间内的元素。\n• 若窗口超出 indexDiff，移除最早加入的元素。\n• 这种做法基于二分查找，时间复杂度稍高（O(n \\log k)），但逻辑更直观。"
+    },
+    {
+     "kind": "text",
+     "text": "两者本质都是限定下标窗口内查询值域邻近元素，区别在于“桶”是 O(1) 近似匹配，“有序集合”是 O(\\log k) 精确匹配。"
+    },
+    {
+     "kind": "heading",
+     "text": "3. 全量伪代码"
+    },
+    {
+     "kind": "heading",
+     "text": "（方法一）桶 + 哈希滑动窗口"
+    },
+    {
+     "kind": "code",
+     "text": "函数 存在重复元素III(nums, indexDiff, valueDiff):\n    若 indexDiff <= 0 或 valueDiff < 0: 返回 False\n\n    w = valueDiff + 1\n    buckets = 空哈希表   # 桶号 -> 值\n\n    对 i, x 在 nums 中枚举:\n        b = x // w   # 计算所属桶号\n\n        若 b 在 buckets 中:\n            返回 True   # 同桶必然满足\n        若 (b-1) 在 buckets 且 |x - buckets[b-1]| <= valueDiff:\n            返回 True\n        若 (b+1) 在 buckets 且 |x - buckets[b+1]| <= valueDiff:\n            返回 True\n\n        buckets[b] = x   # 插入新值\n\n        若 i >= indexDiff:\n            从 buckets 中删除 nums[i - indexDiff] 所在桶  # 窗口收缩\n\n    返回 False"
+    },
+    {
+     "kind": "heading",
+     "text": "（方法二）有序集合 + 滑动窗口（补充思路）"
+    },
+    {
+     "kind": "code",
+     "text": "函数 存在重复元素III(nums, indexDiff, valueDiff):\n    window = 空有序集合（大小限制为 indexDiff）\n\n    对 i, x 在 nums 中枚举:\n        在 window 中查找是否存在值 v 满足 |v - x| <= valueDiff\n        （利用二分查找定位 x-valueDiff 的插入位置，检查邻近元素）\n        若存在: 返回 True\n\n        插入 x 到 window\n        若 window 大小 > indexDiff:\n            移除 nums[i - indexDiff]\n\n    返回 False"
+    },
+    {
+     "kind": "heading",
+     "text": "4. 复杂度"
+    },
+    {
+     "kind": "text",
+     "text": "方法一（桶 + 哈希表）：\n• 时间复杂度：O(n)\n• 空间复杂度：O(\\min(n, indexDiff))"
+    },
+    {
+     "kind": "text",
+     "text": "方法二（有序集合 + 二分查找）：\n• 时间复杂度：O(n \\log(\\min(n, indexDiff)))\n• 空间复杂度：O(\\min(n, indexDiff))"
+    }
+   ],
+   "retrospective": "",
+   "solutions": [
+    {
+     "code": "class Solution:\n    def containsNearbyAlmostDuplicate(self, nums: List[int], indexDiff: int, valueDiff: int) -> bool:\n\n\n        if indexDiff <= 0 or valueDiff < 0:\n            return False\n\n        w = valueDiff + 1\n        buckets = {}                                   # 桶号 -> 桶里那个值\n\n        for i, x in enumerate(nums):\n            b = x // w\n\n            # 查：只看三个桶\n            if b in buckets:                           # 同桶，必然合格\n                return True\n            if b - 1 in buckets and abs(x - buckets[b-1]) <= valueDiff:\n                return True\n            if b + 1 in buckets and abs(x - buckets[b+1]) <= valueDiff:\n                return True\n\n            buckets[b] = x                             # 加\n\n            if i >= indexDiff:                         # 修\n                del buckets[nums[i - indexDiff] // w]\n\n        return False",
+     "name": "solution_1.py"
+    }
+   ],
+   "solvedAt": 1787170930,
+   "statement": "给你一个整数数组 nums 和两个整数 indexDiff 和 valueDiff 。\n\n找出满足下述条件的下标对 (i, j)：\n\ni != j,\n\nabs(i - j) <= indexDiff\n\nabs(nums[i] - nums[j]) <= valueDiff\n\n如果存在，返回 true ；否则，返回 false 。\n\n示例 1：\n\n输入：nums = [1,2,3,1], indexDiff = 3, valueDiff = 0\n输出：true\n解释：可以找出 (i, j) = (0, 3) 。\n满足下述 3 个条件：\ni != j --> 0 != 3\nabs(i - j) <= indexDiff --> abs(0 - 3) <= 3\nabs(nums[i] - nums[j]) <= valueDiff --> abs(1 - 1) <= 0\n\n示例 2：\n\n输入：nums = [1,5,9,1,5,9], indexDiff = 2, valueDiff = 3\n输出：false\n解释：尝试所有可能的下标对 (i, j) ，均无法满足这 3 个条件，因此返回 false 。",
+   "technique": "滑动窗口",
+   "title": "220. 存在重复元素 III"
   },
   {
    "difficulty": "Easy",
@@ -7141,6 +7703,93 @@
    "title": "240. 搜索二维矩阵 II"
   },
   {
+   "difficulty": "Easy",
+   "elements": [
+    "数学结构：字母异位词的本质是字符出现次数分布完全相同，可以用长度为26的计数数组或哈希表来表示这个分布，两分布相等则互为异位词",
+    "枚举范围：本题不涉及大范围枚举，只需各遍历一遍s和t（每个O(n)），若限定小写字母则字符种类只有26种",
+    "数值边界：本题不涉及数值溢出或取模问题，因为计数值最大就是字符串长度，用普通整数计数即可"
+   ],
+   "id": "242_valid-anagram",
+   "number": 242,
+   "pseudocode": [
+    {
+     "kind": "heading",
+     "text": "1. 一句话直击本质"
+    },
+    {
+     "kind": "text",
+     "text": "判断两字符串是否为字母异位词，本质是比较两字符串中字符种类及出现次数是否完全相同。"
+    },
+    {
+     "kind": "heading",
+     "text": "2. 综合思路"
+    },
+    {
+     "kind": "text",
+     "text": "• 思路一：排序法（版本1）\n  将两字符串分别排序后转为有序序列，若两字符串是异位词，排序后必然完全相等。"
+    },
+    {
+     "kind": "text",
+     "text": "• 思路二：哈希计数法（版本2）\n  用哈希表（字典）分别统计两字符串中每个字符出现的次数，最后比较两个哈希表是否相等。"
+    },
+    {
+     "kind": "heading",
+     "text": "3. 全量伪代码"
+    },
+    {
+     "kind": "heading",
+     "text": "排序法"
+    },
+    {
+     "kind": "code",
+     "text": "函数 isAnagram(s, t):\n    将 s 转为字符列表并排序\n    将 t 转为字符列表并排序\n    返回 排序后的s == 排序后的t"
+    },
+    {
+     "kind": "heading",
+     "text": "哈希计数法"
+    },
+    {
+     "kind": "code",
+     "text": "函数 isAnagram(s, t):\n    初始化空字典 seen1, seen2\n\n    遍历字符串 s 中每个字符 i:\n        若 i 不在 seen1 中:\n            seen1[i] = 1\n        否则:\n            seen1[i] += 1\n\n    遍历字符串 t 中每个字符 j:\n        若 j 不在 seen2 中:\n            seen2[j] = 1\n        否则:\n            seen2[j] += 1\n\n    返回 seen1 == seen2"
+    },
+    {
+     "kind": "heading",
+     "text": "4. 复杂度"
+    },
+    {
+     "kind": "heading",
+     "text": "排序法"
+    },
+    {
+     "kind": "text",
+     "text": "• 时间复杂度：O(n \\log n)（排序的复杂度）\n• 空间复杂度：O(n)（排序需要额外空间存储）"
+    },
+    {
+     "kind": "heading",
+     "text": "哈希计数法"
+    },
+    {
+     "kind": "text",
+     "text": "• 时间复杂度：O(n)（遍历两字符串各一次）\n• 空间复杂度：O(k)，其中 k 为字符集大小（如仅小写字母时 k=26，可视为 O(1)）"
+    }
+   ],
+   "retrospective": "",
+   "solutions": [
+    {
+     "code": "class Solution:\n    def isAnagram(self, s: str, t: str) -> bool:\n        return sorted(s) == sorted(t)",
+     "name": "solution_1.py"
+    },
+    {
+     "code": "class Solution:\n    def isAnagram(self, s: str, t: str) -> bool:\n        seen1, seen2 = {}, {}\n        for i in s:\n            if i not in seen1:\n                seen1[i] = 1\n            else:\n                seen1[i] += 1\n        for j in t:\n            if j not in seen2:\n                seen2[j] = 1\n            else:\n                seen2[j] += 1\n        return seen1 == seen2",
+     "name": "solution_2.py"
+    }
+   ],
+   "solvedAt": 1787172538,
+   "statement": "给定两个字符串 s 和 t ，编写一个函数来判断 t 是否是 s 的 字母异位词。\n\n示例 1:\n\n输入: s = \"anagram\", t = \"nagaram\"\n输出: true\n\n示例 2:\n\n输入: s = \"rat\", t = \"car\"\n输出: false",
+   "technique": "数学技巧",
+   "title": "242. 有效的字母异位词"
+  },
+  {
    "difficulty": "Medium",
    "elements": [
     "路径：path 里存已经确定的一串从小到大的因子，比如对 12 走到 path=[2] 表示已经拆出一个 2，剩下 6 待拆。",
@@ -7596,6 +8245,97 @@
    "statement": "给定一个二叉搜索树的 root 和一个 target 值，返回 在 BST 中最接近 target 的值。如果有多个答案，返回最小的。\n\n示例 1:\n\n输入: root = [4,2,5,1,3], target = 3.714286\n输出: 4\n\n示例 2:\n\n输入: root = [1], target = 4.428571\n输出: 1\n\n约束条件:\n\n树中的节点数量在 [1, 104] 范围内。\n\n0 <= Node.val <= 109\n\n-109 <= target <= 109",
    "technique": "二叉树",
    "title": "270. 最接近的二叉搜索树值"
+  },
+  {
+   "difficulty": "Medium",
+   "elements": [
+    "指针类型：这里用的是解码时的双指针i和j，属于同向而行找分隔符的快慢指针模式，不是左右相向指针",
+    "slow 含义：本题不涉及slow写入语义，i和j的作用分别是标记当前字符串起点和寻找#分隔符位置，不存在原地覆盖写入的场景",
+    "停止条件：j指针在找到分隔符'#'时停止（s[j]=='#'），外层i指针在i小于编码字符串总长度时继续循环，i达到字符串长度即整体遍历结束"
+   ],
+   "id": "271_encode-and-decode-strings",
+   "number": 271,
+   "pseudocode": [
+    {
+     "kind": "heading",
+     "text": "1. 核心逻辑一句话总结"
+    },
+    {
+     "kind": "text",
+     "text": "在每个字符串前添加其长度信息作为分隔标记（长度+特殊分隔符+内容），解码时先读长度再按长度精确截取，从而避免字符串内容本身包含分隔符导致的歧义问题。"
+    },
+    {
+     "kind": "heading",
+     "text": "2. 综合思路"
+    },
+    {
+     "kind": "text",
+     "text": "所有 AC 版本采用完全相同的核心策略——长度前缀法（Length-Prefixed Encoding），未出现其他解法分支（如分隔符转义法、Base64编码法等）。具体思路统一为："
+    },
+    {
+     "kind": "text",
+     "text": "• 编码阶段：遍历字符串列表，对每个字符串记录 长度#内容 的格式拼接成一个大字符串。\n• 解码阶段：使用双指针（i 标记当前字符串起始位置，j 用于寻找 # 分隔符位置），先解析出长度数字，再根据长度截取对应内容，重复该过程直至遍历完整个字符串。"
+    },
+    {
+     "kind": "text",
+     "text": "四个版本仅在变量命名、代码格式上存在细微差异，逻辑完全一致，属于同一实现范式的不同书写。"
+    },
+    {
+     "kind": "heading",
+     "text": "3. 全量伪代码"
+    },
+    {
+     "kind": "code",
+     "text": "类 Codec:\n\n    函数 encode(字符串列表 strs) -> 字符串:\n        初始化结果字符串 res = \"\"\n        对于 strs 中的每个字符串 s:\n            res += (s的长度转字符串) + \"#\" + s\n        返回 res\n\n    函数 decode(编码字符串 s) -> 字符串列表:\n        初始化结果列表 res = []\n        初始化指针 i = 0\n        当 i < s的长度:\n            设 j = i\n            当 s[j] 不等于 \"#\":\n                j += 1  // 寻找分隔符位置\n            提取长度 length = 将 s[i:j] 转为整数\n            提取内容 word = s[j+1 : j+1+length]  // 根据长度精确截取\n            将 word 加入 res\n            更新 i = j + 1 + length  // 移动到下一个字符串的起始位置\n        返回 res"
+    },
+    {
+     "kind": "heading",
+     "text": "4. 复杂度分析"
+    },
+    {
+     "kind": "text",
+     "text": "设字符串列表共有 n 个字符串，总字符数（所有字符串长度之和）为 L。"
+    },
+    {
+     "kind": "text",
+     "text": "编码过程：\n• 时间复杂度：O(L) —— 需遍历所有字符并拼接\n• 空间复杂度：O(L) —— 存储编码后的结果字符串（长度前缀增加常数级开销，可忽略）"
+    },
+    {
+     "kind": "text",
+     "text": "解码过程：\n• 时间复杂度：O(L) —— 双指针遍历编码字符串一次，每个字符最多访问常数次\n• 空间复杂度：O(L) —— 存储解码后的字符串列表"
+    },
+    {
+     "kind": "text",
+     "text": "综合复杂度：\n$\\text{时间复杂度} = O(L), \\quad \\text{空间复杂度} = O(L)$"
+    },
+    {
+     "kind": "text",
+     "text": "其中 L 为所有字符串的总长度（该复杂度与字符串数量 n 无直接关系，仅由总字符量决定）。"
+    }
+   ],
+   "retrospective": "",
+   "solutions": [
+    {
+     "code": "class Codec:\n    def encode(self, strs: List[str]) -> str:\n        \"\"\"Encodes a list of strings to a single string.\n        \"\"\"\n        res = \"\"\n        for i in range(0, len(strs)):\n            res += str(len(strs[i]))+\"#\"+strs[i]\n        return res\n\n    def decode(self, s: str) -> List[str]:\n        \"\"\"Decodes a single string to a list of strings.\n        \"\"\"\n        i = 0\n        res = []\n        while i < len(s):\n            j = i\n            while s[j] != \"#\":\n                j += 1\n            length = int(s[i:j])\n            word = s[j+1: j+1+length]\n            res.append(word)\n            i = j+1+length\n        return res\n        \n\n\n# Your Codec object will be instantiated and called as such:\n# codec = Codec()\n# codec.decode(codec.encode(strs))",
+     "name": "solution_1.py"
+    },
+    {
+     "code": "class Codec:\n    def encode(self, strs: List[str]) -> str:\n        \"\"\"Encodes a list of strings to a single string.\n        \"\"\"\n        res = \"\"\n        for i in range(0, len(strs)):\n            res += str(len(strs[i]))+\"#\"+strs[i]\n        return res\n\n    def decode(self, s: str) -> List[str]:\n        \"\"\"Decodes a single string to a list of strings.\n        \"\"\"\n        res = []\n        i= 0\n        while i < len(s):\n            j = i\n            while s[j] != \"#\":\n                j += 1\n            length = int(s[i:j])\n            word = s[j+1: j+1+length]\n            res.append(word)\n            i = j+1+length\n        return res\n        \n\n\n# Your Codec object will be instantiated and called as such:\n# codec = Codec()\n# codec.decode(codec.encode(strs))",
+     "name": "solution_2.py"
+    },
+    {
+     "code": "class Codec:\n    def encode(self, strs: List[str]) -> str:\n        \"\"\"Encodes a list of strings to a single string.\n        \"\"\"\n        res = \"\"\n        for i in range(0, len(strs)):\n            res += str(len(strs[i]))+\"#\"+strs[i]\n        return res\n\n    def decode(self, s: str) -> List[str]:\n        \"\"\"Decodes a single string to a list of strings.\n        \"\"\"\n        res = []\n        i = 0\n        while i < len(s):\n            j = i\n            while s[j] != \"#\":\n                j += 1\n            length = int(s[i:j])\n            word = s[j+1: j+1+length]\n            res.append(word)\n            i = j + 1 + length\n        return res\n\n\n\n# Your Codec object will be instantiated and called as such:\n# codec = Codec()\n# codec.decode(codec.encode(strs))",
+     "name": "solution_3.py"
+    },
+    {
+     "code": "class Codec:\n    def encode(self, strs: List[str]) -> str:\n        \"\"\"Encodes a list of strings to a single string.\n        \"\"\"\n        res = \"\"\n        for i in range(0, len(strs)):\n            s = strs[i]\n            res += str(len(s)) + \"#\" + s\n        return res\n\n    def decode(self, s: str) -> List[str]:\n        \"\"\"Decodes a single string to a list of strings.\n        \"\"\"\n        res = []\n        i = 0\n        while i < len(s):\n            j = i\n            while s[j] != \"#\":\n                j += 1\n            length = int(s[i:j])\n            word = s[j+1: j+1+length]\n            res.append(word)\n            i = j + 1 + length\n        return res\n\n\n\n# Your Codec object will be instantiated and called as such:\n# codec = Codec()\n# codec.decode(codec.encode(strs))",
+     "name": "solution_4.py"
+    }
+   ],
+   "solvedAt": 1787244479,
+   "statement": "Design an algorithm to encode a list of strings to a string. The encoded string is then sent over the network and is decoded back to the original list of strings.\n\nMachine 1 (sender) has the function:\n\nstring encode(vector<string> strs) {\n// ... your code\nreturn encoded_string;\n}\n\nMachine 2 (receiver) has the function:\n\nvector<string> decode(string s) {\n//... your code\nreturn strs;\n}\n\nSo Machine 1 does:\n\nstring encoded_string = encode(strs);\n\nand Machine 2 does:\n\nvector<string> strs2 = decode(encoded_string);\n\nstrs2 in Machine 2 should be the same as strs in Machine 1.\n\nImplement the encode and decode methods.\n\nYou are not allowed to solve the problem using any serialize methods (such as eval).\n\nExample 1:\n\nInput: dummy_input = [\"Hello\",\"World\"]\nOutput: [\"Hello\",\"World\"]\nExplanation:\nMachine 1:\nCodec encoder = new Codec();\nString msg = encoder.encode(strs);\nMachine 1 ---msg---> Machine 2\n\nMachine 2:\nCodec decoder = new Codec();\nString[] strs = decoder.decode(msg);\n\nExample 2:\n\nInput: dummy_input = [\"\"]\nOutput: [\"\"]",
+   "technique": "数组双指针",
+   "title": "271. 字符串的编码与解码"
   },
   {
    "difficulty": "Medium",
@@ -8555,6 +9295,102 @@
    "statement": "给你一个字符串 s ，仅反转字符串中的所有元音字母，并返回结果字符串。\n\n元音字母包括 'a'、'e'、'i'、'o'、'u'，且可能以大小写两种形式出现不止一次。\n\n示例 1：\n\n输入：s = \"IceCreAm\"\n\n输出：\"AceCreIm\"\n\n解释：\n\ns 中的元音是 ['I', 'e', 'e', 'A']。反转这些元音，s 变为 \"AceCreIm\".\n\n示例 2：\n\n输入：s = \"leetcode\"\n\n输出：\"leotcede\"",
    "technique": "数组双指针",
    "title": "345. 反转字符串中的元音字母"
+  },
+  {
+   "difficulty": "Medium",
+   "elements": [
+    "存什么：堆里存的是(频率, 元素)这样的元组，方便按频率排序又能取出对应元素",
+    "序：用小顶堆，按频率字段比较，堆顶始终是当前堆中频率最小的元素",
+    "容量：堆容量固定为k，超过k个就把频率最小的弹出去",
+    "进出时机：遍历哈希表统计出的每个(元素,频率)时push进堆，一旦堆大小超过k就立刻pop堆顶（最小频率的），遍历结束后堆里剩下的k个就是答案"
+   ],
+   "id": "347_top-k-frequent-elements",
+   "number": 347,
+   "pseudocode": [
+    {
+     "kind": "heading",
+     "text": "1. 一句话本质"
+    },
+    {
+     "kind": "text",
+     "text": "统计元素出现频率后，通过排序或桶排序筛选出频率最高的 K 个元素。"
+    },
+    {
+     "kind": "heading",
+     "text": "2. 综合思路"
+    },
+    {
+     "kind": "text",
+     "text": "本题解法可归纳为两大类："
+    },
+    {
+     "kind": "text",
+     "text": "思路一：桶排序（版本1、版本2）\n• 利用哈希表统计每个元素的出现频率。\n• 创建大小为 n+1 的桶数组，下标代表频率值，将元素放入对应频率的桶中。\n• 由于频率范围为 [0, n]，桶排序可将时间复杂度优化至线性级别，无需比较排序。\n• 从高频率桶向低频率桶遍历，依次收集元素直到达到 K 个。"
+    },
+    {
+     "kind": "text",
+     "text": "思路二：直接排序（版本3）\n• 利用哈希表统计频率后，将 (频率, 元素) 组成的元组放入列表。\n• 对列表整体进行排序（降序），直接取排序后的前 K 个元素。\n• 实现简单，但时间复杂度为 O(n \\log n)，劣于桶排序。"
+    },
+    {
+     "kind": "heading",
+     "text": "3. 全量伪代码"
+    },
+    {
+     "kind": "heading",
+     "text": "通用第一步：频率统计"
+    },
+    {
+     "kind": "code",
+     "text": "函数 topKFrequent(nums, k):\n    初始化空哈希表 count\n    对 nums 中每个元素 i:\n        若 i 不在 count 中: count[i] = 1\n        否则: count[i] += 1"
+    },
+    {
+     "kind": "heading",
+     "text": "方法A：桶排序法（版本1、2）"
+    },
+    {
+     "kind": "code",
+     "text": "创建长度为 n+1 的桶数组 arr（每个元素为空列表），下标为频率值\n\n对 count 中每个元素 i:\n    freq = count[i]\n    将 i 加入 arr[freq]\n\nres = []\n从高到低遍历频率 i (从 n 到 0):\n    遍历 arr[i] 中的每个元素 j:\n        将 j 加入 res\n        若 res 长度 == k:\n            返回 res\n返回 res"
+    },
+    {
+     "kind": "heading",
+     "text": "方法B：排序法（版本3）"
+    },
+    {
+     "kind": "code",
+     "text": "构建列表 items，包含 (频率, 元素) 元组\n对 items 按频率降序排序\n\nres = []\n取 items 中前 k 个元组的元素部分，加入 res\n返回 res"
+    },
+    {
+     "kind": "heading",
+     "text": "4. 复杂度分析"
+    },
+    {
+     "kind": "text",
+     "text": "| 方法 | 时间复杂度 | 空间复杂度 |\n|------|-----------|-----------|\n| 桶排序法（版本1、2） | O(n) | O(n) |\n| 排序法（版本3） | O(n \\log n) | O(n) |"
+    },
+    {
+     "kind": "text",
+     "text": "说明：\n• n 为数组 nums 的长度。\n• 桶排序法通过空间换时间，利用频率有界（最大为 n）的特性，将排序转化为线性遍历，是本题的最优解法。\n• 排序法逻辑简单直观，但因排序操作导致时间复杂度上升为 O(n \\log n)。\n• 两种方法的空间复杂度均为 O(n)，主要来自哈希表和辅助数组/列表的存储开销。"
+    }
+   ],
+   "retrospective": "",
+   "solutions": [
+    {
+     "code": "class Solution:\n    def topKFrequent(self, nums: List[int], k: int) -> List[int]:\n        \n        count = {}\n        n = len(nums)\n        for i in nums:\n            if i not in count:\n                count[i] = 1\n            else:\n                count[i] += 1\n        arr = []\n        for i in range(0, n+1):\n            arr.append([])\n\n        for i in count:\n            freq = count[i]\n            arr[freq].append(i)\n\n        res = []\n        for i in range(n, -1, -1):\n            for j in range(0, len(arr[i])):\n                res.append(arr[i][j])\n                if len(res) == k:\n                    return res\n        return res      \n",
+     "name": "solution_1.py"
+    },
+    {
+     "code": "class Solution:\n    def topKFrequent(self, nums: List[int], k: int) -> List[int]:\n        \n        count = {}\n        for i in nums:\n            if i not in count:\n                count[i] = 1\n            else:\n                count[i] += 1\n\n        arr = []\n        for i in range(0, len(nums)+1):\n            arr.append([])\n        \n        for i in count:\n            freq = count[i]\n            arr[freq].append(i)\n\n        res = []\n        for i in range(len(arr)-1, -1, -1):\n            for j in range(0, len(arr[i])):\n                res.append(arr[i][j])\n                if len(res) == k:\n                    return res\n        return res",
+     "name": "solution_2.py"
+    },
+    {
+     "code": "class Solution:\n    def topKFrequent(self, nums: List[int], k: int) -> List[int]:\n        \n        count = {}\n        for i in nums:\n            if i not in count:\n                count[i] = 1\n            else:\n                count[i] += 1\n        \n        items = []\n        for num in count:\n            items.append((count[num], num))\n        items.sort(reverse=True)\n\n\n        res = []\n        for i in range(0, k):\n            res.append(items[i][1])\n        return res",
+     "name": "solution_3.py"
+    }
+   ],
+   "solvedAt": 1787253484,
+   "statement": "给你一个整数数组 nums 和一个整数 k ，请你返回其中出现频率前 k 高的元素。你可以按 任意顺序 返回答案。\n\n示例 1：\n\n输入：nums = [1,1,1,2,2,3], k = 2\n\n输出：[1,2]\n\n示例 2：\n\n输入：nums = [1], k = 1\n\n输出：[1]\n\n示例 3：\n\n输入：nums = [1,2,1,2,1,2,3,1,3,2], k = 2\n\n输出：[1,2]",
+   "technique": "堆（优先级队列）",
+   "title": "347. 前 K 个高频元素"
   },
   {
    "difficulty": "Easy",

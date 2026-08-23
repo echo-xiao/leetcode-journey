@@ -132,11 +132,15 @@ final class AppState: ObservableObject {
 
     /// The four ways of choosing what to practise, as a tree.
     ///
+    /// Recency leads: the thing this app is for is reviewing what was just
+    /// solved, and a lens you reach for daily should not sit below one you
+    /// reach for occasionally.
+    ///
     /// Two of them have no data behind them yet and say so. Shipping them as
     /// empty lists would read as broken; naming what is missing is how the
     /// screen stays honest about its own gaps.
     var homeSections: [HomeSection] {
-        [techniqueSection, recentSection, companySection, problemSetSection]
+        [recentSection, techniqueSection, companySection, problemSetSection]
     }
 
     private var techniqueSection: HomeSection {
