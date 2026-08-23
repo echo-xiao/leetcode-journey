@@ -8,18 +8,17 @@ final class GradingTests: XCTestCase {
 
     private func freshState(grade: Grade = .good) -> CardState {
         grading.apply(
-            grade: grade, to: nil, problemID: "15_3sum", track: .elements,
+            grade: grade, to: nil, problemID: "15_3sum",
             isRepeat: false, now: now
         ).state
     }
 
     func testFirstGradeCreatesStateAndSchedulesForward() {
         let (state, log) = grading.apply(
-            grade: .good, to: nil, problemID: "15_3sum", track: .elements,
+            grade: .good, to: nil, problemID: "15_3sum",
             isRepeat: false, now: now
         )
         XCTAssertEqual(state.problemID, "15_3sum")
-        XCTAssertEqual(state.track, .elements)
         XCTAssertEqual(state.reviewCount, 1)
         XCTAssertEqual(state.lastReview, now)
         XCTAssertGreaterThan(state.due, now)
@@ -28,9 +27,9 @@ final class GradingTests: XCTestCase {
         XCTAssertEqual(log?.isRepeat, false)
     }
 
-    func testAgainPutsTheTrackInTheMistakeBank() {
+    func testAgainPutsTheProblemInTheMistakeBank() {
         let (state, _) = grading.apply(
-            grade: .again, to: nil, problemID: "15_3sum", track: .elements,
+            grade: .again, to: nil, problemID: "15_3sum",
             isRepeat: false, now: now
         )
         XCTAssertTrue(state.inMistakeBank)
@@ -40,7 +39,7 @@ final class GradingTests: XCTestCase {
     func testOneGoodIsNotEnoughToLeaveTheBank() {
         let state = freshState(grade: .again)
         let (after, _) = grading.apply(
-            grade: .good, to: state, problemID: "15_3sum", track: .elements,
+            grade: .good, to: state, problemID: "15_3sum",
             isRepeat: false, now: now.addingTimeInterval(86_400)
         )
         XCTAssertTrue(after.inMistakeBank, "one 会 usually just means the answer was on screen minutes ago")
@@ -51,7 +50,7 @@ final class GradingTests: XCTestCase {
         var state = freshState(grade: .again)
         for day in 1...2 {
             state = grading.apply(
-                grade: .good, to: state, problemID: "15_3sum", track: .elements,
+                grade: .good, to: state, problemID: "15_3sum",
                 isRepeat: false, now: now.addingTimeInterval(Double(day) * 86_400)
             ).state
         }
@@ -62,11 +61,11 @@ final class GradingTests: XCTestCase {
     func testAGoodThenAnAgainResetsTheCount() {
         var state = freshState(grade: .again)
         state = grading.apply(
-            grade: .good, to: state, problemID: "15_3sum", track: .elements,
+            grade: .good, to: state, problemID: "15_3sum",
             isRepeat: false, now: now.addingTimeInterval(86_400)
         ).state
         state = grading.apply(
-            grade: .again, to: state, problemID: "15_3sum", track: .elements,
+            grade: .again, to: state, problemID: "15_3sum",
             isRepeat: false, now: now.addingTimeInterval(2 * 86_400)
         ).state
         XCTAssertEqual(state.consecutiveGood, 0)
@@ -77,7 +76,7 @@ final class GradingTests: XCTestCase {
         var state = freshState(grade: .again)
         for day in 1...2 {
             state = grading.apply(
-                grade: .hard, to: state, problemID: "15_3sum", track: .elements,
+                grade: .hard, to: state, problemID: "15_3sum",
                 isRepeat: false, now: now.addingTimeInterval(Double(day) * 86_400)
             ).state
         }
@@ -92,7 +91,7 @@ final class GradingTests: XCTestCase {
         let countBefore = state.reviewCount
 
         let (after, log) = grading.apply(
-            grade: .good, to: state, problemID: "15_3sum", track: .elements,
+            grade: .good, to: state, problemID: "15_3sum",
             isRepeat: true, now: now.addingTimeInterval(120)
         )
 
@@ -106,7 +105,7 @@ final class GradingTests: XCTestCase {
 
     func testARepeatWithNoPriorStateDoesNotBecomeAFirstGrade() {
         let (state, log) = grading.apply(
-            grade: .good, to: nil, problemID: "15_3sum", track: .elements,
+            grade: .good, to: nil, problemID: "15_3sum",
             isRepeat: true, now: now
         )
 
@@ -122,7 +121,7 @@ final class GradingTests: XCTestCase {
         let grades: [Grade] = [.good, .hard, .good]
         for (index, grade) in grades.enumerated() {
             state = grading.apply(
-                grade: grade, to: state, problemID: "15_3sum", track: .elements,
+                grade: grade, to: state, problemID: "15_3sum",
                 isRepeat: false, now: now.addingTimeInterval(Double(index + 1) * 86_400)
             ).state
         }

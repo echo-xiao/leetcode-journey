@@ -13,7 +13,7 @@ final class SummaryTests: XCTestCase {
 
     private func log(_ date: Date, isRepeat: Bool = false) -> ReviewLog {
         ReviewLog(
-            problemID: "15_3sum", track: .elements, grade: .good,
+            problemID: "15_3sum", grade: .good,
             isRepeat: isRepeat, timestamp: date
         )
     }

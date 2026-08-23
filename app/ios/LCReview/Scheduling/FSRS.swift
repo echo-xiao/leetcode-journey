@@ -1,6 +1,6 @@
 import Foundation
 
-/// What FSRS remembers about one track of one problem.
+/// What FSRS remembers about one problem.
 struct MemoryState: Equatable {
     var stability: Double
     var difficulty: Double

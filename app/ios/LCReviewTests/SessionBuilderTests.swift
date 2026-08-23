@@ -16,11 +16,11 @@ final class SessionBuilderTests: XCTestCase {
     }
 
     private func state(
-        _ id: String, track: Track = .elements, dueOffsetDays: Double,
+        _ id: String, dueOffsetDays: Double,
         lastReviewOffsetDays: Double? = nil, inBank: Bool = false
     ) -> CardState {
         CardState(
-            problemID: id, track: track, stability: 1, difficulty: 5,
+            problemID: id, stability: 1, difficulty: 5,
             due: now.addingTimeInterval(dueOffsetDays * 86_400),
             lastReview: lastReviewOffsetDays.map {
                 now.addingTimeInterval($0 * 86_400)
@@ -52,50 +52,17 @@ final class SessionBuilderTests: XCTestCase {
         XCTAssertEqual(session.first?.id, "b")
     }
 
-    /// Builds a full pair of rows (elements + pseudocode) for one problem, so
-    /// the problem's `earliestDue` genuinely reflects the offsets given
-    /// rather than collapsing to `now` because a track was never recorded.
-    /// `state(...)` only ever makes one row, which is why every existing
-    /// fixture in this file has an implicit "pseudocode is due right now"
-    /// track and can never land in `notYetDue`.
-    private func bothTracksState(
-        _ id: String,
-        elementsDueOffsetDays: Double,
-        pseudocodeDueOffsetDays: Double,
-        lastReviewOffsetDays: Double? = nil
-    ) -> [CardState] {
-        [
-            state(
-                id, track: .elements, dueOffsetDays: elementsDueOffsetDays,
-                lastReviewOffsetDays: lastReviewOffsetDays
-            ),
-            state(
-                id, track: .pseudocode, dueOffsetDays: pseudocodeDueOffsetDays,
-                lastReviewOffsetDays: lastReviewOffsetDays
-            ),
-        ]
-    }
-
     func testTopsUpWithNotYetDueLeastRecentlyReviewedFirst() {
         let problems = ["a", "b", "c"].map { problem($0) }
-        let states =
-            // Genuinely overdue: both tracks recorded and in the past.
-            bothTracksState(
-                "a", elementsDueOffsetDays: -1, pseudocodeDueOffsetDays: -1,
-                lastReviewOffsetDays: -2
-            )
-            // Genuinely not yet due: both tracks recorded and in the future.
-            // Reviewed 40 days ago, far longer ago than "c" below.
-            + bothTracksState(
-                "b", elementsDueOffsetDays: 5, pseudocodeDueOffsetDays: 6,
-                lastReviewOffsetDays: -40
-            )
-            // Also not yet due, but reviewed far more recently than "b", so
-            // it must sort after "b" among the top-ups.
-            + bothTracksState(
-                "c", elementsDueOffsetDays: 5, pseudocodeDueOffsetDays: 6,
-                lastReviewOffsetDays: -3
-            )
+        let states = [
+            // Overdue.
+            state("a", dueOffsetDays: -1, lastReviewOffsetDays: -2),
+            // Not yet due, reviewed 40 days ago -- far longer ago than "c".
+            state("b", dueOffsetDays: 5, lastReviewOffsetDays: -40),
+            // Also not yet due, but touched recently, so it sorts after "b"
+            // among the top-ups.
+            state("c", dueOffsetDays: 5, lastReviewOffsetDays: -3),
+        ]
         let session = builder.build(
             scope: .all, length: 3, problems: problems, states: states, now: now
         )
@@ -106,42 +73,16 @@ final class SessionBuilderTests: XCTestCase {
         let problems = ["due", "n1", "n2", "n3", "n4"].map { problem($0) }
         let states =
             [state("due", dueOffsetDays: -1)]
-            + bothTracksState("n1", elementsDueOffsetDays: 5, pseudocodeDueOffsetDays: 5, lastReviewOffsetDays: -10)
-            + bothTracksState("n2", elementsDueOffsetDays: 6, pseudocodeDueOffsetDays: 6, lastReviewOffsetDays: -9)
-            + bothTracksState("n3", elementsDueOffsetDays: 7, pseudocodeDueOffsetDays: 7, lastReviewOffsetDays: -8)
-            + bothTracksState("n4", elementsDueOffsetDays: 8, pseudocodeDueOffsetDays: 8, lastReviewOffsetDays: -7)
+            + [state("n1", dueOffsetDays: 5, lastReviewOffsetDays: -10)]
+            + [state("n2", dueOffsetDays: 6, lastReviewOffsetDays: -9)]
+            + [state("n3", dueOffsetDays: 7, lastReviewOffsetDays: -8)]
+            + [state("n4", dueOffsetDays: 8, lastReviewOffsetDays: -7)]
         let session = builder.build(
             scope: .all, length: 3, problems: problems, states: states, now: now
         )
         XCTAssertEqual(
             session.count, 3,
             "only one problem is due, so the other two seats must be filled from the not-yet-due top-up pool"
-        )
-    }
-
-    func testProblemQualifiesWhenItsOtherTrackHasNeverBeenRecordedEvenIfTheRecordedTrackIsFarOff() {
-        let problems = ["d1", "a", "n1"].map { problem($0) }
-        let states =
-            // Deeply overdue: leads the queue regardless of what happens to "a".
-            [state("d1", dueOffsetDays: -100)]
-            // Elements is due a month from now, but pseudocode has no row at
-            // all. An unrecorded track is due right now, so "a" must land in
-            // the *due* bucket (earliestDue == now), not the not-yet-due one
-            // — even though its one recorded track is far in the future.
-            // Reviewed very recently, so if it were (wrongly) treated as
-            // not-yet-due it would sort *behind* "n1" below and get cut by
-            // length: 2.
-            + [state("a", track: .elements, dueOffsetDays: 30, lastReviewOffsetDays: -1)]
-            // Genuinely not yet due, both tracks recorded, reviewed long ago
-            // so it would sort ahead of "a" among not-yet-due top-ups.
-            + bothTracksState("n1", elementsDueOffsetDays: 50, pseudocodeDueOffsetDays: 50, lastReviewOffsetDays: -1000)
-        let session = builder.build(
-            scope: .all, length: 2, problems: problems, states: states, now: now
-        )
-        XCTAssertEqual(
-            session.map(\.id), ["d1", "a"],
-            "\"a\" must be treated as due because its pseudocode track was never recorded, " +
-            "so it beats \"n1\" for the second slot despite \"n1\" being reviewed longer ago"
         )
     }
 
@@ -176,11 +117,13 @@ final class SessionBuilderTests: XCTestCase {
         XCTAssertEqual(session.map(\.id), ["a"])
     }
 
-    func testAProblemQualifiesWhenEitherTrackIsDue() {
+    func testADuplicateRowSchedulesFromTheEarlierDate() {
+        // One row per problem is the invariant, but the builder does not
+        // assume it: a stray second row must not make the choice arbitrary.
         let problems = [problem("a")]
         let states = [
-            state("a", track: .elements, dueOffsetDays: 30),
-            state("a", track: .pseudocode, dueOffsetDays: -2),
+            state("a", dueOffsetDays: 30),
+            state("a", dueOffsetDays: -2),
         ]
         let session = builder.build(
             scope: .all, length: 10, problems: problems, states: states, now: now
@@ -188,7 +131,7 @@ final class SessionBuilderTests: XCTestCase {
         XCTAssertEqual(session.map(\.id), ["a"])
     }
 
-    func testMistakeScopeIgnoresDueDatesAndTakesOnlyBankedTracks() {
+    func testMistakeScopeIgnoresDueDatesAndTakesOnlyBankedProblems() {
         let problems = ["a", "b", "c"].map { problem($0) }
         let states = [
             // Banked but not due for a month — must still show up.

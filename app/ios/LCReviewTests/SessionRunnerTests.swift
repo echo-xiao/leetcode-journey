@@ -1,151 +1,161 @@
 import XCTest
 @testable import LCReview
 
-/// SessionRunner is @MainActor-isolated, so the test case must be too.
 @MainActor
 final class SessionRunnerTests: XCTestCase {
 
     private func runner(_ ids: [String]) -> SessionRunner {
-        SessionRunner(steps: ids.map { SessionStep(problemID: $0, askOnly: nil) })
+        SessionRunner(steps: ids.map { SessionStep(problemID: $0, isRepeat: false) })
     }
 
-    func testStartsOnTheStatementWithNothingRevealed() {
+    func testStartsOnTheFirstProblemShowingOnlyTheStatement() {
         let runner = runner(["a", "b"])
-        XCTAssertEqual(runner.revealed, .statement)
+
         XCTAssertEqual(runner.current?.problemID, "a")
-        XCTAssertEqual(runner.progress.total, 2)
+        XCTAssertEqual(runner.revealed, .statement)
+        XCTAssertFalse(runner.isFinished)
     }
 
-    func testTheElementsLayerAsksBeforeItReveals() {
+    func testTapRevealsOneLayerAtATime() {
         let runner = runner(["a"])
-        XCTAssertEqual(runner.pendingGrade(), .elements)
+
         runner.reveal()
-        XCTAssertEqual(runner.revealed, .statement, "reveal must not bypass the question")
-    }
-
-    func testGradingRevealsTheLayerItAskedAbout() {
-        let runner = runner(["a"])
-        runner.record(grade: .good)
         XCTAssertEqual(runner.revealed, .elements)
-        XCTAssertEqual(runner.pendingGrade(), .pseudocode)
-    }
-
-    func testReferenceLayersRevealWithoutAsking() {
-        let runner = runner(["a"])
-        runner.record(grade: .good)  // elements
-        runner.record(grade: .good)  // pseudocode
+        runner.reveal()
         XCTAssertEqual(runner.revealed, .pseudocode)
-        XCTAssertNil(runner.pendingGrade())
         runner.reveal()
         XCTAssertEqual(runner.revealed, .retrospective)
         runner.reveal()
         XCTAssertEqual(runner.revealed, .solutions)
-        runner.reveal()
-        XCTAssertEqual(runner.revealed, .solutions, "the chain ends here")
     }
 
-    func testAgainSchedulesARepeatOfOnlyThatLayer() {
-        let runner = runner(["a"])
-        runner.record(grade: .again)  // elements
-        XCTAssertEqual(
-            runner.repeatsScheduled,
-            [SessionStep(problemID: "a", askOnly: .elements)]
-        )
-    }
-
-    func testRepeatsDoNotChangeTheAdvertisedTotal() {
+    func testTappingPastTheLastLayerDoesNothing() {
+        // The whole point of splitting reveal from grade: a tap can never
+        // carry you out of the problem, however many times it lands.
         let runner = runner(["a", "b"])
-        runner.record(grade: .again)
-        XCTAssertEqual(runner.progress.total, 2, "a repeat is extra, not one of the N")
+        for _ in 0..<10 { runner.reveal() }
+
+        XCTAssertEqual(runner.revealed, .solutions)
+        XCTAssertEqual(runner.current?.problemID, "a", "tapping must never change problem")
+        XCTAssertEqual(runner.index, 0)
     }
 
-    func testRepeatsAreAppendedAfterTheOriginalQueue() {
+    func testGradingIsWhatMovesToTheNextProblem() {
         let runner = runner(["a", "b"])
-        runner.record(grade: .again)   // a/elements fails
-        runner.advance()               // -> b
+
+        runner.grade(.good)
+
         XCTAssertEqual(runner.current?.problemID, "b")
-        runner.advance()               // -> the repeat
-        XCTAssertEqual(runner.current, SessionStep(problemID: "a", askOnly: .elements))
-        XCTAssertFalse(runner.isFinished)
-        runner.record(grade: .good)
-        runner.advance()
+        XCTAssertEqual(runner.revealed, .statement, "the next card starts closed")
+    }
+
+    func testGradingWorksWithoutRevealingAnything() {
+        // The bar is on screen from the first second; nothing has to be
+        // opened before it can be pressed.
+        let runner = runner(["a", "b"])
+
+        runner.grade(.hard)
+
+        XCTAssertEqual(runner.current?.problemID, "b")
+    }
+
+    func testFinishedAfterGradingTheLastProblem() {
+        let runner = runner(["a"])
+
+        runner.grade(.good)
+
+        XCTAssertTrue(runner.isFinished)
+        XCTAssertNil(runner.current)
+    }
+
+    func testGradingWhenFinishedDoesNothing() {
+        let runner = runner(["a"])
+        runner.grade(.good)
+
+        runner.grade(.again)
+
+        XCTAssertEqual(runner.index, 1, "no step to grade, so nothing moves")
+        XCTAssertTrue(runner.repeatsScheduled.isEmpty)
+    }
+
+    func testAgainQueuesTheProblemAgainAtTheEnd() {
+        let runner = runner(["a", "b"])
+
+        runner.grade(.again)
+
+        XCTAssertEqual(runner.repeatsScheduled, [SessionStep(problemID: "a", isRepeat: true)])
+        XCTAssertEqual(runner.current?.problemID, "b")
+        runner.grade(.good)
+        XCTAssertEqual(runner.current?.problemID, "a")
+        XCTAssertEqual(runner.current?.isRepeat, true)
+    }
+
+    func testHardAndGoodQueueNothing() {
+        let runner = runner(["a", "b"])
+
+        runner.grade(.hard)
+        runner.grade(.good)
+
+        XCTAssertTrue(runner.repeatsScheduled.isEmpty)
         XCTAssertTrue(runner.isFinished)
     }
 
-    func testARepeatStepAsksOnlyItsOwnLayerAndThenEnds() {
-        let runner = SessionRunner(
-            steps: [SessionStep(problemID: "a", askOnly: .pseudocode)]
-        )
-        XCTAssertEqual(runner.pendingGrade(), .pseudocode)
-        runner.record(grade: .good)
-        XCTAssertNil(runner.pendingGrade())
-        XCTAssertEqual(runner.revealed, .pseudocode)
-    }
-
-    func testALayerRepeatsAtMostTwicePerSession() {
+    func testAProblemIsNotQueuedMoreThanTwice() {
         let runner = runner(["a"])
-        runner.record(grade: .again)          // 1st repeat scheduled
-        runner.advance()
-        runner.record(grade: .again)          // 2nd repeat scheduled
-        runner.advance()
-        runner.record(grade: .again)          // must NOT schedule a 3rd
-        XCTAssertEqual(runner.repeatsScheduled.count, 2)
+
+        runner.grade(.again)   // queues repeat 1
+        runner.grade(.again)   // this is the repeat: must not queue again
+        XCTAssertEqual(runner.repeatsScheduled.count, 1)
+        XCTAssertTrue(runner.isFinished)
     }
 
-    func testAdvancingMidChainJustMovesOn() {
-        let runner = runner(["a", "b"])
-        runner.record(grade: .good)  // only the elements track answered
-        runner.advance()
-        XCTAssertEqual(runner.current?.problemID, "b")
-        XCTAssertEqual(runner.revealed, .statement, "the new card starts closed")
-        XCTAssertEqual(runner.progress.done, 1)
-    }
+    func testARepeatFailedAgainIsNotRequeued() {
+        let runner = runner(["a"])
+        runner.grade(.again)
 
-    func testGoingBackRestoresHowFarThatCardWasOpen() {
-        let runner = runner(["a", "b"])
-        runner.record(grade: .good)   // a: elements open
-        runner.record(grade: .good)   // a: pseudocode open
-        runner.reveal()               // a: retrospective open
-        runner.advance()
-        runner.goBack()
-
-        XCTAssertEqual(runner.current?.problemID, "a")
-        XCTAssertEqual(runner.revealed, .retrospective, "a revisit is a look, not a reset")
-    }
-
-    func testGoingBackDoesNotReAskAGradedLayer() {
-        let runner = runner(["a", "b"])
-        runner.record(grade: .good)   // elements graded
-        runner.record(grade: .again)  // pseudocode graded
-        runner.advance()
-        runner.goBack()
-
-        XCTAssertNil(runner.pendingGrade(), "both tracks were answered; revisiting must not re-ask")
-    }
-
-    func testGoingBackStillLetsYouFinishALayerYouSkipped() {
-        let runner = runner(["a", "b"])
-        runner.record(grade: .good)   // only elements answered
-        runner.advance()
-        runner.goBack()
+        XCTAssertEqual(runner.current?.isRepeat, true)
+        runner.grade(.again)
 
         XCTAssertEqual(
-            runner.pendingGrade(), .pseudocode,
-            "an unanswered layer is unfinished work, not a re-grade"
+            runner.repeatsScheduled.count, 1,
+            "a bad problem must not fill the session with itself"
         )
     }
 
-    func testProgressDoesNotRewindWhenGoingBack() {
+    func testProgressCountsPlannedProblemsNotRepeats() {
         let runner = runner(["a", "b"])
-        runner.advance()
+        XCTAssertEqual(runner.progress.total, 2)
+        XCTAssertEqual(runner.progress.done, 0)
+
+        runner.grade(.again)
         XCTAssertEqual(runner.progress.done, 1)
-        runner.goBack()
-        XCTAssertEqual(runner.progress.done, 1, "the counter tracks how far you got")
+
+        runner.grade(.good)
+        XCTAssertEqual(runner.progress.done, 2)
+
+        // Now on the repeat, which is past the advertised length.
+        runner.grade(.good)
+        XCTAssertEqual(runner.progress.done, 2, "extra work must not read as 3 / 2")
+        XCTAssertEqual(runner.progress.total, 2)
     }
 
-    func testGoingBackFromTheFirstCardDoesNothing() {
+    func testEachProblemRemembersHowFarItWasOpened() {
         let runner = runner(["a", "b"])
-        runner.goBack()
-        XCTAssertEqual(runner.current?.problemID, "a")
+        runner.reveal()
+        runner.reveal()
+        XCTAssertEqual(runner.revealed, .pseudocode)
+
+        runner.grade(.good)
+
+        XCTAssertEqual(runner.revealed, .statement)
+    }
+
+    func testAnEmptySessionIsFinishedImmediately() {
+        let runner = runner([])
+
+        XCTAssertTrue(runner.isFinished)
+        XCTAssertNil(runner.current)
+        XCTAssertEqual(runner.progress.done, 0)
+        XCTAssertEqual(runner.progress.total, 0)
     }
 }

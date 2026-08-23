@@ -1,10 +1,12 @@
 import SwiftUI
 
-/// The three buttons, shown before the answer appears.
+/// The three buttons, pinned below the card for the whole problem.
 ///
-/// They separate by weight as much as by colour so the order reads at a
-/// glance: 不会 is a filled near-black block, 勉强 is outlined, 会 is filled
-/// green.
+/// Deliberately short: it is on screen the entire time now rather than
+/// appearing at two gates, so every point it takes is a point the card
+/// does not get. The weight difference stays -- 不会 a filled near-black
+/// block, 勉强 outlined, 会 filled green -- because that, not size, is what
+/// makes the order readable at a glance.
 struct GradeBar: View {
     let onGrade: (Grade) -> Void
 
@@ -15,7 +17,7 @@ struct GradeBar: View {
             button("会", grade: .good, style: .solidAccent)
         }
         .padding(.horizontal, 16)
-        .padding(.vertical, 14)
+        .padding(.vertical, 8)
         .background(.regularMaterial)
     }
 
@@ -27,9 +29,9 @@ struct GradeBar: View {
             onGrade(grade)
         } label: {
             Text(label)
-                .font(.system(size: 17, weight: .medium))
+                .font(.system(size: 15, weight: .medium))
                 .frame(maxWidth: .infinity)
-                .padding(.vertical, 14)
+                .padding(.vertical, 10)
                 .foregroundColor(foreground(style))
                 .background(background(style))
                 .overlay(

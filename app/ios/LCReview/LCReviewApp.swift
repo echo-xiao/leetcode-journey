@@ -98,10 +98,8 @@ struct RootView: View {
                 SessionView(
                     problems: state.problems,
                     runner: runner,
-                    onGrade: { id, track, grade, isRepeat in
-                        state.record(
-                            problemID: id, track: track, grade: grade, isRepeat: isRepeat
-                        )
+                    onGrade: { id, grade, isRepeat in
+                        state.record(problemID: id, grade: grade, isRepeat: isRepeat)
                     },
                     onFinish: { state.finishSession() }
                 )

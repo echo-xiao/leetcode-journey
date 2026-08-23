@@ -147,7 +147,7 @@ final class AppState: ObservableObject {
             problems: problems, states: allStates, now: .now
         )
         activeRunner = SessionRunner(
-            steps: queue.map { SessionStep(problemID: $0.id, askOnly: nil) }
+            steps: queue.map { SessionStep(problemID: $0.id, isRepeat: false) }
         )
     }
 
@@ -155,12 +155,10 @@ final class AppState: ObservableObject {
         activeRunner = nil
     }
 
-    func record(problemID: String, track: Track, grade: Grade, isRepeat: Bool) {
-        let existing = allStates.first {
-            $0.problemID == problemID && $0.track == track
-        }
+    func record(problemID: String, grade: Grade, isRepeat: Bool) {
+        let existing = allStates.first { $0.problemID == problemID }
         let (state, log) = grading.apply(
-            grade: grade, to: existing, problemID: problemID, track: track,
+            grade: grade, to: existing, problemID: problemID,
             isRepeat: isRepeat, now: .now
         )
         if existing == nil { context.insert(state) }
