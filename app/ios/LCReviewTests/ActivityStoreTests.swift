@@ -59,7 +59,7 @@ final class ActivityStoreTests: XCTestCase {
 
         XCTAssertEqual(snapshot.status, .fresh)
         XCTAssertEqual(snapshot.streak, 15)
-        XCTAssertEqual(snapshot.cells.count, 90)
+        XCTAssertEqual(snapshot.cells.count, ActivityStore.windowDays)
         XCTAssertEqual(count(snapshot.cells, on: "2026-08-20"), 78)
         XCTAssertTrue(FileManager.default.fileExists(atPath: cacheURL.path))
     }
@@ -147,7 +147,8 @@ final class ActivityStoreTests: XCTestCase {
         XCTAssertEqual(snapshot.status, .unavailable)
         XCTAssertEqual(snapshot.streak, 0)
         XCTAssertEqual(
-            snapshot.cells.count, 90, "the grid keeps its shape so the layout does not jump"
+            snapshot.cells.count, ActivityStore.windowDays,
+            "the grid keeps its shape so the layout does not jump"
         )
         XCTAssertTrue(snapshot.cells.allSatisfy { $0.count == 0 })
     }
