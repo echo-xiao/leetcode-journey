@@ -159,6 +159,13 @@ def ask(client, folder, tag):
 
 def main():
     force = "--force" in sys.argv
+    # One folder only, regenerated whether or not it already has answers.
+    # Used by `refresh-problem`, where the code changed underneath a set of
+    # answers that were right for the old version.
+    only = None
+    for a in sys.argv[1:]:
+        if a.startswith("--only="):
+            only = a.split("=", 1)[1]
     limit = None
     for a in sys.argv[1:]:
         if a.startswith("--limit"):
@@ -186,7 +193,12 @@ def main():
         with open(ANSWERS_PATH, encoding="utf-8") as f:
             answers = json.load(f)
 
-    todo = [f for f in sorted(ymap) if force or f not in answers]
+    if only:
+        todo = [only] if only in ymap else []
+        need_class = [] if todo else need_class
+        answers.pop(only, None)
+    else:
+        todo = [f for f in sorted(ymap) if force or f not in answers]
     if limit:
         todo = todo[:limit]
     print("待处理 {} 道（已有 {} 道，待判题型 {} 道）".format(len(todo), len(answers), len(need_class)))
