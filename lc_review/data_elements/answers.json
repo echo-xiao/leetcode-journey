@@ -2301,5 +2301,17 @@
   "遍历到nums[i]时先判断它是否已在集合seen里，不在就把它加入seen",
   "当seen的大小超过k（即i>=k）时，把窗口最左边的元素nums[i-k]从seen中移除，保持窗口大小不超过k",
   "一旦发现当前元素nums[i]已经在seen中，立刻返回True，遍历结束都没发现就返回False"
+ ],
+ "239_sliding-window-maximum": [
+  "队列从队头到队尾保持单调递减（存的是nums值对应的下标，值递减）",
+  "存下标，因为要判断下标是否滑出窗口范围，同时能通过下标取回nums值",
+  "当队尾下标对应的值nums[q队尾] <= nums[i]时弹出队尾，因为它比新元素小且更早过期，不可能再成为最大值",
+  "正着从i=0到n-1遍历数组"
+ ],
+ "76_minimum-window-substring": [
+  "变长窗口，右指针一直扩到覆盖t，左指针在覆盖时收缩，窗口大小随内容动态变化",
+  "每次j右移一格就把s[j]计入win（win[c]+=1），扩大窗口纳入新字符",
+  "当win已经覆盖need（covered返回True）时就移动left收缩，移出s[i]时win[s[i]]-=1，若减到0就从win里删掉这个key，然后i+=1",
+  "在while covered(win,need)为真的循环体里，每次收缩前先比较当前窗口长度j-i+1和minres，更短就更新minres和besti"
  ]
 }

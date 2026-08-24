@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <key>Label</key>
+    <string>com.echoxiao.leetcode-journey.sync</string>
+
+    <key>ProgramArguments</key>
+    <array>
+        <string>/Users/echoooooo/PycharmProjects/leetcode-journey/scripts/sync_daily.sh</string>
+    </array>
+
+    <!-- 3am. If the Mac is asleep launchd runs it once on wake, so a machine
+         that is closed overnight still syncs. -->
+    <key>StartCalendarInterval</key>
+    <dict>
+        <key>Hour</key>
+        <integer>3</integer>
+        <key>Minute</key>
+        <integer>0</integer>
+    </dict>
+
+    <key>RunAtLoad</key>
+    <false/>
+
+    <!-- The script writes its own dated log; these catch anything that dies
+         before it gets that far. -->
+    <key>StandardOutPath</key>
+    <string>/Users/echoooooo/PycharmProjects/leetcode-journey/logs/launchd.out</string>
+    <key>StandardErrorPath</key>
+    <string>/Users/echoooooo/PycharmProjects/leetcode-journey/logs/launchd.err</string>
+</dict>
+</plist>
