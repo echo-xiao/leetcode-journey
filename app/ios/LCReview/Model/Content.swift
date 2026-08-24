@@ -52,6 +52,17 @@ struct Problem: Codable, Identifiable, Hashable {
     /// "recent", and telling a day's new problems from its revisits
     /// needs both.
     let firstSolvedAt: Int?
+    /// How many accepted versions the repository holds.
+    ///
+    /// `solutions` is the reading list, capped and deduplicated; this is
+    /// the record's size. The card compares the two to say how much it is
+    /// not showing, rather than trusting a difference computed elsewhere.
+    ///
+    /// Optional because a payload written before this field existed must
+    /// still decode. The cache on disk is one such payload every time the
+    /// app is updated ahead of the content, and a decode failure there
+    /// would empty the home screen until the network came back.
+    let acceptedVersions: Int?
 }
 
 /// The whole downloaded file.

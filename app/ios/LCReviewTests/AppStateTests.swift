@@ -31,7 +31,8 @@ final class AppStateTests: XCTestCase {
                 id: "\(i)", number: i, title: "p\(i)", difficulty: "Easy",
                 technique: "贪心", statement: "s", elements: ["e"],
                 pseudocode: [PseudocodeBlock(kind: .text, text: "p")],
-                retrospective: "", solutions: [], solvedAt: nil, firstSolvedAt: nil
+                retrospective: "", solutions: [], solvedAt: nil, firstSolvedAt: nil,
+            acceptedVersions: 0
             )
         }
         let payload = ContentPayload(version: 1, problems: problems)
@@ -166,7 +167,8 @@ final class AppStateTests: XCTestCase {
                 id: "1", number: 1, title: "p1", difficulty: "Easy",
                 technique: "贪心", statement: "s", elements: ["e"],
                 pseudocode: [PseudocodeBlock(kind: .text, text: "p")],
-                retrospective: "", solutions: [], solvedAt: nil, firstSolvedAt: nil
+                retrospective: "", solutions: [], solvedAt: nil, firstSolvedAt: nil,
+            acceptedVersions: 0
             )
         ]
         let good = try JSONEncoder().encode(ContentPayload(version: 3, problems: problems))

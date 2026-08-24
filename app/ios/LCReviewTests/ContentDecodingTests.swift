@@ -53,4 +53,27 @@ final class ContentDecodingTests: XCTestCase {
         XCTAssertEqual(Grade.again.rawValue, 1)
         XCTAssertEqual(Grade.good.rawValue, 3)
     }
+
+    func testAPayloadWrittenBeforeAcceptedVersionsExistedStillDecodes() {
+        // The cache on disk is exactly this every time the app is updated
+        // ahead of the content it downloads. A decode failure there would
+        // empty the home screen until the network came back.
+        let json = """
+        {"version": 3, "problems": [{
+          "id": "1_two-sum", "number": 1, "title": "1. 两数之和",
+          "difficulty": "Easy", "technique": "数组双指针",
+          "statement": "s", "elements": ["e"],
+          "pseudocode": [{"kind": "text", "text": "p"}],
+          "retrospective": "", "solutions": [],
+          "solvedAt": null, "firstSolvedAt": null
+        }]}
+        """
+
+        let payload = try? JSONDecoder().decode(
+            ContentPayload.self, from: Data(json.utf8)
+        )
+
+        XCTAssertEqual(payload?.problems.count, 1)
+        XCTAssertNil(payload?.problems.first?.acceptedVersions)
+    }
 }

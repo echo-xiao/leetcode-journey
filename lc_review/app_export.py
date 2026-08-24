@@ -17,7 +17,7 @@ import re
 import textwrap
 from pathlib import Path
 
-from . import ac_times
+from . import ac_times, code_shape
 from .problem_source import PROBLEMS, REPO, elements_of, meta_of, statement_of, title_of
 
 SCHEMA_VERSION = 4
@@ -142,16 +142,50 @@ def _body_after_heading(path: Path) -> str:
     return "\n".join(lines).strip()
 
 
+#: How many solutions a card will show at most.
+#:
+#: The folder holds every accepted submission, and passing then tweaking and
+#: resubmitting inside one session is normal -- one problem here has sixteen,
+#: twelve of which survive shape deduplication because `not head` and
+#: `head is None` are different trees. A dozen cards is a scroll nobody
+#: reviews, and the oldest of them are a debugging session from a year ago.
+MAX_SOLUTIONS = 5
+
+
+def _accepted_versions(folder: Path) -> int:
+    """How many accepted versions the repository holds for this problem."""
+    return sum(1 for path in folder.iterdir() if _SOLUTION_RE.match(path.name))
+
+
 def _solutions(folder: Path) -> list[dict]:
+    """The newest few accepted versions, one per approach.
+
+    Two filters. Versions sharing a code shape collapse to one, so the same
+    solution submitted twice is not shown twice. What survives is then capped
+    at `MAX_SOLUTIONS`, newest first -- file numbering follows LeetCode's
+    order, so the lowest numbers are the most recent thinking.
+
+    The folder keeps everything either way. It is the record; this is the
+    reading list.
+    """
     found = []
     for path in folder.iterdir():
         match = _SOLUTION_RE.match(path.name)
         if match:
             found.append((int(match.group(1)), path))
-    return [
-        {"name": path.name, "code": path.read_text(encoding="utf-8")}
-        for _, path in sorted(found)
-    ]
+
+    kept: list[dict] = []
+    seen: set[str] = set()
+    for _, path in sorted(found):
+        code = path.read_text(encoding="utf-8")
+        shape = code_shape.shape_of(code)
+        if shape in seen:
+            continue
+        seen.add(shape)
+        kept.append({"name": path.name, "code": code})
+        if len(kept) == MAX_SOLUTIONS:
+            break
+    return kept
 
 
 def problem_entry(
@@ -181,6 +215,10 @@ def problem_entry(
         # are the part of a retrospective worth seeing.
         "retrospective": _body_after_heading(folder / "review.md"),
         "solutions": _solutions(folder),
+        # Everything the folder holds, so the card can say how much it is
+        # not showing. A fact rather than a difference, so the app is not
+        # trusting arithmetic done here.
+        "acceptedVersions": _accepted_versions(folder),
         # When this problem was last accepted on LeetCode, or null if the
         # index does not know yet. Null rather than 0, because 0 is a real
         # date (1970) and would sort as the oldest problem in the library

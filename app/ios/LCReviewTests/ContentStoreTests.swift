@@ -40,7 +40,8 @@ final class ContentStoreTests: XCTestCase {
                 id: $0, number: 1, title: $0, difficulty: "Easy", technique: "贪心",
                 statement: "s", elements: ["e"],
                 pseudocode: [PseudocodeBlock(kind: .text, text: "p")],
-                retrospective: "", solutions: [], solvedAt: nil, firstSolvedAt: nil
+                retrospective: "", solutions: [], solvedAt: nil, firstSolvedAt: nil,
+            acceptedVersions: 0
             )
         }
         return try JSONEncoder().encode(ContentPayload(version: 1, problems: problems))

@@ -61,13 +61,34 @@ struct ChainCardView: View {
                                 }
                             }
 
-                            // Only the first solution is shown — the owner
-                            // decided extra solution cards added scroll
-                            // length without adding anything worth reviewing.
-                            if revealed >= .solutions, let solution = problem.solutions.first {
-                                connector
-                                labeledCard(id: Self.solutionID(0), label: solution.name) {
-                                    codeBlock(solution.code)
+                            // One card per approach. Only the first used to
+                            // be shown, because extra cards added scroll
+                            // length without adding anything worth reviewing
+                            // -- but that was when the extras could be the
+                            // same solution submitted twice. The exporter now
+                            // drops versions repeating a code shape, so what
+                            // is left really is a different way of solving it.
+                            if revealed >= .solutions {
+                                ForEach(
+                                    Array(problem.solutions.enumerated()), id: \.offset
+                                ) { index, solution in
+                                    connector
+                                    labeledCard(
+                                        id: Self.solutionID(index), label: solution.name
+                                    ) {
+                                        codeBlock(solution.code)
+                                    }
+                                }
+                                // Said out loud rather than silently dropped.
+                                // Repeated passes inside one session are
+                                // normal, so the repository can hold a dozen
+                                // versions of a problem while the card shows
+                                // the newest few.
+                                if let hidden = hiddenVersions {
+                                    Text(hidden)
+                                        .font(Theme.tagFont)
+                                        .foregroundColor(Theme.secondaryText)
+                                        .padding(.top, 10)
                                 }
                             }
                         }
@@ -84,6 +105,13 @@ struct ChainCardView: View {
                 }
             }
         }
+    }
+
+    /// "另有 N 版在仓库里", or nothing when the card shows everything.
+    private var hiddenVersions: String? {
+        guard let total = problem.acceptedVersions else { return nil }
+        let hidden = total - problem.solutions.count
+        return hidden > 0 ? "另有 \(hidden) 版在仓库里" : nil
     }
 
     // MARK: Card identity, for `ScrollViewReader`
