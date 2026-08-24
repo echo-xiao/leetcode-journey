@@ -30,23 +30,8 @@ struct SessionBuilder {
             byProblem[state.problemID, default: []].append(state)
         }
 
-        let candidates = problems.filter { problem in
-            switch scope {
-            case .all:
-                return true
-            case .technique(let name):
-                return problem.technique == name
-            case .mistakes:
-                return byProblem[problem.id]?.contains(where: \.inMistakeBank) ?? false
-            case .recent(let withinDays):
-                // A problem with no known date is left out rather than
-                // ordered by a date it does not have. This entry is about
-                // dates; a problem without one has nothing to say here.
-                guard let solvedAt = problem.solvedAt else { return false }
-                guard let withinDays else { return true }
-                let cutoff = now.addingTimeInterval(-Double(withinDays) * 86_400)
-                return Date(timeIntervalSince1970: TimeInterval(solvedAt)) >= cutoff
-            }
+        let candidates = problems.filter {
+            isInScope($0, scope: scope, byProblem: byProblem, now: now)
         }
 
         let ordered: [Problem]
@@ -90,6 +75,61 @@ struct SessionBuilder {
     private func dueDate(_ states: [CardState]?, now: Date) -> Date {
         guard let states, !states.isEmpty else { return .distantPast }
         return states.map(\.due).min() ?? .distantPast
+    }
+
+    /// Whether a problem belongs to a scope at all.
+    ///
+    /// One definition shared by the queue and the count. They were written
+    /// separately once, and the count quietly forgot the day window on
+    /// `.recent`, so every time slice reported the whole library.
+    private func isInScope(
+        _ problem: Problem, scope: SessionScope,
+        byProblem: [String: [CardState]], now: Date
+    ) -> Bool {
+        switch scope {
+        case .all:
+            return true
+        case .technique(let name):
+            return problem.technique == name
+        case .mistakes:
+            return byProblem[problem.id]?.contains(where: \.inMistakeBank) ?? false
+        case .recent(let withinDays):
+            // A problem with no known date is left out rather than ordered by
+            // a date it does not have. This scope is about dates; a problem
+            // without one has nothing to say here.
+            guard let solvedAt = problem.solvedAt else { return false }
+            guard let withinDays else { return true }
+            let cutoff = now.addingTimeInterval(-Double(withinDays) * 86_400)
+            return Date(timeIntervalSince1970: TimeInterval(solvedAt)) >= cutoff
+        }
+    }
+
+    /// How many problems in this scope are waiting right now.
+    ///
+    /// Uncapped by session length on purpose: the number answers "how much is
+    /// waiting", and one capped at ten would answer nothing. This is the
+    /// figure the home screen originally refused to show, on the grounds that
+    /// opening an app to four hundred waiting cards is discouraging. The owner
+    /// asked for it; the discouraging number is the true one.
+    ///
+    /// For the mistake bank there is no "not yet due": being in the bank is
+    /// the whole condition, so the backlog is its size.
+    func backlog(
+        scope: SessionScope, problems: [Problem], states: [CardState], now: Date
+    ) -> Int {
+        var byProblem: [String: [CardState]] = [:]
+        for state in states {
+            byProblem[state.problemID, default: []].append(state)
+        }
+        return problems.filter { problem in
+            guard isInScope(problem, scope: scope, byProblem: byProblem, now: now) else {
+                return false
+            }
+            // The mistake bank has no "not yet due": being in it is the whole
+            // condition, so every member counts.
+            if scope == .mistakes { return true }
+            return dueDate(byProblem[problem.id], now: now) <= now
+        }.count
     }
 
     /// Breaks the tie between problems that have never been reviewed here.

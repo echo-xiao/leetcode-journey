@@ -286,4 +286,112 @@ final class SessionBuilderTests: XCTestCase {
 
         XCTAssertEqual(session.map(\.id), ["known"])
     }
+
+    // MARK: - 积压
+
+    func testBacklogCountsEveryProblemDueNowNotJustOneSession() {
+        // The number the home screen used to hide. It is not capped by
+        // session length: the point of showing it is how much is waiting, and
+        // a figure capped at ten would say nothing.
+        let problems = (0..<25).map { problem("p\($0)", solvedDaysAgo: Double($0 + 1)) }
+
+        let backlog = builder.backlog(scope: .all, problems: problems, states: [], now: now)
+
+        XCTAssertEqual(backlog, 25)
+    }
+
+    func testBacklogExcludesProblemsNotYetDue() {
+        let problems = ["due", "later"].map { problem($0) }
+        let states = [
+            state("due", dueOffsetDays: -1),
+            state("later", dueOffsetDays: 5),
+        ]
+
+        XCTAssertEqual(
+            builder.backlog(scope: .all, problems: problems, states: states, now: now), 1
+        )
+    }
+
+    func testBacklogIsScopedToTheTechnique() {
+        let problems = [
+            problem("a", technique: "二叉树"),
+            problem("b", technique: "二叉树"),
+            problem("c", technique: "贪心"),
+        ]
+
+        XCTAssertEqual(
+            builder.backlog(
+                scope: .technique("二叉树"), problems: problems, states: [], now: now
+            ),
+            2
+        )
+    }
+
+    func testBacklogOfTheMistakeScopeIsTheWholeBank() {
+        // Nothing in the bank is "not yet due" -- being in it is the whole
+        // condition -- so the backlog is its size.
+        let problems = ["a", "b", "c"].map { problem($0) }
+        let states = [
+            state("a", dueOffsetDays: 30, inBank: true),
+            state("b", dueOffsetDays: -90, inBank: false),
+            state("c", dueOffsetDays: 1, inBank: true),
+        ]
+
+        XCTAssertEqual(
+            builder.backlog(scope: .mistakes, problems: problems, states: states, now: now), 2
+        )
+    }
+
+    func testBacklogOfARecentWindowRespectsThatWindow() {
+        // The bug this pins down: the count and the queue each had their own
+        // copy of "is this problem in scope", and the count's copy forgot the
+        // day window, so every time slice reported the whole library.
+        let problems = [
+            problem("d1", solvedDaysAgo: 1),
+            problem("d20", solvedDaysAgo: 20),
+            problem("d200", solvedDaysAgo: 200),
+        ]
+
+        XCTAssertEqual(
+            builder.backlog(
+                scope: .recent(withinDays: 7), problems: problems, states: [], now: now
+            ),
+            1
+        )
+        XCTAssertEqual(
+            builder.backlog(
+                scope: .recent(withinDays: 30), problems: problems, states: [], now: now
+            ),
+            2
+        )
+        XCTAssertEqual(
+            builder.backlog(
+                scope: .recent(withinDays: nil), problems: problems, states: [], now: now
+            ),
+            3
+        )
+    }
+
+    func testTheCountAndTheQueueAgreeOnEveryScope() {
+        // A queue can be shorter than its backlog because of session length,
+        // but it must never contain a problem the count excluded.
+        let problems = [
+            problem("a", technique: "二叉树", solvedDaysAgo: 1),
+            problem("b", technique: "贪心", solvedDaysAgo: 40),
+            problem("c", technique: "二叉树", solvedDaysAgo: 400),
+        ]
+        let scopes: [SessionScope] = [
+            .all, .technique("二叉树"), .recent(withinDays: 7), .recent(withinDays: nil),
+        ]
+
+        for scope in scopes {
+            let queue = builder.build(
+                scope: scope, length: 100, problems: problems, states: [], now: now
+            )
+            let count = builder.backlog(
+                scope: scope, problems: problems, states: [], now: now
+            )
+            XCTAssertEqual(queue.count, count, "\(scope) disagrees")
+        }
+    }
 }
