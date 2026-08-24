@@ -104,6 +104,24 @@ struct SessionBuilder {
         }
     }
 
+    /// How many problems belong to this scope at all, waiting or not.
+    ///
+    /// The counterpart to `backlog`. Reviewing a problem takes it out of the
+    /// backlog but not out of the week it was solved in, and the pair is what
+    /// makes a row read as progress rather than as a number that shrinks for
+    /// no visible reason.
+    func total(
+        scope: SessionScope, problems: [Problem], states: [CardState], now: Date
+    ) -> Int {
+        var byProblem: [String: [CardState]] = [:]
+        for state in states {
+            byProblem[state.problemID, default: []].append(state)
+        }
+        return problems.filter {
+            isInScope($0, scope: scope, byProblem: byProblem, now: now)
+        }.count
+    }
+
     /// How many problems in this scope are waiting right now.
     ///
     /// Uncapped by session length on purpose: the number answers "how much is

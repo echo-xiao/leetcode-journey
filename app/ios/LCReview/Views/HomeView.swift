@@ -11,6 +11,9 @@ struct HomeEntry: Identifiable, Equatable {
     /// at the cost of a large figure on a library that has barely been
     /// reviewed.
     let backlog: Int
+    /// Everything in this scope, waiting or not. Reviewing a problem takes
+    /// it out of the backlog but not out of the week it was solved in.
+    let total: Int
     /// How many the session will actually ask, which is the smaller of the
     /// backlog and the session length.
     let sessionSize: Int
@@ -120,13 +123,22 @@ struct HomeView: View {
         return formatter
     }()
 
-    /// How many problems in this row are waiting, and nothing else.
+    /// Progress: how many of this row are not waiting, over how many there
+    /// are. "7 / 16", "0 / 66".
     ///
-    /// Session length is deliberately not shown next to it: it is one number
-    /// for the whole app, it lives in settings, and repeating it on every row
-    /// would be noise on a screen whose job is to say what is waiting.
+    /// Done over total, not remaining over total. "9 / 16" reads as nine of
+    /// sixteen finished, which is the opposite of what a remaining count
+    /// means, and a number that can be read backwards is worse than no number.
+    ///
+    /// "Done" is done for now, not forever: a problem drops out of the
+    /// backlog until its next due date and then counts as waiting again. The
+    /// fraction is progress against today's queue, and it is meant to go back
+    /// down tomorrow.
+    ///
+    /// Session length is deliberately absent: it is one number for the whole
+    /// app, it lives in settings, and repeating it on every row is noise.
     private static func countLabel(_ entry: HomeEntry) -> String {
-        "\(entry.backlog) 题"
+        "\(entry.total - entry.backlog) / \(entry.total)"
     }
 
     private var counters: some View {

@@ -144,11 +144,15 @@ final class AppState: ObservableObject {
         let waiting = builder.backlog(
             scope: scope, problems: problems, states: states, now: .now
         )
+        let everything = builder.total(
+            scope: scope, problems: problems, states: states, now: .now
+        )
         let queue = builder.build(
             scope: scope, length: sessionLength, problems: problems, states: states, now: .now
         )
         return HomeEntry(
-            id: id, label: label, backlog: waiting, sessionSize: queue.count, scope: scope
+            id: id, label: label, backlog: waiting, total: everything,
+            sessionSize: queue.count, scope: scope
         )
     }
 
@@ -197,7 +201,10 @@ final class AppState: ObservableObject {
             // A window with nothing in it is dropped rather than shown as
             // zero: it is a slice of time, not a category, and an empty slice
             // is not a thing you can start.
-            return row.sessionSize == 0 ? nil : row
+            // Dropped when the window holds nothing at all. A window with
+            // problems in it that are simply all reviewed still belongs on
+            // screen, reading 0 / 16 -- that is progress, not emptiness.
+            return row.total == 0 ? nil : row
         }
         return HomeSection(
             id: "recent", label: "按最近刷",

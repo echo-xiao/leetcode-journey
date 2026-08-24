@@ -394,4 +394,56 @@ final class SessionBuilderTests: XCTestCase {
             XCTAssertEqual(queue.count, count, "\(scope) disagrees")
         }
     }
+
+    // MARK: - 范围总数
+
+    func testTotalCountsEveryProblemInScopeIncludingOnesNotDue() {
+        // The counterpart to backlog: what you have done, not what is
+        // waiting. A problem reviewed this morning still belongs to the week
+        // it was solved in.
+        let problems = ["a", "b"].map { problem($0) }
+        let states = [
+            state("a", dueOffsetDays: -1),
+            state("b", dueOffsetDays: 30),
+        ]
+
+        XCTAssertEqual(builder.total(scope: .all, problems: problems, states: states, now: now), 2)
+        XCTAssertEqual(
+            builder.backlog(scope: .all, problems: problems, states: states, now: now), 1
+        )
+    }
+
+    func testTotalRespectsTheRecentWindow() {
+        let problems = [
+            problem("d1", solvedDaysAgo: 1),
+            problem("d200", solvedDaysAgo: 200),
+        ]
+        let states = [state("d1", dueOffsetDays: 30)]
+
+        XCTAssertEqual(
+            builder.total(
+                scope: .recent(withinDays: 7), problems: problems, states: states, now: now
+            ),
+            1,
+            "reviewing it does not remove it from the week it was solved in"
+        )
+        XCTAssertEqual(
+            builder.backlog(
+                scope: .recent(withinDays: 7), problems: problems, states: states, now: now
+            ),
+            0
+        )
+    }
+
+    func testTotalIsScopedToTheTechnique() {
+        let problems = [
+            problem("a", technique: "二叉树"),
+            problem("b", technique: "贪心"),
+        ]
+
+        XCTAssertEqual(
+            builder.total(scope: .technique("二叉树"), problems: problems, states: [], now: now),
+            1
+        )
+    }
 }
