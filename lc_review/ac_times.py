@@ -17,6 +17,11 @@ import json
 from pathlib import Path
 
 PATH = Path(__file__).resolve().parent.parent / "Problems" / "_ac_times.json"
+#: When each problem was solved for the *first* time. Kept apart from PATH
+#: because the two answer different questions and are written by different
+#: rules: the last pass moves forward as you practise, the first never
+#: moves at all.
+FIRST_PATH = Path(__file__).resolve().parent.parent / "Problems" / "_first_ac.json"
 
 
 def latest_ac_timestamp(submissions: list[dict]) -> int | None:
@@ -85,6 +90,35 @@ def merge_recent(
             index[folder] = stamp
             changed += 1
     return changed
+
+
+def earliest_ac_timestamp(submissions: list[dict]) -> int | None:
+    """The first accepted submission's unix time, or None.
+
+    The counterpart to `latest_ac_timestamp`: this is the day a problem stopped
+    being unsolved, which is what separates新刷 from 复习 in a daily count.
+    """
+    stamps: list[int] = []
+    for submission in submissions:
+        try:
+            stamps.append(int(submission.get("timestamp")))
+        except (TypeError, ValueError):
+            continue
+    return min(stamps) if stamps else None
+
+
+def record_first(problem_id: str, timestamp: int, path: Path | None = None) -> None:
+    """Set one problem's first-solved date, keeping the earlier of the two.
+
+    The opposite rule to `record`. A first pass is a fact about the past, so a
+    later run seeing a newer submission must not overwrite it; but an earlier
+    one turning up (a deeper page of history) should win.
+    """
+    path = path or FIRST_PATH
+    index = load(path)
+    existing = index.get(problem_id)
+    index[problem_id] = min(int(timestamp), existing) if existing else int(timestamp)
+    save(index, path)
 
 
 def load(path: Path | None = None) -> dict[str, int]:

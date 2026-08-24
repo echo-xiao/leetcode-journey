@@ -116,6 +116,8 @@ final class AppState: ObservableObject {
     }
 
     var totalReviews: Int { summary.totalReviews(logs: allLogs) }
+    var reviewsToday: Int { summary.reviewsToday(logs: allLogs, now: .now) }
+    var newlySolvedToday: Int { summary.newlySolvedToday(problems: problems, now: .now) }
     /// The rows above the tree: what you start without choosing a lens.
     ///
     /// 错题 only appears when there is something in it. A row that is always

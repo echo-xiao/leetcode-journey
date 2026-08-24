@@ -47,6 +47,12 @@ def pending_folders(index: dict[str, int]) -> list[str]:
 def run(dry_run: bool = True, limit: int | None = None, pause: float = 0.7) -> int:
     """Ask LeetCode for each missing date. Returns how many were recorded."""
     index = ac_times.load()
+    first = ac_times.load(ac_times.FIRST_PATH)
+    # A problem needs another request if either date is missing. The first-pass
+    # index arrived later than the last-pass one, so on the first run after
+    # that change every problem is pending again -- one more five-minute
+    # sweep, and then neither index needs one.
+    index = {name: stamp for name, stamp in index.items() if name in first}
     pending = pending_folders(index)
     if limit:
         pending = pending[:limit]
@@ -64,13 +70,15 @@ def run(dry_run: bool = True, limit: int | None = None, pause: float = 0.7) -> i
         try:
             submissions = fetcher.get_all_ac_submissions(slug)
             solved_at = ac_times.latest_ac_timestamp(submissions)
-            if solved_at is None:
+            first_at = ac_times.earliest_ac_timestamp(submissions)
+            if solved_at is None or first_at is None:
                 print(f"  跳过 {folder_name}: 没有取到通过记录")
                 continue
             # Written every iteration rather than once at the end: five
             # minutes is long enough that an interruption is a real
             # possibility, and losing the whole run to it would be avoidable.
             ac_times.record(folder_name, solved_at)
+            ac_times.record_first(folder_name, first_at)
             recorded += 1
             if position % 25 == 0 or position == len(pending):
                 print(f"  已补 {position} / {len(pending)}")
@@ -78,5 +86,6 @@ def run(dry_run: bool = True, limit: int | None = None, pause: float = 0.7) -> i
             print(f"  ✗ {folder_name}: {error}")
         time.sleep(pause)
 
-    print(f"补齐 {recorded} 道，索引现有 {len(ac_times.load())} 道")
+    print(f"补齐 {recorded} 道，最近通过索引 {len(ac_times.load())} 道，"
+          f"首次通过索引 {len(ac_times.load(ac_times.FIRST_PATH))} 道")
     return recorded

@@ -43,6 +43,8 @@ struct HomeSection: Identifiable, Equatable {
 struct HomeView: View {
     let problemCount: Int
     let totalReviews: Int
+    let reviewsToday: Int
+    let newlySolvedToday: Int
     let streak: Int
     let cells: [HeatmapCell]
     /// The rows that stand on their own, above the tree.
@@ -144,7 +146,8 @@ struct HomeView: View {
     private var counters: some View {
         HStack(spacing: 0) {
             counter(problemCount, "题目")
-            counter(totalReviews, "复习")
+            counter(newlySolvedToday, "今日新刷")
+            counter(reviewsToday, "今日复习")
             counter(streak, "连续天")
         }
     }
