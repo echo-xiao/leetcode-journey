@@ -84,6 +84,17 @@ def export_app_command(apply: bool = True) -> None:
     run(dry_run=not apply)
 
 
+def refresh_problem_command(slug: str, apply: bool) -> None:
+    """Re-download one problem's code and regenerate pseudocode and elements.
+
+    For a problem solved again after it was already in the library: sync-new
+    never revisits those, so the repository keeps the old version.
+    """
+    from .refresh_problem import run
+
+    run(slug, dry_run=not apply)
+
+
 def refresh_ac_times_command(apply: bool) -> None:
     """Move the accepted-at date forward for problems solved again recently.
 
@@ -153,6 +164,12 @@ def main() -> None:
     # Writes only into app/ inside the repo, so there is nothing to opt into.
     subparsers.add_parser("export-app", help="导出 app 内容 content.json")
 
+    problem = subparsers.add_parser(
+        "refresh-problem", help="重下某道题的代码并重生成伪代码与要素"
+    )
+    problem.add_argument("slug", help="题目 slug，例如 trapping-rain-water")
+    problem.add_argument("--apply", action="store_true", help="实际写入")
+
     refresh = subparsers.add_parser(
         "refresh-ac-times", help="刷新最近重刷题目的通过时间"
     )
@@ -179,6 +196,8 @@ def main() -> None:
         export_anki_command()
     elif args.command == "export-app":
         export_app_command()
+    elif args.command == "refresh-problem":
+        refresh_problem_command(args.slug, args.apply)
     elif args.command == "refresh-ac-times":
         refresh_ac_times_command(args.apply)
     elif args.command == "backfill-ac-times":

@@ -1,16 +1,20 @@
 class Solution:
     def trap(self, height: List[int]) -> int:
+        
         n = len(height)
-        left, right = 0, n-1
+        stack = []
         res = 0
-        maxleft, maxright = 0, 0
-        while left < right:
-            maxleft = max(maxleft, height[left])
-            maxright = max(maxright, height[right])
-            if maxleft <= maxright:
-                res += (maxleft - height[left])
-                left += 1
-            else:
-                res += (maxright - height[right])
-                right -= 1
+        for i in range(0, n):
+            while len(stack) > 0 and height[i] > height[stack[-1]]:
+                bottom = stack.pop()
+
+                if len(stack) == 0:
+                    break
+
+                left = height[stack[-1]]
+                right = height[i]
+                wall = min(left, right) - height[bottom]
+                length = i - stack[-1] - 1
+                res += wall * length
+            stack.append(i)
         return res
