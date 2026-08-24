@@ -25,15 +25,42 @@ Problems/104_maximum-depth-of-binary-tree/
 python3 -m lc_review.cli sync-all --apply
 ```
 
-它按顺序做五件事，顺序不能调换——题目得先存在，复盘才有地方放；
+它按顺序做七件事，顺序不能调换——题目得先存在，复盘才有地方放；
 回顾表的行得先建好，复盘列才写得进去；app 的内容包必须最后打包，
 不然打包时 `Problems/*/review.md` 还是上一轮的，手机上拿到的就是旧内容：
 
-1. 拉力扣上新通过的题，生成四件套，并在 Notion「LC 旧题回顾」建行
-2. 给新题生成要素答案（每题一次 Claude 调用）
-3. 把 Notion 上的复盘写进各题的 `review.md`
-4. 把复盘写进「LC 旧题回顾」的复盘列，橙色高亮一并带过去
-5. 把 `Problems/` 打包成 `app/content.json`，供 iOS app 下载
+1. 刷新最近重刷过的题目的通过时间
+2. 拉力扣上新通过的题，生成四件套，并在 Notion「LC 旧题回顾」建行
+3. 刷新写法变了的老题：拿力扣最近 20 条 AC，比对每道题的代码结构，只有出现了本地
+   没有的写法才重下代码、重生成伪代码和要素。改个变量名不算，换一种解法才算
+4. 给新题生成要素答案（每题一次 Claude 调用）
+5. 把 Notion 上的复盘写进各题的 `review.md`
+6. 把复盘写进「LC 旧题回顾」的复盘列，橙色高亮一并带过去
+7. 把 `Problems/` 打包成 `app/content.json`，供 iOS app 下载
+
+### 不用手动跑
+
+`scripts/sync_daily.sh` 每天凌晨 3:00 由 launchd 自动跑一遍上面这条管线，跑完只提交
+`Problems/`、`app/content.json`、`lc_review/data_elements/` 并推送。Mac 睡着不会跳过，
+醒来后补跑一次。日志在 `logs/`，留 14 天。
+
+失败会弹一条 macOS 通知，成功不弹。最常见的失败是力扣 session 过期，几周一次，重新在
+Chrome 登录把 cookie 填回 `.env` 就行。另一种是当时不在 `main` 分支上——定时任务会拒绝
+在别的分支上提交，直接跳过并通知。
+
+装：
+
+```bash
+ln -sf "$PWD/scripts/com.echoxiao.leetcode-journey.sync.plist" \
+   ~/Library/LaunchAgents/com.echoxiao.leetcode-journey.sync.plist
+launchctl bootstrap gui/$(id -u) ~/Library/LaunchAgents/com.echoxiao.leetcode-journey.sync.plist
+```
+
+停：
+
+```bash
+launchctl bootout gui/$(id -u)/com.echoxiao.leetcode-journey.sync
+```
 
 不加 `--apply` 是试运行，只报告会做什么，不写任何东西，包括最后一步的
 `app/content.json`。前四步里有三步写到工作区之外（Notion 没有撤销），
