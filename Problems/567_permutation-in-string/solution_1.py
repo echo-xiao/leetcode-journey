@@ -1,25 +1,28 @@
 class Solution:
     def checkInclusion(self, s1: str, s2: str) -> bool:
-        s1Count, s2Count = {}, {}
+        seen = {}
+        for i in s1:
+            if i not in seen:
+                seen[i] = 1
+            else:
+                seen[i] += 1
         
-        for char in s1:
-            s1Count[char] = 1 + s1Count.get(char, 0)
 
-        left, right = 0, 0
+        win = {}
+        n = len(s1)
+        for j in range(0,len(s2)):
+            c = s2[j]
+            if c not in win:
+                win[c] = 1
+            else:
+                win[c] += 1
 
-
-        while right < len(s2):
-            s2Count[s2[right]] = 1 + s2Count.get(s2[right], 0)
-            right += 1
-
-            while right - left > len(s1):
-                
-                s2Count[s2[left]] -= 1
-                if s2Count[s2[left]] == 0:
-                    del s2Count[s2[left]]
-
-                left += 1
-
-            if s1Count == s2Count:
+            if j >= n:
+                left = s2[j-n]
+                win[left] -= 1
+                if win[left] == 0:
+                    del win[left]
+            
+            if seen == win:
                 return True
         return False

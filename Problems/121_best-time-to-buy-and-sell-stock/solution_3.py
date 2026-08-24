@@ -1,15 +1,12 @@
 class Solution:
     def maxProfit(self, prices: List[int]) -> int:
-        res = self.solve(prices, 0, float('inf'))
-        return max(0, res)
         
-    def solve(self, prices: List[int], i: int, minPrice: int) -> int:
-        if i == len(prices):
-            return 0
+        minPrice = float('inf')
+        maxProfit = 0
 
-        profitToday = prices[i] - minPrice
+        for i in range(0, len(prices)):
 
-        newMinPrice = min(minPrice, prices[i])
-        profitLater = self.solve(prices, i+1, newMinPrice)
+            minPrice = min(minPrice, prices[i])
+            maxProfit = max(maxProfit, prices[i]-minPrice)
 
-        return max(profitToday, profitLater)
+        return maxProfit
