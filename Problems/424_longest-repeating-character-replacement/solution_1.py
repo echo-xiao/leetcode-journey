@@ -1,33 +1,37 @@
 class Solution:
     def characterReplacement(self, s: str, k: int) -> int:
-        
+       
+        n = len(s)
+        win = {}
+        i = 0
+        maxres = 0
 
-
-
-        dic = {}
-        maxCount = 0
-
-        right, left = 0, 0
-        res = []
-        maxLen = 0
-        while right < len(s):
-            char = s[right]
-            res.append(s[right])
-            
-            if char not in dic:
-                dic[char] = 1
+        for j in range(0, n):
+            c = s[j]
+            if c not in win:
+                win[c] = 1
             else:
-                dic[char] += 1
+                win[c] += 1
+            
+            maxcnt = 0
+            for ch in win:
+                if win[ch] > maxcnt:
+                    maxcnt = win[ch]
+            need = (j-i+1) - maxcnt
+            
+            while need > k:
+                left = s[i]
+                win[left] -= 1
+                if win[left] == 0:
+                    del win[left]
+                i += 1
 
-            maxCount = max(dic[char], maxCount)
-            right += 1
-
-            while len(res) - maxCount > k:
-                dic[res[0]] -= 1
-                del res[0]
-                left += 1
-
-            maxLen = max(maxLen, right - left)
-
-        return maxLen
-
+                maxcnt = 0
+                for ch in win:
+                    if win[ch] > maxcnt:
+                        maxcnt = win[ch]
+                need = (j-i+1) - maxcnt
+            
+            res = j - i + 1
+            maxres = max(res, maxres)
+        return maxres

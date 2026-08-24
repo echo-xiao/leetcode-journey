@@ -20,7 +20,8 @@ final class SessionBuilderTests: XCTestCase {
             },
             firstSolvedAt: firstSolvedDaysAgo.map {
                 Int(now.addingTimeInterval(-$0 * 86_400).timeIntervalSince1970)
-            }
+            },
+            acceptedVersions: 0
         )
     }
 

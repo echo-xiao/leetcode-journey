@@ -38,7 +38,8 @@ final class SummaryTests: XCTestCase {
             retrospective: "", solutions: [], solvedAt: nil,
             firstSolvedAt: firstSolvedDaysAgo.map {
                 Int(Date().addingTimeInterval(-$0 * 86_400).timeIntervalSince1970)
-            }
+            },
+            acceptedVersions: 0
         )
     }
 
@@ -87,7 +88,8 @@ final class SummaryTests: XCTestCase {
             pseudocode: [PseudocodeBlock(kind: .text, text: "p")],
             retrospective: "", solutions: [],
             solvedAt: Int(now.timeIntervalSince1970),
-            firstSolvedAt: Int(now.addingTimeInterval(-400 * 86_400).timeIntervalSince1970)
+            firstSolvedAt: Int(now.addingTimeInterval(-400 * 86_400).timeIntervalSince1970),
+            acceptedVersions: 0
         )
 
         XCTAssertEqual(summary.newlySolvedToday(problems: [old], now: now), 0)

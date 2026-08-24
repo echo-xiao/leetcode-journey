@@ -65,8 +65,12 @@ def test_solutions_sort_numerically_not_lexically(tmp_path):
         "# 1. Demo · 题目\n\n**难度**: Easy\n\n## 题目描述\n\nx\n", encoding="utf-8"
     )
     (folder / "elements.md").write_text("# 1. Demo · 要素\n", encoding="utf-8")
+    # Each file needs its own code shape, or deduplication collapses them
+    # and this stops testing the sort order it is named for.
     for index in (1, 2, 10):
-        (folder / f"solution_{index}.py").write_text(f"# {index}\n", encoding="utf-8")
+        (folder / f"solution_{index}.py").write_text(
+            f"def f():\n    return {index}\n", encoding="utf-8"
+        )
     entry = app_export.problem_entry(folder, {})
     assert [s["name"] for s in entry["solutions"]] == [
         "solution_1.py",
@@ -244,3 +248,82 @@ def test_entry_first_solved_is_null_when_unknown(fixture_problems):
         fixture_problems / "9999_fixture-long", TECHNIQUES, ac_times={}, first_ac={}
     )
     assert entry["firstSolvedAt"] is None
+
+
+def test_solutions_are_deduplicated_by_shape(tmp_path):
+    # The repository keeps every accepted version; the card should not show
+    # the same approach twice just because it was submitted twice.
+    folder = tmp_path / "1_two-sum"
+    folder.mkdir()
+    (folder / "solution_1.py").write_text(
+        "def f(x):\n    return sum(x)\n", encoding="utf-8"
+    )
+    # Same shape as solution_1, different names.
+    (folder / "solution_2.py").write_text(
+        "def g(nums):\n    return sum(nums)\n", encoding="utf-8"
+    )
+    (folder / "solution_3.py").write_text(
+        "def f(x):\n    t = 0\n    for i in x:\n        t += i\n    return t\n",
+        encoding="utf-8",
+    )
+
+    kept = app_export._solutions(folder)
+
+    assert [s["name"] for s in kept] == ["solution_1.py", "solution_3.py"]
+
+
+def test_deduplication_keeps_the_lowest_numbered_version(tmp_path):
+    # solution_1 is the newest accepted version -- refresh-problem rewrites
+    # the group in LeetCode's order, newest first -- so keeping the lowest
+    # number keeps the most recent take on each approach.
+    folder = tmp_path / "1_two-sum"
+    folder.mkdir()
+    (folder / "solution_1.py").write_text(
+        "def newest(x):\n    return sum(x)\n", encoding="utf-8"
+    )
+    (folder / "solution_2.py").write_text(
+        "def older(y):\n    return sum(y)\n", encoding="utf-8"
+    )
+
+    kept = app_export._solutions(folder)
+
+    assert [s["name"] for s in kept] == ["solution_1.py"]
+    assert "newest" in kept[0]["code"]
+
+
+def test_at_most_five_solutions_reach_the_card(tmp_path):
+    # Sixteen accepted submissions for one problem is a real case: passing,
+    # then tweaking and resubmitting within the same session. Even after
+    # shapes collapse, a dozen cards is a scroll nobody reviews.
+    folder = tmp_path / "1_two-sum"
+    folder.mkdir()
+    for index in range(1, 9):
+        (folder / f"solution_{index}.py").write_text(
+            f"def f(x):\n    return x + {index}\n", encoding="utf-8"
+        )
+
+    kept = app_export._solutions(folder)
+
+    assert [s["name"] for s in kept] == [
+        "solution_1.py", "solution_2.py", "solution_3.py",
+        "solution_4.py", "solution_5.py",
+    ]
+
+
+def test_entry_reports_how_many_accepted_versions_exist(tmp_path):
+    # The card says "N more in the repository" from this. A count of what is
+    # really there, not the number that were dropped, so the app is not
+    # trusting arithmetic done somewhere else.
+    folder = tmp_path / "1_two-sum"
+    folder.mkdir()
+    (folder / "problem.md").write_text("# 1. 两数之和 · 题目\n", encoding="utf-8")
+    for index in range(1, 8):
+        (folder / f"solution_{index}.py").write_text(
+            f"def f(x):\n    return x + {index}\n", encoding="utf-8"
+        )
+
+    entry = app_export.problem_entry(folder, {})
+
+    assert entry["acceptedVersions"] == 7
+    assert len(entry["solutions"]) == 5
+
