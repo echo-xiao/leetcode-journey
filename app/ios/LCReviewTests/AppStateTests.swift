@@ -91,12 +91,16 @@ final class AppStateTests: XCTestCase {
     func testChangingSessionLengthUpdatesHomeEntryCounts() async throws {
         let state = try await makeState(problemCount: 30)
         let before = state.homeEntries.first { $0.id == "all" }
-        XCTAssertEqual(before?.count, 10)
+        XCTAssertEqual(before?.sessionSize, 10)
+        XCTAssertEqual(before?.backlog, 30, "the backlog is the whole library, uncapped")
 
         state.updateSessionLength(5)
 
         let after = state.homeEntries.first { $0.id == "all" }
-        XCTAssertEqual(after?.count, 5, "home rows must reflect the new length immediately")
+        XCTAssertEqual(
+            after?.sessionSize, 5, "home rows must reflect the new length immediately"
+        )
+        XCTAssertEqual(after?.backlog, 30, "session length must not change what is waiting")
     }
 
     func testSessionLengthPersistsAcrossAppStateInstances() throws {

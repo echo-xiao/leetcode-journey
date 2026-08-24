@@ -4,8 +4,16 @@ import SwiftUI
 struct HomeEntry: Identifiable, Equatable {
     let id: String
     let label: String
-    /// The length of the session this row will start — never a backlog count.
-    let count: Int
+    /// How many problems in this scope are waiting right now, uncapped.
+    ///
+    /// The screen used to advertise session length here instead, deliberately
+    /// hiding this number. It reads as the truer answer to "what is in here",
+    /// at the cost of a large figure on a library that has barely been
+    /// reviewed.
+    let backlog: Int
+    /// How many the session will actually ask, which is the smaller of the
+    /// backlog and the session length.
+    let sessionSize: Int
     let scope: SessionScope
 }
 
@@ -112,6 +120,15 @@ struct HomeView: View {
         return formatter
     }()
 
+    /// How many problems in this row are waiting, and nothing else.
+    ///
+    /// Session length is deliberately not shown next to it: it is one number
+    /// for the whole app, it lives in settings, and repeating it on every row
+    /// would be noise on a screen whose job is to say what is waiting.
+    private static func countLabel(_ entry: HomeEntry) -> String {
+        "\(entry.backlog) 题"
+    }
+
     private var counters: some View {
         HStack(spacing: 0) {
             counter(problemCount, "题目")
@@ -143,7 +160,7 @@ struct HomeView: View {
                             .font(Theme.bodyFont)
                             .foregroundColor(Theme.primaryText)
                         Spacer()
-                        Text("\(entry.count) 题")
+                        Text(Self.countLabel(entry))
                             .font(Theme.tagFont)
                             .foregroundColor(Theme.secondaryText)
                         Image(systemName: "chevron.right")
@@ -246,7 +263,7 @@ struct HomeView: View {
                     .font(Theme.bodyFont)
                     .foregroundColor(Theme.primaryText)
                 Spacer()
-                Text("\(child.count) 题")
+                Text(Self.countLabel(child))
                     .font(Theme.tagFont)
                     .foregroundColor(Theme.secondaryText)
             }

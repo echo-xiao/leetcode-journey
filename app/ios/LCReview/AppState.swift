@@ -130,15 +130,26 @@ final class AppState: ObservableObject {
         )
         if !mistakes.isEmpty {
             entries.append(
-                HomeEntry(id: "mistakes", label: "错题", count: mistakes.count, scope: .mistakes)
+                entry(id: "mistakes", label: "错题", scope: .mistakes, states: states)
             )
         }
-
-        let all = builder.build(
-            scope: .all, length: sessionLength, problems: problems, states: states, now: .now
-        )
-        entries.append(HomeEntry(id: "all", label: "全部", count: all.count, scope: .all))
+        entries.append(entry(id: "all", label: "全部", scope: .all, states: states))
         return entries
+    }
+
+    /// One row, carrying both what is waiting and what a session will ask.
+    private func entry(
+        id: String, label: String, scope: SessionScope, states: [CardState]
+    ) -> HomeEntry {
+        let waiting = builder.backlog(
+            scope: scope, problems: problems, states: states, now: .now
+        )
+        let queue = builder.build(
+            scope: scope, length: sessionLength, problems: problems, states: states, now: .now
+        )
+        return HomeEntry(
+            id: id, label: label, backlog: waiting, sessionSize: queue.count, scope: scope
+        )
     }
 
     /// The four ways of choosing what to practise, as a tree.
@@ -160,10 +171,11 @@ final class AppState: ObservableObject {
         let grouped = Dictionary(grouping: problems, by: \.technique)
             .filter { !$0.key.isEmpty }
             .sorted { $0.value.count > $1.value.count }
-        let children = grouped.map { name, group in
-            HomeEntry(
+        let states = allStates
+        let children = grouped.map { name, _ in
+            entry(
                 id: "technique-\(name)", label: name,
-                count: min(sessionLength, group.count), scope: .technique(name)
+                scope: .technique(name), states: states
             )
         }
         return HomeSection(
@@ -178,18 +190,14 @@ final class AppState: ObservableObject {
         ]
         let states = allStates
         let children = windows.compactMap { label, days -> HomeEntry? in
-            let queue = builder.build(
-                scope: .recent(withinDays: days), length: sessionLength,
-                problems: problems, states: states, now: .now
+            let row = entry(
+                id: "recent-\(days.map(String.init) ?? "all")", label: label,
+                scope: .recent(withinDays: days), states: states
             )
             // A window with nothing in it is dropped rather than shown as
             // zero: it is a slice of time, not a category, and an empty slice
             // is not a thing you can start.
-            guard !queue.isEmpty else { return nil }
-            return HomeEntry(
-                id: "recent-\(days.map(String.init) ?? "all")", label: label,
-                count: queue.count, scope: .recent(withinDays: days)
-            )
+            return row.sessionSize == 0 ? nil : row
         }
         return HomeSection(
             id: "recent", label: "按最近刷",
