@@ -111,6 +111,8 @@ struct RootView: View {
                 HomeView(
                     problemCount: state.problems.count,
                     totalReviews: state.totalReviews,
+                    reviewsToday: state.reviewsToday,
+                    newlySolvedToday: state.newlySolvedToday,
                     streak: state.activityStreak,
                     cells: state.heatmapCells,
                     entries: state.homeEntries,

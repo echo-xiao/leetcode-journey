@@ -7,6 +7,7 @@
     "slow 含义：本题不涉及：没有原地覆盖或去重的写入动作，外层的 i 只是被固定的第一个加数下标，不是「下一个待写入位置」。",
     "停止条件：内层 j 扫到 nums 末尾（j = len(nums)-1）就停，外层 i 到 len(nums)-2 结束；一旦 nums[i]+nums[j]==target 立刻返回 [i, j] 提前结束，不存在两指针相遇的判定。"
    ],
+   "firstSolvedAt": 1753734385,
    "id": "1_two-sum",
    "number": 1,
    "pseudocode": [
@@ -62,6 +63,7 @@
     "指针关系：本题不涉及快慢指针，用的是l1、l2两个链表同步遍历相加，不存在步数差/速度差的关系",
     "停止条件：循环停止条件是l1和l2都遍历完且进位carry为0，不是fast/slow这种终止方式"
    ],
+   "firstSolvedAt": 1763398238,
    "id": "2_add-two-numbers",
    "number": 2,
    "pseudocode": [
@@ -142,6 +144,7 @@
     "出窗口时机：当res列表长度不等于去重后的集合长度（说明有重复字符）时，就不断删除res最前面的元素并left右移，直到窗口内无重复字符",
     "记结果时机：每次内层while结束、确保窗口内无重复字符后，用当前窗口长度right-left更新maxLen"
    ],
+   "firstSolvedAt": 1764272672,
    "id": "3_longest-substring-without-repeating-characters",
    "number": 3,
    "pseudocode": [
@@ -197,6 +200,7 @@
     "slow 含义：本题不涉及，因为本题是双指针相向收缩找最大容积，不是快慢指针原地覆盖数组的场景",
     "停止条件：当left < right时继续循环，也就是left和right相遇时停止"
    ],
+   "firstSolvedAt": 1780001059,
    "id": "11_container-with-most-water",
    "number": 11,
    "pseudocode": [
@@ -260,6 +264,7 @@
     "slow 含义：本题不涉及，本题是相向双指针求和问题，没有快慢指针写入数组的场景",
     "停止条件：right和left在同一个while循环里移动，停止条件是left小于right不成立即左右指针相遇或交叉时结束该轮内层循环"
    ],
+   "firstSolvedAt": 1779833099,
    "id": "15_3sum",
    "number": 15,
    "pseudocode": [
@@ -351,6 +356,7 @@
     "slow 含义：本题不涉及，因为这是左右指针夹逼问题，不是快慢指针同向遍历，没有慢指针写入位置的概念",
     "停止条件：right/left指针相遇即停（while left < right），左右指针相遇时该i对应的内层搜索结束，外层i继续遍历下一个数"
    ],
+   "firstSolvedAt": 1779844676,
    "id": "16_3sum-closest",
    "number": 16,
    "pseudocode": [
@@ -423,6 +429,7 @@
     "结束条件：index 等于 digits 的长度，说明每个数字都挑完了一个字母，把 path 转成字符串塞进 res 后返回；另外 digits 为空时直接返回空列表。",
     "撤销：递归回来后把刚加进 path 的那个字母 pop 掉，让 path 恢复到选它之前的长度（若用字符串拼接传参则天然无需手动撤销）。"
    ],
+   "firstSolvedAt": 1767131863,
    "id": "17_letter-combinations-of-a-phone-number",
    "number": 17,
    "pseudocode": [
@@ -486,6 +493,7 @@
     "slow 含义：本题不涉及，因为本题是相向双指针找组合，不是同向快慢指针做原地写入",
     "停止条件：内层while循环条件是left<right，两指针相遇（left>=right）就停止，外层i、j则遍历到n-1为止"
    ],
+   "firstSolvedAt": 1779999231,
    "id": "18_4sum",
    "number": 18,
    "pseudocode": [
@@ -557,6 +565,7 @@
     "指针关系：两个指针都从 dummy 出发，fast 先走 n 步，之后同速前进，始终让 fast 领先 slow 恰好 n 个节点，这样 slow 停下时正好停在待删节点的前一个。",
     "停止条件：当 fast.next == null 时停（fast 到达最后一个节点），此时 slow.next 就是倒数第 n 个，执行 slow.next = slow.next.next。"
    ],
+   "firstSolvedAt": 1763420523,
    "id": "19_remove-nth-node-from-end-of-list",
    "number": 19,
    "pseudocode": [
@@ -609,6 +618,7 @@
     "进出时机：遇到 '(' '[' '{' 就压栈；遇到 ')' ']' '}' 时看栈顶能不能配上，能配就弹出，栈空或配不上直接返回 False。",
     "剩余元素含义：结束后栈里剩的都是没被闭合的开括号，非空说明无效，只有空栈才返回 True。"
    ],
+   "firstSolvedAt": 1762708979,
    "id": "20_valid-parentheses",
    "number": 20,
    "pseudocode": [
@@ -684,6 +694,7 @@
     "指针关系：这题不是快慢指针，是 list1、list2 两条链各一个指针加一个 curr 尾指针：谁的值小就把谁接到 curr 后面并让那条链的指针后移，curr 始终指向已合并部分的最后一个节点。",
     "停止条件：当 list1 或 list2 任一为 null 时结束循环，然后把 curr.next 直接指向另一条还没走完的链表剩余部分。"
    ],
+   "firstSolvedAt": 1505304889,
    "id": "21_merge-two-sorted-lists",
    "number": 21,
    "pseudocode": [
@@ -736,6 +747,7 @@
     "结束条件：path 长度到 2*n 时说明 n 对括号都放完且一路合法，把它转成字符串塞进 res 然后 return。",
     "撤销：递归回来后把刚加的那个字符从 path 末尾删掉，left/right 因为是按参数传值的所以自动还原，不用手动改。"
    ],
+   "firstSolvedAt": 1767204425,
    "id": "22_generate-parentheses",
    "number": 22,
    "pseudocode": [
@@ -795,6 +807,7 @@
     "指针关系：不是快慢指针，而是三个挨着的指针：prev 是已处理部分的尾巴，first 和 second 是待交换的相邻两个（second = first.next），每轮交换完 prev 挪到 first，first 挪到原来的 nxt。",
     "停止条件：while second 不为空就继续，也就是当剩下不足两个节点（first 为空或 first.next 为空导致 second 为 None）时停下，剩的单个节点原样挂着不动。"
    ],
+   "firstSolvedAt": 1763528709,
    "id": "24_swap-nodes-in-pairs",
    "number": 24,
    "pseudocode": [
@@ -846,6 +859,7 @@
     "slow 含义：slow指向的是当前已确定的不重复区间的最后一个元素所在位置，也就是下一个新元素要写入的前一格",
     "停止条件：fast从0遍历到数组末尾，也就是fast越界（fast超过len(nums)-1）时停止"
    ],
+   "firstSolvedAt": 1753903925,
    "id": "26_remove-duplicates-from-sorted-array",
    "number": 26,
    "pseudocode": [
@@ -889,6 +903,7 @@
     "slow 含义：slow指向的是下一个要写入非val元素的位置，也就是新数组末尾的下一格",
     "停止条件：fast从0遍历到数组末尾，越界（fast超过数组长度-1）就停止"
    ],
+   "firstSolvedAt": 1753914792,
    "id": "27_remove-element",
    "number": 27,
    "pseudocode": [
@@ -949,6 +964,7 @@
     "判定条件：先判nums[mid]==target直接返回，再判nums[left]<=nums[mid]看左半是否有序，从而决定target落在左半还是右半有序区间里",
     "边界收缩：命中target直接返回mid；若左半[left,mid]有序且target在[nums[left],nums[mid])内则right=mid-1，否则left=mid+1；若右半有序且target在(nums[mid],nums[right]]内则left=mid+1，否则right=mid-1"
    ],
+   "firstSolvedAt": 1764868362,
    "id": "33_search-in-rotated-sorted-array",
    "number": 33,
    "pseudocode": [
@@ -1041,6 +1057,7 @@
     "判定条件：判定条件是 nums[mid] 与 target 的三种大小关系（等于、小于、大于），不是单调check函数",
     "边界收缩：nums[mid]<target时left=mid+1，nums[mid]>target时right=mid-1，nums[mid]==target时不直接返回，找左边界就收right=mid-1继续往左找，找右边界就收left=mid+1继续往右找，循环结束后再判断left或right位置是否等于target"
    ],
+   "firstSolvedAt": 1764873002,
    "id": "34_find-first-and-last-position-of-element-in-sorted-array",
    "number": 34,
    "pseudocode": [
@@ -1125,6 +1142,7 @@
     "判定条件：直接比较nums[m]和target是否相等，因为找的是具体数值的位置，不需要额外的check函数。",
     "边界收缩：nums[m]等于target时直接返回m；nums[m]大于target说明插入点在左边，r=m-1；nums[m]小于target说明插入点在右边，l=m+1；循环结束后l就是插入位置。"
    ],
+   "firstSolvedAt": 1756839378,
    "id": "35_search-insert-position",
    "number": 35,
    "pseudocode": [
@@ -1196,6 +1214,7 @@
     "枚举范围：枚举范围就是固定的9x9=81个格子各遍历一次，宫格编号用(r//3)*3+(c//3)计算，不存在可缩小的枚举空间",
     "数值边界：数值都是1-9的字符/数字，不涉及大数运算，不会溢出也不需要取模"
    ],
+   "firstSolvedAt": 1787259793,
    "id": "36_valid-sudoku",
    "number": 36,
    "pseudocode": [
@@ -1272,6 +1291,7 @@
     "结束条件：target减到0时把path加入结果集并返回，target小于0时直接返回不再往下搜",
     "撤销：递归调用结束后把path末尾刚加进去的那个候选数弹出，把target恢复成加这个数之前的状态"
    ],
+   "firstSolvedAt": 1767307420,
    "id": "39_combination-sum",
    "number": 39,
    "pseudocode": [
@@ -1332,6 +1352,7 @@
     "结束条件：target等于0时把path加入res并返回，target小于0时直接返回不再往下搜",
     "撤销：递归调用结束后把刚加入path的元素弹出，回到调用前的状态，方便尝试下一个选择"
    ],
+   "firstSolvedAt": 1767309323,
    "id": "40_combination-sum-ii",
    "number": 40,
    "pseudocode": [
@@ -1375,6 +1396,7 @@
     "slow 含义：本题不涉及快慢指针，因为解法是相向双指针，不存在写入位置的slow指针",
     "停止条件：循环条件是left < right，当左右指针相遇时停止"
    ],
+   "firstSolvedAt": 1787444381,
    "id": "42_trapping-rain-water",
    "number": 42,
    "pseudocode": [
@@ -1442,7 +1464,7 @@
      "name": "solution_2.py"
     }
    ],
-   "solvedAt": 1787449061,
+   "solvedAt": 1787518660,
    "statement": "给定 n 个非负整数表示每个宽度为 1 的柱子的高度图，计算按此排列的柱子，下雨之后能接多少雨水。\n\n示例 1：\n\n输入：height = [0,1,0,2,1,0,1,3,2,1,2,1]\n输出：6\n解释：上面是由数组 [0,1,0,2,1,0,1,3,2,1,2,1] 表示的高度图，在这种情况下，可以接 6 个单位的雨水（蓝色部分表示雨水）。\n\n示例 2：\n\n输入：height = [4,2,0,3,2,5]\n输出：9",
    "technique": "数组双指针",
    "title": "42. 接雨水"
@@ -1455,6 +1477,7 @@
     "结束条件：path的长度等于nums的长度，此时把path的副本加入结果res",
     "撤销：把path末尾刚加进去的数字弹出，并把对应的used[i]重新置为False"
    ],
+   "firstSolvedAt": 1767368965,
    "id": "46_permutations",
    "number": 46,
    "pseudocode": [
@@ -1515,6 +1538,7 @@
     "结束条件：path的长度等于nums的长度，说明所有数都排完了，把path复制一份加入res",
     "撤销：把path末尾刚加的元素弹出，并把对应位置的used[i]重新设为False，还原成没选这个数的状态"
    ],
+   "firstSolvedAt": 1767373118,
    "id": "47_permutations-ii",
    "number": 47,
    "pseudocode": [
@@ -1562,6 +1586,7 @@
     "枚举范围：本题不涉及枚举缩放范围，因为不是在数值区间里搜索，而是遍历一遍字符串数组和每个字符串内部字符即可，没有sqrt(n)或质因数分解这类优化点。",
     "数值边界：本题不涉及数值溢出或取模，因为处理的是字符串排序或字符计数，没有大数运算，计数最多也就是字符串长度这种量级，不会溢出。"
    ],
+   "firstSolvedAt": 1787256833,
    "id": "49_group-anagrams",
    "number": 49,
    "pseudocode": [
@@ -1637,6 +1662,7 @@
     "指针关系：本题不是fast/slow双指针，而是先算出链表长度cnt和旋转步数r，让指针走cnt-r步定位新的断点",
     "停止条件：停止条件是走过的步数l减到0，即prev和head一起移动cnt-r次后停止，而不是判断fast是否为空"
    ],
+   "firstSolvedAt": 1763572202,
    "id": "61_rotate-list",
    "number": 61,
    "pseudocode": [
@@ -1681,6 +1707,7 @@
     "判定条件：判定条件是mid*mid和x比较：相等直接就是答案，大于说明mid偏大，小于说明mid可能是答案但还要往右找更大的",
     "边界收缩：mid*mid==x时直接返回mid；mid*mid>x时right=mid-1；mid*mid<x时先把res记为mid（因为要的是不超过x的最大整数，mid是候选答案）再left=mid+1继续找更大的"
    ],
+   "firstSolvedAt": 1756918888,
    "id": "69_sqrtx",
    "number": 69,
    "pseudocode": [
@@ -1754,6 +1781,7 @@
     "base case：n等于1时返回1，n等于2时返回2",
     "遍历顺序：从小到大计算，先算出dp[n-1]和dp[n-2]再算dp[n]，本题用递归加记忆化实现，本质上是从下往上填表"
    ],
+   "firstSolvedAt": 1761712958,
    "id": "70_climbing-stairs",
    "number": 70,
    "pseudocode": [
@@ -1802,6 +1830,7 @@
     "判定条件：判定条件是mid映射回二维坐标(row=mid/n, col=mid%n)后matrix[row][col]和target是否相等",
     "边界收缩：midVal==target直接返回True，midVal>target说明target在左边把right=mid-1，midVal<target说明target在右边把left=mid+1"
    ],
+   "firstSolvedAt": 1764875932,
    "id": "74_search-a-2d-matrix",
    "number": 74,
    "pseudocode": [
@@ -1854,6 +1883,7 @@
     "结束条件：当path的长度等于k时，把path的副本加入结果集res并返回",
     "撤销：递归调用结束后把刚加入path的num弹出，恢复path到调用前的状态"
    ],
+   "firstSolvedAt": 1767379301,
    "id": "77_combinations",
    "number": 77,
    "pseudocode": [
@@ -1914,6 +1944,7 @@
     "结束条件：没有显式的结束条件，因为每个path状态本身都是一个合法子集，所以每次进入dfs就直接把path加入res，start超出数组长度时循环自然不执行直接返回",
     "撤销：撤销的是path的最后一个元素，即把刚加进path的nums[i]弹出，恢复到递归前的路径状态"
    ],
+   "firstSolvedAt": 1767385266,
    "id": "78_subsets",
    "number": 78,
    "pseudocode": [
@@ -1966,6 +1997,7 @@
     "结束条件：结束条件是idx等于word长度说明整个单词都匹配上了返回True，或者当前格子越界/字符不匹配/已访问返回False",
     "撤销：撤销的是把board[r][c]从标记的'#'还原成保存的临时变量tmp原始字符，让这个格子在其他路径里能再次被使用"
    ],
+   "firstSolvedAt": 1767472976,
    "id": "79_word-search",
    "number": 79,
    "pseudocode": [
@@ -2018,6 +2050,7 @@
     "判定条件：先判断nums[mid]==target直接返回true；再判断nums[left]==nums[mid]时无法判断哪边有序就left+=1缩小重复；否则判断左半部分[nums[left],nums[mid])还是右半部分(nums[mid],nums[right]]是有序的，再看target是否落在有序那段里",
     "边界收缩：命中target直接返回true；如果左边有序且target在[nums[left],nums[mid])内则right=mid-1，否则left=mid+1；如果右边有序且target在(nums[mid],nums[right]]内则left=mid+1，否则right=mid-1；遇到nums[left]==nums[mid]时无法判断有序性就left+=1去重复元素"
    ],
+   "firstSolvedAt": 1764884280,
    "id": "81_search-in-rotated-sorted-array-ii",
    "number": 81,
    "pseudocode": [
@@ -2109,6 +2142,7 @@
     "指针关系：这里不是快慢指针，而是prev和curr两个指针，prev始终指向最后一个确认不重复的节点，curr用来向前探测和当前节点值相同的重复节点",
     "停止条件：当curr为空或curr.next为空时停止外层遍历，内层跳过重复节点的循环在curr.next为空或curr.val不等于curr.next.val时停止"
    ],
+   "firstSolvedAt": 1763492728,
    "id": "82_remove-duplicates-from-sorted-list-ii",
    "number": 82,
    "pseudocode": [
@@ -2172,6 +2206,7 @@
     "指针关系：这里不是快慢指针追赶关系，而是当前节点cur和cur.next做值比较，相等就把cur.next跳过去指向cur.next.next，不相等cur才前移",
     "停止条件：当cur为空或cur.next为空时停止遍历，因为此时没有下一个节点可比较了"
    ],
+   "firstSolvedAt": 1753136601,
    "id": "83_remove-duplicates-from-sorted-list",
    "number": 83,
    "pseudocode": [
@@ -2231,6 +2266,7 @@
     "指针关系：本题不涉及快慢指针的步数/速度关系，只用less和greater两个指针各自在自己的链表末尾追加节点",
     "停止条件：停止条件是curr遍历到原链表末尾（curr为null），然后把less的next接到greaterDummy.next完成合并"
    ],
+   "firstSolvedAt": 1763577052,
    "id": "86_partition-list",
    "number": 86,
    "pseudocode": [
@@ -2286,6 +2322,7 @@
     "slow 含义：本题不涉及slow指针，因为不是同向快慢指针场景，而是两个数组各自从末尾往前移动的指针",
     "停止条件：当p1<0或p2<0时停止主循环（其中一个数组比完了），如果p2还有剩余（p2>=0）就继续把nums2剩下的元素抄到nums1前面，直到p2<0"
    ],
+   "firstSolvedAt": 1600689542,
    "id": "88_merge-sorted-array",
    "number": 88,
    "pseudocode": [
@@ -2338,6 +2375,7 @@
     "结束条件：结束条件是res的长度达到cnt=2^n，说明已经生成了完整的格雷编码序列",
     "撤销：撤销的是把本次加入的nxt从res末尾弹出，并把nxt从visited集合中删除，恢复到选择前的状态"
    ],
+   "firstSolvedAt": 1767554817,
    "id": "89_gray-code",
    "number": 89,
    "pseudocode": [
@@ -2390,6 +2428,7 @@
     "结束条件：没有显式的结束条件，每次进入dfs都先把当前path加入res，遍历完idx到末尾就自然返回（没有硬性终止判断，靠for循环遍历完退出）",
     "撤销：撤销的是path末尾刚加入的那个元素，把它pop掉，恢复到递归前的路径状态"
    ],
+   "firstSolvedAt": 1767557517,
    "id": "90_subsets-ii",
    "number": 90,
    "pseudocode": [
@@ -2433,6 +2472,7 @@
     "指针关系：本题不涉及快慢指针，用的是prev和curr两个指针做头插法反转，curr始终指向待反转区间的第一个未处理节点，prev固定指向反转区间前一个节点",
     "停止条件：不是fast/slow停止模式，而是用计数器循环right-left次（或统计cnt从left到right），循环结束条件是已经处理完right-left+1个节点"
    ],
+   "firstSolvedAt": 1763580191,
    "id": "92_reverse-linked-list-ii",
    "number": 92,
    "pseudocode": [
@@ -2493,6 +2533,7 @@
     "结束条件：path长度达到4段且start正好等于s的总长度时，说明4段刚好用完整个字符串，拼成IP加入结果；若path到4段但start没到末尾则直接返回不记录",
     "撤销：撤销的是path中最后加入的那个分段字符串（path.pop()），把状态还原到选这个分段之前，方便尝试下一个不同长度的分段"
    ],
+   "firstSolvedAt": 1767561460,
    "id": "93_restore-ip-addresses",
    "number": 93,
    "pseudocode": [
@@ -2545,6 +2586,7 @@
     "单层主体：对当前node：先递归处理左子树，再把node.val加入res，再递归处理右子树，左右子树内部已经各自处理好自己的中序结果",
     "代码位置：处理当前节点值（加入res）的代码写在递归左子树之后、递归右子树之前，也就是中序位置"
    ],
+   "firstSolvedAt": 1760057946,
    "id": "94_binary-tree-inorder-traversal",
    "number": 94,
    "pseudocode": [
@@ -2618,6 +2660,7 @@
     "base case：base case是dp[0]=[None]，表示0个节点时子树为空",
     "遍历顺序：按照子树长度length从1到n从小到大遍历，因为构建长度为length的树需要用到更短的dp[j-1]和dp[length-j]，必须先算完短的"
    ],
+   "firstSolvedAt": 1765906706,
    "id": "95_unique-binary-search-trees-ii",
    "number": 95,
    "pseudocode": [
@@ -2711,6 +2754,7 @@
     "base case：dp[0]=1（空树算一种），dp[1]=1（一个节点只有一种树）",
     "遍历顺序：从小到大遍历i（从2到n），因为算dp[i]要用到dp[j-1]和dp[i-j]这些更小的子问题，必须先算完"
    ],
+   "firstSolvedAt": 1765913874,
    "id": "96_unique-binary-search-trees",
    "number": 96,
    "pseudocode": [
@@ -2787,6 +2831,7 @@
     "单层主体：检查当前节点值是否大于下界且小于上界，不满足直接返回假；满足则往左子树传入(下界,当前值)，往右子树传入(当前值,上界)继续验证，两边都为真才算对",
     "代码位置：前序位置：先判断当前节点值是否越界（不满足直接返回假），再递归左右子树；中序遍历法则是把比较逻辑放在中序位置（左子树递归完之后、递归右子树之前，比较prev和当前值）"
    ],
+   "firstSolvedAt": 1765920984,
    "id": "98_validate-binary-search-tree",
    "number": 98,
    "pseudocode": [
@@ -2899,6 +2944,7 @@
     "单层主体：先递归处理左子树，然后比较prev和当前node的值，如果prev大于node说明出现逆序，第一次出现就记录first为prev，每次出现都把second更新为node，最后把prev设为当前node，再递归处理右子树",
     "代码位置：主体代码写在中序位置（左子树递归之后、右子树递归之前），因为要利用中序遍历下有序性来判断逆序对"
    ],
+   "firstSolvedAt": 1766003765,
    "id": "99_recover-binary-search-tree",
    "number": 99,
    "pseudocode": [
@@ -2971,6 +3017,7 @@
     "单层主体：当前节点都非空时先比 p.val 和 q.val，不等直接 False，相等就要求左对左、右对右两次递归都为 True。",
     "代码位置：前序位置：先比当前两个节点的值，再往下递归左右孩子，最后把两个子结果用与连接返回。"
    ],
+   "firstSolvedAt": 1760061593,
    "id": "100_same-tree",
    "number": 100,
    "pseudocode": [
@@ -3035,6 +3082,7 @@
     "单层主体：当前这一对节点值相等的前提下，交叉递归比较：isMirror(p.left, q.right) 和 isMirror(p.right, q.left) 都为真才返回真。",
     "代码位置：前序位置：先在当前层比较 p、q 的值和空情况，再往下递归两对子树。"
    ],
+   "firstSolvedAt": 1760063224,
    "id": "101_symmetric-tree",
    "number": 101,
    "pseudocode": [
@@ -3087,6 +3135,7 @@
     "单层主体：看当前节点：如果 level 等于 res 的长度说明这层第一次到，先 append 一个空列表，然后把 node.val 放进 res[level]，再拿 level+1 去递归左右孩子。",
     "代码位置：写在前序位置——必须先把当前节点的值记进本层，再往下递归，这样同一层的值才是从左到右的顺序。"
    ],
+   "firstSolvedAt": 1763874996,
    "id": "102_binary-tree-level-order-traversal",
    "number": 102,
    "pseudocode": [
@@ -3151,6 +3200,7 @@
     "单层主体：当前节点只做两件事：若 res 长度等于 level 就先新开一个空双端队列，然后按 level 偶数从队尾 append、奇数从队头 appendleft 把 node.val 放进 res[level]，再带 level+1 递归左右孩子。",
     "代码位置：写在前序位置——必须先把当前节点值按层放好再往下递归，这样同层节点的插入顺序才是从左到右，锯齿反转才正确。"
    ],
+   "firstSolvedAt": 1766009506,
    "id": "103_binary-tree-zigzag-level-order-traversal",
    "number": 103,
    "pseudocode": [
@@ -3219,6 +3269,7 @@
     "单层主体：当前节点只做一件事：拿到左右子树深度后取较大值再加 1（加上自己这一层）。",
     "代码位置：写在后序位置，必须先递归算完左右子树深度才能算当前节点的深度；若换成辅助函数带 depth 往下传的写法，则是在前序位置更新全局 ans。"
    ],
+   "firstSolvedAt": 1760113124,
    "id": "104_maximum-depth-of-binary-tree",
    "number": 104,
    "pseudocode": [
@@ -3283,6 +3334,7 @@
     "单层主体：拿 preorder[0] 当根建节点，在 inorder 里找到它的下标 midIdx，左边 midIdx 个元素配 preorder[1:1+midIdx] 建左子树，右边剩下的配 preorder[1+midIdx:] 建右子树，挂上后返回根。",
     "代码位置：前序位置——先用 preorder 首元素造出根节点再往下递归，左右子树返回值挂到 root.left/right 上即可，不需要后序汇总。"
    ],
+   "firstSolvedAt": 1766082633,
    "id": "105_construct-binary-tree-from-preorder-and-inorder-traversal",
    "number": 105,
    "pseudocode": [
@@ -3359,6 +3411,7 @@
     "单层主体：取后序最后一个元素当根值建根节点，在中序里找到它的下标 i，用 i 把中序切成左右两段、并按左子树长度 i 把后序切成左段和右段（去掉最后那个根），分别递归接到 root.left 和 root.right。",
     "代码位置：前序位置——先根据后序末尾建出根节点并切分区间，再去递归左右子树，最后返回 root。"
    ],
+   "firstSolvedAt": 1766088464,
    "id": "106_construct-binary-tree-from-inorder-and-postorder-traversal",
    "number": 106,
    "pseudocode": [
@@ -3411,6 +3464,7 @@
     "单层主体：取出当前队列长度作为这一层的节点数，把这批节点依次弹出、值收进 vals，同时把它们的非空左右孩子按序入队，循环结束把 vals 追加到 ans。",
     "代码位置：本题不涉及前中后序，因为是队列层序遍历；唯一类似的处理是全部层收集完后把 ans 整体反转再返回。"
    ],
+   "firstSolvedAt": 1766164622,
    "id": "107_binary-tree-level-order-traversal-ii",
    "number": 107,
    "pseudocode": [
@@ -3459,6 +3513,7 @@
     "单层主体：取 mid=(left+right)//2，用 nums[mid] 新建根节点，然后把 build(left,mid-1) 挂到 root.left、build(mid+1,right) 挂到 root.right，返回 root。",
     "代码位置：前序位置：先建当前根节点再递归造左右子树（若用索引模拟中序那种写法，则是先递归左、再取值建根、再递归右的中序位置）。"
    ],
+   "firstSolvedAt": 1756762739,
    "id": "108_convert-sorted-array-to-binary-search-tree",
    "number": 108,
    "pseudocode": [
@@ -3527,6 +3582,7 @@
     "单层主体：快慢指针找到这段链表中点 slow 当根，在 prev 处把链表切断，然后左半段递归给 root.left、slow.next 那段递归给 root.right，返回 root。",
     "代码位置：快慢指针法是前序（先定根再递归左右）；全局指针法必须中序——先建完左子树，再用当前 curr.val 建根并把 curr 后移，最后建右子树。"
    ],
+   "firstSolvedAt": 1763595236,
    "id": "109_convert-sorted-list-to-binary-search-tree",
    "number": 109,
    "pseudocode": [
@@ -3639,6 +3695,7 @@
     "单层主体：拿到左右子树高度后，先看有没有 -1，再看 abs(left-right) 是否大于 1，任一成立就返回 -1，否则返回 max(left,right)+1。",
     "代码位置：后序位置，必须先把左右子树高度都算出来才能判断当前节点是否平衡。"
    ],
+   "firstSolvedAt": 1760241310,
    "id": "110_balanced-binary-tree",
    "number": 110,
    "pseudocode": [
@@ -3683,6 +3740,7 @@
     "单层主体：拿到左右子树的最小深度后，若某一侧为空就只用另一侧的值加 1，两侧都有才取 min(左,右)+1。",
     "代码位置：后序位置——必须先算完左右子树的深度，才能在回来时合并加 1。"
    ],
+   "firstSolvedAt": 1760308812,
    "id": "111_minimum-depth-of-binary-tree",
    "number": 111,
    "pseudocode": [
@@ -3763,6 +3821,7 @@
     "单层主体：当前节点先把自己的值从目标里扣掉得到 sumVal = targetSum - root.val，若是叶子就看 sumVal 是否为 0，否则把 sumVal 传给左右子树，左右任一返回 true 就 true。",
     "代码位置：前序位置：先扣掉当前节点值再往下递归，返回时只做左右结果的或运算，不需要后序额外处理。"
    ],
+   "firstSolvedAt": 1760291526,
    "id": "112_path-sum",
    "number": 112,
    "pseudocode": [
@@ -3843,6 +3902,7 @@
     "单层主体：把 node.val 压进 path，判断如果是叶子节点且 rest == node.val 就把 path 的拷贝存进 res，然后分别用 rest - node.val 递归左右孩子，最后弹出 path 末尾元素回溯。",
     "代码位置：加入 path 和叶子判断写在前序位置（进入节点就做），从 path 弹出节点写在后序位置（左右都递归完再撤销）。"
    ],
+   "firstSolvedAt": 1766188325,
    "id": "113_path-sum-ii",
    "number": 113,
    "pseudocode": [
@@ -3907,6 +3967,7 @@
     "单层主体：假设左右子树都已经被拉成链表了，当前节点只做三件事：root.right = prev、root.left = null、prev = root。",
     "代码位置：写在后序位置，而且递归顺序要反过来先右再左（右→左→处理自己），这样 prev 始终是前序序列里紧跟在 root 后面的那个节点。"
    ],
+   "firstSolvedAt": 1763598998,
    "id": "114_flatten-binary-tree-to-linked-list",
    "number": 114,
    "pseudocode": [
@@ -4039,6 +4100,7 @@
     "单层主体：只做两件连接：root.left.next = root.right；若 root.next 存在，则 root.right.next = root.next.left；然后递归左右孩子。",
     "代码位置：前序位置——先把当前层的两条 next 连好，再往下递归，因为右子树需要父层的 next 已经就位。"
    ],
+   "firstSolvedAt": 1763667324,
    "id": "116_populating-next-right-pointers-in-each-node",
    "number": 116,
    "pseudocode": [
@@ -4123,6 +4185,7 @@
     "单层主体：当前节点已经有正确的 next：顺着 root.next 往右扫兄弟节点，找到第一个有左孩子或右孩子的节点，把那个孩子记为 nxt；然后 root.right.next = nxt，root.left.next = root.right（没有 right 就指 nxt）。",
     "代码位置：前序位置——必须先把当前层两个孩子的 next 连好，再递归；而且要先递归右子树后递归左子树，保证进入左子树时右边的 next 链已经就绪。"
    ],
+   "firstSolvedAt": 1763676379,
    "id": "117_populating-next-right-pointers-in-each-node-ii",
    "number": 117,
    "pseudocode": [
@@ -4212,6 +4275,7 @@
     "base case：dp[0] = [1]（第一行只有一个 1），并且每行的首尾 dp[i][0] = dp[i][i] = 1。",
     "遍历顺序：行从上往下 i 从 1 到 numRows-1，每行内 j 从左到右，这样算 dp[i][j] 时上一行 dp[i-1][j-1] 和 dp[i-1][j] 已经算好了。"
    ],
+   "firstSolvedAt": 1761763267,
    "id": "118_pascals-triangle",
    "number": 118,
    "pseudocode": [
@@ -4273,6 +4337,7 @@
     "base case：rowIndex 为 0 时返回 [1]，为 1 时返回 [1,1]。",
     "遍历顺序：从第 0 行往下逐行推到第 rowIndex 行（递归解法是先递归到底再回溯着往上拼），算第 i 行时第 i-1 行必须已经算好；若用一维数组原地更新，行内要从右往左倒着写。"
    ],
+   "firstSolvedAt": 1761765782,
    "id": "119_pascals-triangle-ii",
    "number": 119,
    "pseudocode": [
@@ -4318,6 +4383,7 @@
     "base case：minPrice 初始为正无穷、maxProfit 初始为 0（不交易就是 0 利润）；递归里 i 越过数组末尾时返回 0。",
     "遍历顺序：从左到右按天数 i=0 到 n-1 遍历一次，因为第 i 天的利润依赖的是它前面所有天的最低价。"
    ],
+   "firstSolvedAt": 1761780788,
    "id": "121_best-time-to-buy-and-sell-stock",
    "number": 121,
    "pseudocode": [
@@ -4373,7 +4439,7 @@
      "name": "solution_5.py"
     }
    ],
-   "solvedAt": 1762287809,
+   "solvedAt": 1787521801,
    "statement": "给定一个数组 prices ，它的第 i 个元素 prices[i] 表示一支给定股票第 i 天的价格。\n\n你只能选择 某一天 买入这只股票，并选择在 未来的某一个不同的日子 卖出该股票。设计一个算法来计算你所能获取的最大利润。\n\n返回你可以从这笔交易中获取的最大利润。如果你不能获取任何利润，返回 0 。\n\n示例 1：\n\n输入：[7,1,5,3,6,4]\n输出：5\n解释：在第 2 天（股票价格 = 1）的时候买入，在第 5 天（股票价格 = 6）的时候卖出，最大利润 = 6-1 = 5 。\n注意利润不能是 7-1 = 6, 因为卖出价格需要大于买入价格；同时，你不能在买入前卖出股票。\n\n示例 2：\n\n输入：prices = [7,6,4,3,1]\n输出：0\n解释：在这种情况下, 没有交易完成, 所以最大利润为 0。",
    "technique": "动态规划",
    "title": "121. 买卖股票的最佳时机"
@@ -4385,6 +4451,7 @@
     "slow 含义：本题不涉及，因为本题不是快慢指针场景，不存在原地写入数组的操作",
     "停止条件：当left>=right时停止，也就是左右指针相遇或交错时结束比较，此时若中途没发现字符不等就返回True"
    ],
+   "firstSolvedAt": 1787261413,
    "id": "125_valid-palindrome",
    "number": 125,
    "pseudocode": [
@@ -4456,6 +4523,7 @@
     "枚举范围：只需遍历去重后的集合（用set存num），且只对满足num-1不在集合中的num做向后扩展（查num+1,num+2...），不是起点的数字直接跳过，不用每个数都往后扫。",
     "数值边界：数组元素是int范围内的普通整数，长度和count都是普通计数，不会溢出也不需要取模，本题不涉及边界处理问题。"
    ],
+   "firstSolvedAt": 1787173383,
    "id": "128_longest-consecutive-sequence",
    "number": 128,
    "pseudocode": [
@@ -4552,6 +4620,7 @@
     "单层主体：先把 currSum 更新成 currSum*10+node.val，若左右子节点都为空说明是叶子直接返回这个数，否则把左右子树的返回值加起来返回。",
     "代码位置：累积数字和叶子判断写在前序位置（进入节点、递归子树之前），左右结果相加算在后序位置。"
    ],
+   "firstSolvedAt": 1766440848,
    "id": "129_sum-root-to-leaf-numbers",
    "number": 129,
    "pseudocode": [
@@ -4620,6 +4689,7 @@
     "结束条件：start 等于 s 的长度，说明整个字符串都切完了，把 path 的拷贝放进 res 然后返回。",
     "撤销：递归回来后把刚加进 path 的那段子串 pop 掉，让 path 回到加它之前的样子，好去试下一个更长的切法。"
    ],
+   "firstSolvedAt": 1767654995,
    "id": "131_palindrome-partitioning",
    "number": 131,
    "pseudocode": [
@@ -4672,6 +4742,7 @@
     "单层主体：先 new 一个值等于 curr.val 的 cloneNode 并立刻登记 visited[curr]=cloneNode，然后遍历 curr.neighbors，把每个邻居递归克隆的结果 append 到 cloneNode.neighbors。",
     "代码位置：前序位置：必须先建好克隆节点并写进哈希表，再去递归邻居，否则遇到环会无限递归。"
    ],
+   "firstSolvedAt": 1768242423,
    "id": "133_clone-graph",
    "number": 133,
    "pseudocode": [
@@ -4759,6 +4830,7 @@
     "指针关系：本题不涉及快慢指针的步数差：两次遍历都是一个 curr 单步走，两趟之间的关系靠哈希表 oldNode 把原节点映射到新节点，而不是靠指针间距。",
     "停止条件：两次遍历都是 while curr != null 时走完整条链，遍历中对 curr.next / curr.random 判空后才去哈希表取对应新节点，最后返回 oldNode[head]（head 为空直接返回空）。"
    ],
+   "firstSolvedAt": 1763679552,
    "id": "138_copy-list-with-random-pointer",
    "number": 138,
    "pseudocode": [
@@ -4802,6 +4874,7 @@
     "指针关系：速度差：slow 每次走 1 步（slow = slow.next），fast 每次走 2 步（fast = fast.next.next），有环时 fast 每轮相对 slow 靠近 1 步，必定追上",
     "停止条件：while fast 且 fast.next 都不为空才继续走（走两步要保证这两个都在），一旦 fast 或 fast.next 为 null 说明到头无环返回 False；循环里 slow == fast 就返回 True"
    ],
+   "firstSolvedAt": 1753204455,
    "id": "141_linked-list-cycle",
    "number": 141,
    "pseudocode": [
@@ -4853,6 +4926,7 @@
     "指针关系：第一阶段 fast 每次两步、slow 每次一步（速度差 2:1）；相遇后把 fast 拨回 head，两者改成同速一步一步走，再次相遇处就是入口。",
     "停止条件：第一阶段循环条件是 fast != null && fast.next != null，一旦不满足说明到尾了、无环返回 null；第二阶段停在 slow == fast。"
    ],
+   "firstSolvedAt": 1763743636,
    "id": "142_linked-list-cycle-ii",
    "number": 142,
    "pseudocode": [
@@ -4900,6 +4974,7 @@
     "指针关系：fast 每轮走两步、slow 走一步，保持 fast 的步数是 slow 的两倍，这样 fast 到尾时 slow 正好停在前半段的最后一个节点上，slow.next 就是后半段的头，然后 slow.next=None 把两段断开。",
     "停止条件：循环条件是 fast 和 fast.next 都不为空，即 fast 走到最后一个节点（奇数长度）或走到空（偶数长度）就停；之后合并阶段的停止条件是 lst1 或 lst2 有一个为空。"
    ],
+   "firstSolvedAt": 1763510824,
    "id": "143_reorder-list",
    "number": 143,
    "pseudocode": [
@@ -4952,6 +5027,7 @@
     "单层主体：当前节点只做一件事：把 node.val 塞进 res，然后交给左子树、右子树各自去填自己的部分。",
     "代码位置：写在前序位置——先 res.add(node.val)，再递归 left，最后递归 right；迭代版对应压栈时先压 right 后压 left。"
    ],
+   "firstSolvedAt": 1760216482,
    "id": "144_binary-tree-preorder-traversal",
    "number": 144,
    "pseudocode": [
@@ -5032,6 +5108,7 @@
     "单层主体：当前节点只做一件事——把自己的 val 加到 res 末尾，左右子树的结果由两次递归调用保证已经排在前面。",
     "代码位置：写在后序位置：先 traverse(node.left) 再 traverse(node.right)，最后才 res.append(node.val)。"
    ],
+   "firstSolvedAt": 1760216625,
    "id": "145_binary-tree-postorder-traversal",
    "number": 145,
    "pseudocode": [
@@ -5116,6 +5193,7 @@
     "进出时机：get 命中或 put 更新旧键时：先 remove 该节点再 add 到头部；put 新键：新节点直接插头部并登记哈希表；只有当哈希表大小超过 capacity 时才从 tail 前一个节点出队并同步删哈希表条目。",
     "剩余元素含义：本题不涉及——这是常驻的数据结构，没有「循环结束」，链表任何时刻从头到尾就是从最近使用到最久未使用的排序。"
    ],
+   "firstSolvedAt": 1763748749,
    "id": "146_lru-cache",
    "number": 146,
    "pseudocode": [
@@ -5191,6 +5269,7 @@
     "指针关系：不是快慢指针，而是 curr 指向待插入节点、prev 从 dummy 起在已排序段里往后扫找插入点，另外还要先用 nxt 存住 curr.next 防止断链。",
     "停止条件：内层 prev 在 prev.next 为空或 prev.next.val >= curr.val 时停下就地插入；外层 curr 走到 null（原链表遍历完）整个排序结束。"
    ],
+   "firstSolvedAt": 1763768994,
    "id": "147_insertion-sort-list",
    "number": 147,
    "pseudocode": [
@@ -5242,6 +5321,7 @@
     "指针关系：slow 一次一步、fast 一次两步，速度差 2:1；关键是让 slow 停在左半段的最后一个节点（比如 fast 从 head.next 起跑，或另存一个 prev 记住 slow 前一个），这样才能 slow.next=null 把链表真正切成两段。",
     "停止条件：fast 从 head.next 出发时，循环条件是 fast != null && fast.next != null，跳出时 slow 正好是左半段末尾；只有两个节点时切成 1+1，保证递归能缩小规模不死循环。合并那步的停止条件是 left 或 right 有一个走到 null，剩下的一截直接整条接到 curr.next。"
    ],
+   "firstSolvedAt": 1763766702,
    "id": "148_sort-list",
    "number": 148,
    "pseudocode": [
@@ -5286,6 +5366,7 @@
     "进出时机：遇到非空格字符时把字符累加到临时变量tmp里，遇到空格且tmp非空时把tmp作为一个单词存入lst并清空tmp，这就是'进'的时机；本题没有'出'的操作，只在最后统一反转lst并拼接",
     "剩余元素含义：循环结束后lst里保存的是原字符串中按顺序切分出的所有单词，最后把这个列表整体反转再拼接就是答案，不存在中间剩余未处理的元素"
    ],
+   "firstSolvedAt": 1785179677,
    "id": "151_reverse-words-in-a-string",
    "number": 151,
    "pseudocode": [
@@ -5374,6 +5455,7 @@
     "判定条件：不是找等于某个 target，而是拿 nums[mid] 和右端 nums[right] 比大小：mid 比右端小说明 mid 落在后半段（含最小值的那段），mid 比右端大说明最小值在 mid 右边。",
     "边界收缩：nums[mid] < nums[right] 时 right = mid（mid 可能就是最小值，不能跳过）；nums[mid] > nums[right] 时 left = mid + 1（mid 肯定不是最小值）；相等（有重复元素时）就 right -= 1 保守缩一格，本题无重复所以不会出现，全程不提前返回，循环结束后返回 nums[left]。"
    ],
+   "firstSolvedAt": 1764888438,
    "id": "153_find-minimum-in-rotated-sorted-array",
    "number": 153,
    "pseudocode": [
@@ -5434,6 +5516,7 @@
     "判定条件：不是找 target，而是拿 nums[mid] 跟右端点 nums[right] 比，判断 mid 落在哪一段。",
     "边界收缩：nums[mid] > nums[right] 说明最小值在右半，left = mid+1；nums[mid] < nums[right] 说明 mid 可能就是最小值，right = mid；相等时无法判断，只能 right-- 丢掉一个重复的右端点；全程不提前返回，最后返回 nums[left]。"
    ],
+   "firstSolvedAt": 1765400582,
    "id": "154_find-minimum-in-rotated-sorted-array-ii",
    "number": 154,
    "pseudocode": [
@@ -5494,6 +5577,7 @@
     "单层主体：假设左子树已经翻好了，当前节点只做三件事：让 root.left.left = root.right，root.left.right = root，然后把 root.left 和 root.right 都置空。",
     "代码位置：后序位置——必须先递归拿到 newRoot，再改当前节点的左右指针，否则指针一改就找不到原来的左孩子链了。"
    ],
+   "firstSolvedAt": 1766445629,
    "id": "156_binary-tree-upside-down",
    "number": 156,
    "pseudocode": [
@@ -5546,6 +5630,7 @@
     "出窗口时机：当窗口内不同字符数超过 2 种时才收缩：删掉 res 最前面的那个字符、left++，直到种类数回到 2 及以内（用哈希表时是把 s[left] 计数减 1，减到 0 就删掉这个 key）。",
     "记结果时机：每次收缩完、窗口重新合法后更新 maxLen = max(maxLen, right - left)（此处 right 已经自增过，所以窗口长度就是 right - left）。"
    ],
+   "firstSolvedAt": 1764282377,
    "id": "159_longest-substring-with-at-most-two-distinct-characters",
    "number": 159,
    "pseudocode": [
@@ -5589,6 +5674,7 @@
     "指针关系：两指针同速走，靠「走完自己再走对方」来抵消长度差：ptr1 走 A 再走 B、ptr2 走 B 再走 A，走到相交点时两者总步数相同，所以是路径长度相等的关系，不是快慢步差。",
     "停止条件：停止条件是 ptr1 == ptr2：要么在相交结点相遇返回该结点，要么两者同时走完 a+b 步都变成 None 返回 None（注意判空时是先切换到另一条链表头，切换只允许各做一次，靠 None 本身参与比较来保证不死循环）。"
    ],
+   "firstSolvedAt": 1753228347,
    "id": "160_intersection-of-two-linked-lists",
    "number": 160,
    "pseudocode": [
@@ -5637,6 +5723,7 @@
     "判定条件：不是比 target，而是比较 nums[mid] 和 nums[mid+1]，看当前是在上坡还是下坡。",
     "边界收缩：nums[mid] >= nums[mid+1]（下坡）时 right = mid，保留 mid 自己；否则（上坡）left = mid + 1；没有\"命中直接返回\"这一支，循环结束后返回 left。"
    ],
+   "firstSolvedAt": 1764889744,
    "id": "162_find-peak-element",
    "number": 162,
    "pseudocode": [
@@ -5684,6 +5771,7 @@
     "slow 含义：本题不涉及，因为这里不是原地覆盖/去重的快慢指针，没有「待写入位置」这回事。",
     "停止条件：当 left >= right（两指针相遇或交错）就停，循环条件写 left < right（写 <= 也行但同一个数不能用两次），中途只要 numbers[left]+numbers[right]==target 就直接返回 [left+1, right+1]，走完循环返回 [-1,-1]。"
    ],
+   "firstSolvedAt": 1764962901,
    "id": "167_two-sum-ii-input-array-is-sorted",
    "number": 167,
    "pseudocode": [
@@ -5739,6 +5827,7 @@
     "枚举范围：不用枚举候选值，只需从头到尾扫一遍 nums，用 candidate 和 cnt 两个变量边走边更新；分治法则是按下标 mid 不断二分递归。",
     "数值边界：cnt 最大只到 n，n≤5万级别不会溢出、也不用取模；只需注意 cnt 为 0 时必须换候选，以及题目保证多数元素存在，所以不用额外验证 candidate。"
    ],
+   "firstSolvedAt": 1756763697,
    "id": "169_majority-element",
    "number": 169,
    "pseudocode": [
@@ -5811,6 +5900,7 @@
     "进出时机：只有「进」没有「出」：每次 add(number) 就把该数字的计数加一，find 只读不删，所以不存在弹出时机。",
     "剩余元素含义：本题不涉及，哈希表里始终保存所有 add 过的数字及其次数，find 遍历结束返回 False 只说明没有配对，不代表有残留结构。"
    ],
+   "firstSolvedAt": 1754072503,
    "id": "170_two-sum-iii-data-structure-design",
    "number": 170,
    "pseudocode": [
@@ -5855,6 +5945,7 @@
     "单层主体：next() 里只做三件事：弹出栈顶节点 node，若它有右孩子就对右孩子调 _push_left，然后返回 node.val——左子树已经在之前压栈时处理完了。",
     "代码位置：中序：栈顶弹出即“访问当前节点”，弹出前左边全压完（左），弹出后再展开右子树（右），正好是左-根-右的迭代版。"
    ],
+   "firstSolvedAt": 1766514906,
    "id": "173_binary-search-tree-iterator",
    "number": 173,
    "pseudocode": [
@@ -5915,6 +6006,7 @@
     "出窗口时机：因为窗口定长，right 前进就等于 left 自动跟着前进一格，不需要显式的 left 收缩，也没有移出元素要维护的数据（每次直接按下标切出新子串）。",
     "记结果时机：当某个子串的计数从1变成2那一刻（即 dic[res]==1 又遇到它）把它加入 ans，保证每个重复子串只记一次。"
    ],
+   "firstSolvedAt": 1764285948,
    "id": "187_repeated-dna-sequences",
    "number": 187,
    "pseudocode": [
@@ -5962,6 +6054,7 @@
     "枚举范围：枚举范围固定就是 32 次循环（对应 32 个二进制位），不需要缩到 sqrt 也不看质因数，因为题目明确是 32 位无符号整数，位数写死。",
     "数值边界：输入输出都当 32 位无符号数看，不用取模；在 Java/C++ 里要注意右移用无符号右移（>>>）避免符号位填充，Python 里则要在最后与 0xFFFFFFFF 相与，别让结果超出 32 位。"
    ],
+   "firstSolvedAt": 1756833323,
    "id": "190_reverse-bits",
    "number": 190,
    "pseudocode": [
@@ -6017,6 +6110,7 @@
     "枚举范围：不需要遍历全部 32 位：位操作法只循环 1 的个数次（最多 32 次），逐位除 2 法则循环到 n 变 0 为止，也就是最高位 1 的位置。",
     "数值边界：输入是 32 位整数，用 Python 时 n 恒为非负所以 n>0 的循环安全；在 C++/Java 里若 n 为负数要用无符号或逻辑右移 >>>，否则右移补 1 会死循环，本题不涉及取模和溢出。"
    ],
+   "firstSolvedAt": 1756836756,
    "id": "191_number-of-1-bits",
    "number": 191,
    "pseudocode": [
@@ -6093,6 +6187,7 @@
     "单层主体：只看当前节点：如果 level == res.size()，说明这一层还没记过，就把 node.val 加进 res（因为先走右边，所以它就是该层最右），然后先递归右子节点、再递归左子节点，层号都 +1。",
     "代码位置：写在前序位置——必须进入子节点之前就判断并记录当前节点值，且顺序改成「右先左后」；BFS 写法则是每层出队完后取 vals 最后一个。"
    ],
+   "firstSolvedAt": 1766518911,
    "id": "199_binary-tree-right-side-view",
    "number": 199,
    "pseudocode": [
@@ -6153,6 +6248,7 @@
     "visited 时机：入队的同时立刻把 grid[nxtR][nxtC] 改成 '0'（起点也在入队时就改），不能等出队再改，否则同一格会被多个方向重复入队。",
     "是否分层：不用分层，只数连通块个数不关心距离，逐个出队即可。"
    ],
+   "firstSolvedAt": 1768509317,
    "id": "200_number-of-islands",
    "number": 200,
    "pseudocode": [
@@ -6264,6 +6360,7 @@
     "指针关系：本题只有一个游标 curr 停在待检查节点的前一个位置，curr.next 才是被判断的节点，靠这个「前驱—当前」的一步之差来做删除；不涉及快慢指针的速度差。",
     "停止条件：当 curr.next == null 时停，即已经检查完最后一个节点；注意删除时 curr 不前进（curr.next = curr.next.next），只有不删才 curr = curr.next，否则会漏掉连续相同值的节点。"
    ],
+   "firstSolvedAt": 1753283533,
    "id": "203_remove-linked-list-elements",
    "number": 203,
    "pseudocode": [
@@ -6323,6 +6420,7 @@
     "指针关系：不是快慢指针，是相邻的前后两个指针：left 是已反转部分的头（初始 None），right 是当前待处理节点，两者始终差一步，每轮把 right.next 掉头指向 left 后一起后移。",
     "停止条件：伪代码里循环到 right.next 为空停（此时 right 是最后一个节点，循环外单独把它接上 left 并当作新头）；更常见的写法是 while right != None，循环结束后直接返回 left。"
    ],
+   "firstSolvedAt": 1750460548,
    "id": "206_reverse-linked-list",
    "number": 206,
    "pseudocode": [
@@ -6391,6 +6489,7 @@
     "拓扑排序：需要，本题就是拿拓扑排序判环：Kahn 法把入度 0 的入队、出队时把邻居入度减 1，最后看出队数是否等于 numCourses；或者 DFS 三色标记，任一节点 dfs 返回 False 就说明有环。",
     "最短路松弛：本题不涉及，只要判断能不能修完所有课（有没有环），不求任何路径长度，边也没有权重。"
    ],
+   "firstSolvedAt": 1768246463,
    "id": "207_course-schedule",
    "number": 207,
    "pseudocode": [
@@ -6491,6 +6590,7 @@
     "出窗口时机：只要 res >= target 就不停地缩：先记长度，再 res 减去 nums[left]，然后 left++，直到 res < target。",
     "记结果时机：在窗口和刚满足 res >= target、还没弹出左端元素之前记一次 minLen = min(minLen, right-left)；全程没满足过就返回 0。"
    ],
+   "firstSolvedAt": 1764288399,
    "id": "209_minimum-size-subarray-sum",
    "number": 209,
    "pseudocode": [
@@ -6567,6 +6667,7 @@
     "拓扑排序：这题就是拓扑排序：Kahn 法把入度 0 的课入队、逐个出队并给后继减入度，结果长度等于 numCourses 就返回，否则有环返回空数组；DFS 三色法则在完成时把课加入 res，最后整体逆序输出。",
     "最短路松弛：本题不涉及，只要一个合法学习顺序，边没有权重，不求最短路。"
    ],
+   "firstSolvedAt": 1768267206,
    "id": "210_course-schedule-ii",
    "number": 210,
    "pseudocode": [
@@ -6643,6 +6744,7 @@
     "结束条件：path 长度等于 k 且 path 元素和等于 n 时，把 path 的副本存进 res 并返回；数字用到 9 或和超了自然结束这层。",
     "撤销：递归返回后把刚加进 path 的 num 弹出去（同时若用变量累加和，也要把 num 从和里减掉），恢复到选它之前的状态。"
    ],
+   "firstSolvedAt": 1767656032,
    "id": "216_combination-sum-iii",
    "number": 216,
    "pseudocode": [
@@ -6690,6 +6792,7 @@
     "枚举范围：本题不涉及枚举范围缩减，需要对数组从头到尾逐个元素遍历一次，不能只看部分范围",
     "数值边界：本题不涉及数值边界问题，元素只用于哈希集合的存在性判断，不涉及数值计算、溢出或取模"
    ],
+   "firstSolvedAt": 1787110772,
    "id": "217_contains-duplicate",
    "number": 217,
    "pseudocode": [
@@ -6774,6 +6877,7 @@
     "出窗口时机：当 seen 里元素个数超过 k 时，把离开窗口的 nums[j-k] 从集合里删掉，集合大小回到 k。",
     "记结果时机：在把 nums[j] 加入集合之前先查，若 nums[j] 已在 seen 里就立刻返回 True；整个数组走完都没撞上就返回 False。"
    ],
+   "firstSolvedAt": 1755889580,
    "id": "219_contains-duplicate-ii",
    "number": 219,
    "pseudocode": [
@@ -6834,6 +6938,7 @@
     "出窗口时机：当i>=indexDiff时，要把下标i-indexDiff对应的旧元素从buckets里删除（把它所在的桶清空），以保证窗口内只保留最近indexDiff个下标的元素",
     "记结果时机：在插入新元素之前先检查：自身桶b、左桶b-1、右桶b+1是否已有值且与x的差<=valueDiff，一旦满足立即返回True，遍历完都没命中则返回False"
    ],
+   "firstSolvedAt": 1787170930,
    "id": "220_contains-duplicate-iii",
    "number": 220,
    "pseudocode": [
@@ -6918,6 +7023,7 @@
     "单层主体：当前节点自己算 1，加上左子树的个数和右子树的个数；优化版则先沿左链、右链量出左右深度，深度相等就说明左子树是满的，直接用 2^深度-1 顶掉一边，只递归另一边。",
     "代码位置：后序位置——必须先拿到左右子树的节点数才能相加返回（优化版的量深度属于进入递归前的前序判断）。"
    ],
+   "firstSolvedAt": 1756930943,
    "id": "222_count-complete-tree-nodes",
    "number": 222,
    "pseudocode": [
@@ -6990,6 +7096,7 @@
     "进出时机：push 时先把 x 入队尾，再把它前面的 n-1 个元素依次出队重新入队，让 x 顶到队头；pop/top 直接取队头，也就是最近入栈的元素。",
     "剩余元素含义：本题不涉及，这是设计数据结构题没有遍历循环；队列里留着的就是当前栈中还没弹出的元素，队头到队尾对应栈顶到栈底。"
    ],
+   "firstSolvedAt": 1762980950,
    "id": "225_implement-stack-using-queues",
    "number": 225,
    "pseudocode": [
@@ -7062,6 +7169,7 @@
     "单层主体：当前节点只干一件事——把它的 left 和 right 两个指针对调，剩下的左右子树交给递归各自翻转。",
     "代码位置：前序和后序都行（前序先交换再递归左右，后序先递归左右再把返回结果对调）；中序要写成递归左、交换、再递归新的左，否则会把同一棵子树翻两次。"
    ],
+   "firstSolvedAt": 1760295035,
    "id": "226_invert-binary-tree",
    "number": 226,
    "pseudocode": [
@@ -7178,6 +7286,7 @@
     "单层主体：当前节点是中序序列里的下一个数：先走完左子树，然后 k 减 1，若 k 变成 0 就把 node.val 存进 res 并返回，否则继续走右子树。",
     "代码位置：写在中序位置（左子树递归和右子树递归之间），因为只有中序才让 BST 节点按从小到大出现。"
    ],
+   "firstSolvedAt": 1766521120,
    "id": "230_kth-smallest-element-in-a-bst",
    "number": 230,
    "pseudocode": [
@@ -7246,6 +7355,7 @@
     "进出时机：push 时元素直接进 input 栈；pop/peek 时先看 output 是否为空，空了就把 input 里的元素全倒进 output，然后从 output 栈顶取；不空就直接从 output 栈顶取。",
     "剩余元素含义：input 里剩的是较晚入队还没倒过去的元素，output 里剩的是已倒序、排在队列前面等着出队的元素；两个都空才算队列空。"
    ],
+   "firstSolvedAt": 1762984531,
    "id": "232_implement-queue-using-stacks",
    "number": 232,
    "pseudocode": [
@@ -7333,6 +7443,7 @@
     "指针关系：slow 一次一步、fast 一次两步，fast 走完时 slow 正好停在中点（前半段末尾或后半段起点），偶数长度时 slow 落在后半段第一个，奇数长度让 slow 再多走一步跳过正中间那个节点。",
     "停止条件：while fast != null and fast.next != null 结束循环；之后从 slow 开始反转后半段，再拿 head 和反转后的头同时往后走，逐个比对值，任一为 null 就停，中途不等就返回 False。"
    ],
+   "firstSolvedAt": 1753378127,
    "id": "234_palindrome-linked-list",
    "number": 234,
    "pseudocode": [
@@ -7405,6 +7516,7 @@
     "单层主体：拿 p.val、q.val 跟 root.val 比：都比它小就把答案交给左子树，都比它大就交给右子树，一大一小（或有一个等于 root）说明 root 就是分叉点，直接返回 root。",
     "代码位置：前序位置——先比较当前节点的值决定往哪边走，不需要等子树结果回来。"
    ],
+   "firstSolvedAt": 1766521935,
    "id": "235_lowest-common-ancestor-of-a-binary-search-tree",
    "number": 235,
    "pseudocode": [
@@ -7457,6 +7569,7 @@
     "单层主体：拿到左右子树的返回值 left、right：左右都非空说明 p、q 分居两侧，当前 root 就是答案；只有一边非空就把那一边的结果往上传；两边都空返回 null。",
     "代码位置：后序位置——必须先递归拿到 left 和 right 的结果，才能判断当前节点是不是分叉点。"
    ],
+   "firstSolvedAt": 1766539193,
    "id": "236_lowest-common-ancestor-of-a-binary-tree",
    "number": 236,
    "pseudocode": [
@@ -7508,6 +7621,7 @@
     "指针关系：只有 node 和它后继 nxt = node.next 这一对相邻指针（差一步），没有快慢指针赛跑，把 nxt 的值抄给 node 再让 node.next 跳过 nxt 即可。",
     "停止条件：本题不涉及循环停止条件，操作是 O(1) 的一次性动作；唯一要判的是 nxt.next 是否为空，为空就把 node.next 置为 None。"
    ],
+   "firstSolvedAt": 1763756244,
    "id": "237_delete-node-in-a-linked-list",
    "number": 237,
    "pseudocode": [
@@ -7551,6 +7665,7 @@
     "preSum[0] 定义：本题不用数组存前缀积而是用变量left/right从1开始累乘，left初始为1相当于preSum[0]=1（乘法单位元），天然省掉了第一个位置左边没有元素的特判",
     "差分下标位置：本题不涉及差分，因为这里不需要对区间做增减操作，只是单纯求每个位置左右两侧的累乘积"
    ],
+   "firstSolvedAt": 1785182677,
    "id": "238_product-of-array-except-self",
    "number": 238,
    "pseudocode": [
@@ -7618,6 +7733,7 @@
     "slow 含义：本题不涉及，这里没有原地写数据的 slow，两个下标分别是当前所在的行号和列号，只用来读 matrix[row][col]。",
     "停止条件：当 row 越过最后一行（row >= m）或 col 退到 -1（col < 0）时循环结束返回 False，中途遇到 matrix[row][col] == target 直接返回 True。"
    ],
+   "firstSolvedAt": 1764973978,
    "id": "240_search-a-2d-matrix-ii",
    "number": 240,
    "pseudocode": [
@@ -7709,6 +7825,7 @@
     "枚举范围：本题不涉及大范围枚举，只需各遍历一遍s和t（每个O(n)），若限定小写字母则字符种类只有26种",
     "数值边界：本题不涉及数值溢出或取模问题，因为计数值最大就是字符串长度，用普通整数计数即可"
    ],
+   "firstSolvedAt": 1787172468,
    "id": "242_valid-anagram",
    "number": 242,
    "pseudocode": [
@@ -7797,6 +7914,7 @@
     "结束条件：i 超过 sqrt(target) 就没得选了，循环自然结束返回；每次找到能整除的 i 时，直接把 path+[i, target/i] 作为一个完整答案记下来。",
     "撤销：递归回来后把刚 append 进 path 的那个因子 i pop 掉，让 path 回到进入这层前的样子。"
    ],
+   "firstSolvedAt": 1767659360,
    "id": "254_factor-combinations",
    "number": 254,
    "pseudocode": [
@@ -7853,6 +7971,7 @@
     "单层主体：把当前节点值接到 path 后面得到 new_path，若左右孩子都为空说明是叶子就把 new_path 存进 res，否则对存在的左右孩子分别用 new_path+\"->\" 递归下去。",
     "代码位置：前序位置：先拼好当前节点的路径字符串再往下递归，路径必须自上而下带下去，后序拿不到父链信息。"
    ],
+   "firstSolvedAt": 1760300670,
    "id": "257_binary-tree-paths",
    "number": 257,
    "pseudocode": [
@@ -7908,6 +8027,7 @@
     "slow 含义：本题不涉及，这里没有快慢指针也不需要原地写回数组，j 只是固定 i 之后的左边界指针，不是写入位置。",
     "停止条件：内层循环在 j 和 k 相遇时停（while j < k），外层 i 走到 len(nums)-3 为止（保证后面还能取出两个数）。"
    ],
+   "firstSolvedAt": 1765039793,
    "id": "259_3sum-smaller",
    "number": 259,
    "pseudocode": [
@@ -7952,6 +8072,7 @@
     "拓扑排序：本题不涉及，无向图判树只需连通性判断，没有依赖顺序可排。",
     "最短路松弛：本题不涉及，只问是不是树，不求任何距离。"
    ],
+   "firstSolvedAt": 1768337015,
    "id": "261_graph-valid-tree",
    "number": 261,
    "pseudocode": [
@@ -8015,6 +8136,7 @@
     "局部最优判据：每统计完一个字符就立刻检查oddCnt是否大于1，一旦大于1就可以马上判定不能构成回文并返回False，不用等遍历完",
     "正确性理由：回文串的结构决定了最多只能有一个字符出现奇数次（放在正中间），其余字符必须成对分布在两侧，所以只要发现第二个奇数次字符出现，就必然无法配对成回文，提前终止是安全的，不会漏判也不会误判"
    ],
+   "firstSolvedAt": 1768148990,
    "id": "266_palindrome-permutation",
    "number": 266,
    "pseudocode": [
@@ -8083,6 +8205,7 @@
     "结束条件：path 长度等于 half 长度时，把 left+mid+left 反转 拼成完整回文塞进 res 后返回；另外开头奇数频次字符超过 1 个就直接返回空列表，根本不进 DFS。",
     "撤销：递归回来后把 path 末尾刚加的字符弹掉，并把 used[i] 重新置回 False。"
    ],
+   "firstSolvedAt": 1767662977,
    "id": "267_palindrome-permutation-ii",
    "number": 267,
    "pseudocode": [
@@ -8130,6 +8253,7 @@
     "slow 含义：本题不涉及，这里没有快慢指针也不用往数组里写数据，只有二分的 left/right 边界",
     "停止条件：排序后的循环停在 left > right（即 right 越到 left 左边）时，此时 left 就是缺失的数字；递归版同样以 left > right 作为返回 left 的出口"
    ],
+   "firstSolvedAt": 1756935664,
    "id": "268_missing-number",
    "number": 268,
    "pseudocode": [
@@ -8186,6 +8310,7 @@
     "单层主体：比较target和root.val的大小，决定往左子树还是右子树递归，拿到子树返回的closest后，跟root.val比谁离target更近，返回更近的那个",
     "代码位置：前序位置：先判断走左还是走右并递归，拿到结果后在当前节点（回溯时）做比较，所以准确说是后序位置——先处理子树递归调用，再用结果和当前节点比较后返回"
    ],
+   "firstSolvedAt": 1756943783,
    "id": "270_closest-binary-search-tree-value",
    "number": 270,
    "pseudocode": [
@@ -8253,6 +8378,7 @@
     "slow 含义：本题不涉及slow写入语义，i和j的作用分别是标记当前字符串起点和寻找#分隔符位置，不存在原地覆盖写入的场景",
     "停止条件：j指针在找到分隔符'#'时停止（s[j]=='#'），外层i指针在i小于编码字符串总长度时继续循环，i达到字符串长度即整体遍历结束"
    ],
+   "firstSolvedAt": 1787181414,
    "id": "271_encode-and-decode-strings",
    "number": 271,
    "pseudocode": [
@@ -8345,6 +8471,7 @@
     "判定条件：判定条件是citations[mid]与n-mid比较，看第mid个及之后共n-mid篇论文的引用数是否都够格，本质是找citations[mid]>=n-mid的最左位置",
     "边界收缩：citations[mid]==n-mid时命中直接返回n-mid；citations[mid]>n-mid说明答案可能更大，right=mid-1往左收缩；citations[mid]<n-mid说明不够格，left=mid+1往右收缩，循环结束后返回n-left"
    ],
+   "firstSolvedAt": 1765124424,
    "id": "275_h-index-ii",
    "number": 275,
    "pseudocode": [
@@ -8388,6 +8515,7 @@
     "枚举范围：第一次遍历0到n-1淘汰出唯一候选人candidate，第二次遍历0到n-1验证candidate是否真的满足名人条件，两次遍历范围都是全部n个人，无法再缩小",
     "数值边界：本题不涉及，n是人数（题目里最多几百人量级），不存在整数溢出或取模的问题"
    ],
+   "firstSolvedAt": 1768341114,
    "id": "277_find-the-celebrity",
    "number": 277,
    "pseudocode": [
@@ -8436,6 +8564,7 @@
     "判定条件：判定条件是isBadVersion(mid)，这是一个单调的check函数（一旦为true后面全为true），不是判断等于某个target",
     "边界收缩：如果mid是错误版本，说明第一个错误版本在mid或更前面，right=mid-1；如果mid不是错误版本，第一个错误版本在mid之后，left=mid+1；没有命中就直接返回的情况，最后left就是第一个错误版本"
    ],
+   "firstSolvedAt": 1757003425,
    "id": "278_first-bad-version",
    "number": 278,
    "pseudocode": [
@@ -8491,6 +8620,7 @@
     "slow 含义：slow指向的是下一个应该放置非零元素的位置（也就是已处理好的非零区间的末尾）",
     "停止条件：fast从0遍历到数组末尾（越界即停），遍历结束后再用一个循环把slow到末尾的位置全部置零"
    ],
+   "firstSolvedAt": 1754074793,
    "id": "283_move-zeroes",
    "number": 283,
    "pseudocode": [
@@ -8547,6 +8677,7 @@
     "拓扑排序：本题不涉及拓扑排序，因为没有用Kahn或DFS三色法找环，而是用二分+计数直接定位重复值所在区间",
     "最短路松弛：本题不涉及最短路和distTo数组，算法用的是left、right、mid和cnt变量做区间二分，没有距离松弛过程"
    ],
+   "firstSolvedAt": 1765131289,
    "id": "287_find-the-duplicate-number",
    "number": 287,
    "pseudocode": [
@@ -8623,6 +8754,7 @@
     "出窗口时机：本题不涉及，没有left指针收缩窗口这一操作，映射一旦建立不会被移除",
     "记结果时机：结果就是遍历完所有字符和单词后没有出现映射冲突就返回True，中途一旦发现冲突立刻返回False"
    ],
+   "firstSolvedAt": 1767737015,
    "id": "290_word-pattern",
    "number": 290,
    "pseudocode": [
@@ -8667,6 +8799,7 @@
     "结束条件：结束条件是pidx等于pattern长度，此时若sidx也正好等于s长度则匹配成功返回True，否则返回False（还有剩余字符没匹配完）",
     "撤销：撤销的是给char新建立的映射（从charToStr中删除char）以及把对应子串sub从usedStrs集合中移除，恢复到选择前的状态"
    ],
+   "firstSolvedAt": 1767721938,
    "id": "291_word-pattern-ii",
    "number": 291,
    "pseudocode": [
@@ -8712,6 +8845,7 @@
     "base case：当s中不存在任何\"++\"子串（无法进行任何翻转）时，当前玩家必败，返回False",
     "遍历顺序：按状态转移的方向，从s翻转生成的nxt（局面复杂度更低，剩余++更少）先递归求解，再回溯得到s的结果，本质是自顶向下的记忆化递归，不需要显式规定遍历顺序"
    ],
+   "firstSolvedAt": 1767751948,
    "id": "294_flip-game-ii",
    "number": 294,
    "pseudocode": [
@@ -8761,6 +8895,7 @@
     "base case：base case是tail初始只包含nums[0]一个元素，表示长度为1的子序列结尾是nums[0]",
     "遍历顺序：按nums数组的原始顺序从左到右遍历一遍，每个元素处理时前面的tail状态已经是当前最优的，直接二分查找更新即可"
    ],
+   "firstSolvedAt": 1765134596,
    "id": "300_longest-increasing-subsequence",
    "number": 300,
    "pseudocode": [
@@ -8820,6 +8955,7 @@
     "preSum[0] 定义：curr[0]定义为0，表示前0个元素的和，这样查询[0,right]时不用单独判断left=0，直接curr[right+1]-curr[0]就行",
     "差分下标位置：本题不涉及，因为题目不需要对区间做批量增减操作，不需要差分数组"
    ],
+   "firstSolvedAt": 1759699941,
    "id": "303_range-sum-query-immutable",
    "number": 303,
    "pseudocode": [
@@ -8876,6 +9012,7 @@
     "visited 时机：用isLand数组标记某格是否已变成陆地，在处理positions[i]时先标记当前格为陆地，再去看四周是否已标记过陆地从而决定是否合并，防止把同一个格子重复计数或重复合并",
     "是否分层：本题不需要分层遍历，因为不是逐层扩散求最短路径，而是用并查集一次性判断连通块个数"
    ],
+   "firstSolvedAt": 1768854179,
    "id": "305_number-of-islands-ii",
    "number": 305,
    "pseudocode": [
@@ -8920,6 +9057,7 @@
     "单层主体：本题不涉及：单层主体在这题里对应的是BFS中每一轮把当前所有叶节点（入度为1的节点）移除并更新邻居入度，而不是二叉树的单层递归逻辑",
     "代码位置：本题不涉及：这题用BFS层层剥离或两次DFS找直径来解，不是通过前中后序遍历二叉树来实现的"
    ],
+   "firstSolvedAt": 1768348138,
    "id": "310_minimum-height-trees",
    "number": 310,
    "pseudocode": [
@@ -8992,6 +9130,7 @@
     "拓扑排序：本题不涉及拓扑排序，因为是无向图求连通分量，不存在方向和依赖关系，不需要排序节点顺序",
     "最短路松弛：本题不涉及最短路松弛，题目只求连通分量的个数，不关心节点间的路径长度"
    ],
+   "firstSolvedAt": 1768419665,
    "id": "323_number-of-connected-components-in-an-undirected-graph",
    "number": 323,
    "pseudocode": [
@@ -9085,6 +9224,7 @@
     "base case：dp[0]=0（0的二进制没有1），dp[1]=1（1的二进制只有一个1）",
     "遍历顺序：从小到大遍历i（从0或1一直到n），保证算dp[i]时dp[i//2]已经算好"
    ],
+   "firstSolvedAt": 1761926035,
    "id": "338_counting-bits",
    "number": 338,
    "pseudocode": [
@@ -9161,6 +9301,7 @@
     "出窗口时机：当窗口内不同字符种类数超过k时，就要移动left缩小窗口，移出string[left]对应字符的计数（计数减到0就说明这个字符不在窗口里了），直到不同字符数不超过k为止",
     "记结果时机：每次内层收缩循环结束后（保证窗口合法即不同字符数≤k），就用当前窗口长度right-left去更新maxLen"
    ],
+   "firstSolvedAt": 1764288889,
    "id": "340_longest-substring-with-at-most-k-distinct-characters",
    "number": 340,
    "pseudocode": [
@@ -9204,6 +9345,7 @@
     "slow 含义：本题不涉及，因为这里用的是左右指针相向夹逼，不是快慢指针同向遍历，没有slow这个角色",
     "停止条件：当i>=j时停止，即左右指针相遇或交错"
    ],
+   "firstSolvedAt": 1785176438,
    "id": "345_reverse-vowels-of-a-string",
    "number": 345,
    "pseudocode": [
@@ -9304,6 +9446,7 @@
     "容量：堆容量固定为k，超过k个就把频率最小的弹出去",
     "进出时机：遍历哈希表统计出的每个(元素,频率)时push进堆，一旦堆大小超过k就立刻pop堆顶（最小频率的），遍历结束后堆里剩下的k个就是答案"
    ],
+   "firstSolvedAt": 1787245946,
    "id": "347_top-k-frequent-elements",
    "number": 347,
    "pseudocode": [
@@ -9399,6 +9542,7 @@
     "slow 含义：本题不涉及慢指针含义，因为双指针法这里i、j只是两个数组各自的遍历游标，不是原地覆盖写入的场景",
     "停止条件：当i达到nums1长度或j达到nums2长度（任一数组遍历越界）时停止"
    ],
+   "firstSolvedAt": 1754082369,
    "id": "349_intersection-of-two-arrays",
    "number": 349,
    "pseudocode": [
@@ -9470,6 +9614,7 @@
     "slow 含义：本题不涉及slow指针，因为这里是两个数组各用一个指针同向扫描比较大小，不是单数组的快慢指针写入场景",
     "停止条件：当i达到nums1长度或j达到nums2长度（任一数组遍历完）时停止"
    ],
+   "firstSolvedAt": 1754231137,
    "id": "350_intersection-of-two-arrays-ii",
    "number": 350,
    "pseudocode": [
@@ -9514,6 +9659,7 @@
     "进出时机：每次hit调用时把新时间戳加入队尾；每次getHits调用时，从队头开始把时间差>=300的旧时间戳依次弹出",
     "剩余元素含义：循环结束后队列里剩下的时间戳就是最近300秒内还有效的敲击记录，其数量就是getHits的返回值"
    ],
+   "firstSolvedAt": 1765149906,
    "id": "362_design-hit-counter",
    "number": 362,
    "pseudocode": [
@@ -9558,6 +9704,7 @@
     "判定条件：判定条件是mid*mid和num的比较：相等就是完全平方数，mid*mid>num说明mid偏大，mid*mid<num说明mid偏小",
     "边界收缩：mid*mid==num时直接返回True；mid*mid>num时说明根在mid左边，right=mid-1；mid*mid<num时说明根在mid右边，left=mid+1；循环结束还没找到就返回False"
    ],
+   "firstSolvedAt": 1757008835,
    "id": "367_valid-perfect-square",
    "number": 367,
    "pseudocode": [
@@ -9614,6 +9761,7 @@
     "判定条件：判定条件是guess(mid)的返回值：0表示猜中，-1表示mid猜大了，1表示mid猜小了",
     "边界收缩：猜中(guess(mid)==0)直接返回mid；猜大了(-1)说明目标更小，right=mid-1；猜小了(1)说明目标更大，left=mid+1"
    ],
+   "firstSolvedAt": 1757013361,
    "id": "374_guess-number-higher-or-lower",
    "number": 374,
    "pseudocode": [
@@ -9670,6 +9818,7 @@
     "进出时机：本题不涉及，本题的关键操作是二分的 left/right 收缩和从矩阵左下角向右上角扫描计数，没有入栈出栈或入队出队的时机",
     "剩余元素含义：本题不涉及，循环结束时 left 等于 right，直接就是第 K 小的元素，不存在剩余元素的概念"
    ],
+   "firstSolvedAt": 1765216529,
    "id": "378_kth-smallest-element-in-a-sorted-matrix",
    "number": 378,
    "pseudocode": [
@@ -9717,6 +9866,7 @@
     "slow 含义：本题不涉及慢指针写入语义，i指针的含义是s中下一个待匹配的字符位置，不是数组写入位置",
     "停止条件：停止条件是i走到s末尾（越界，说明s全部匹配成功）或者j走到t末尾（越界，说明t遍历完还没匹配完s）"
    ],
+   "firstSolvedAt": 1761940426,
    "id": "392_is-subsequence",
    "number": 392,
    "pseudocode": [
@@ -9781,6 +9931,7 @@
     "出窗口时机：本题不涉及：没有 left 指针收缩窗口，而是直接用出现次数小于 K 的字符作为分隔符把字符串切成多段子串",
     "记结果时机：结果更新发生在递归返回处：每次对切分出的子串递归调用 longestSubstring 后取所有子结果的最大值 maxRes，若整个字符串所有字符出现次数都不小于 K，则直接返回该字符串长度作为结果"
    ],
+   "firstSolvedAt": 1764437272,
    "id": "395_longest-substring-with-at-least-k-repeating-characters",
    "number": 395,
    "pseudocode": [
@@ -9824,6 +9975,7 @@
     "connected 判据：先分别找到 u 和 v 的根节点 rootU、rootV，如果两个变量不在 parent 字典里说明没出现过直接判不连通返回-1，否则看 rootU 是否等于 rootV，相等就是连通的，可以用 weight[u]/weight[v] 算出比值",
     "优化方式：要做路径压缩，在 find 函数里递归查找根节点时把路径上每个节点的 parent 直接指向根节点，同时同步更新 weight 为该节点到根节点的累计比值，本题没有按秩合并（union 时统一把一方根接到另一方根即可，量级不大不影响效率）"
    ],
+   "firstSolvedAt": 1768426231,
    "id": "399_evaluate-division",
    "number": 399,
    "pseudocode": [
@@ -9907,6 +10059,7 @@
     "枚举范围：不是遍历所有数，而是按位数分组跳跃式缩小范围，最多循环log10(n)次就能定位到具体是几位数",
     "数值边界：n最大到2^31-1，count和length相乘可能超过int范围，需要用long来存储中间计算结果防止溢出"
    ],
+   "firstSolvedAt": 1765220566,
    "id": "400_nth-digit",
    "number": 400,
    "pseudocode": [
@@ -9951,6 +10104,7 @@
     "结束条件：当前选中的灯数量等于turnedOn时记录一个有效时间（若小时≤11且分钟≤59），或者索引超出灯列表末尾时停止递归",
     "撤销：回溯时把之前加到当前小时或当前分钟上的灯值减回去，恢复选择前的小时和分钟状态"
    ],
+   "firstSolvedAt": 1761168009,
    "id": "401_binary-watch",
    "number": 401,
    "pseudocode": [
@@ -10047,6 +10201,7 @@
     "单层主体：检查root.left是否存在且是叶子节点，是的话把它的值算进来，再加上左子树和右子树各自递归算出的左叶子之和",
     "代码位置：后序位置，因为要先拿到左右子树各自算好的左叶子之和，再和当前节点判断结果相加返回"
    ],
+   "firstSolvedAt": 1760313001,
    "id": "404_sum-of-left-leaves",
    "number": 404,
    "pseudocode": [
@@ -10114,6 +10269,7 @@
     "局部最优判据：局部最优判据是看当前字符出现次数的奇偶性：偶数直接全加进res，奇数则减1后加进res并标记hasOdd为True，不需要看其他字符的情况。",
     "正确性理由：回文串由若干对称的字符对加最多一个中心字符组成，每个字符能贡献的成对数量只取决于自身出现次数的奇偶性，互不影响，所以逐字符贪心累加成对数、最后统一补一个中心字符就能得到全局最长长度。"
    ],
+   "firstSolvedAt": 1762559337,
    "id": "409_longest-palindrome",
    "number": 409,
    "pseudocode": [
@@ -10158,6 +10314,7 @@
     "出窗口时机：当窗口长度≥3且加入新元素后不再满足等差数列时，就把left右移、删掉res的第一个元素，直到窗口重新合法（不是每步都出窗口，是不满足才收缩）",
     "记结果时机：每次right扩窗后只要当前窗口长度≥3（说明是合法等差子数组），就把窗口长度减2累加到ttl里，因为长度为L的等差窗口能贡献L-2个等差子数组"
    ],
+   "firstSolvedAt": 1764291063,
    "id": "413_arithmetic-slices",
    "number": 413,
    "pseudocode": [
@@ -10210,6 +10367,7 @@
     "出窗口时机：当窗口长度(right-left)减去maxCount大于k时（说明需要替换的字符数超过k个），就把left指向的字符频率减一并把left右移，直到条件不再满足",
     "记结果时机：每次right右移并完成窗口收缩判断后，用当前窗口长度(right-left)更新maxLen"
    ],
+   "firstSolvedAt": 1764442699,
    "id": "424_longest-repeating-character-replacement",
    "number": 424,
    "pseudocode": [
@@ -10254,6 +10412,7 @@
     "拓扑排序：本题不涉及拓扑排序，因为图里没有依赖顺序关系，只是求两个基因串之间的最短变化路径",
     "最短路松弛：不用单独的distTo数组，而是队列里每个元素带上(基因串, step)，step就是从startGene走到当前基因串的步数，出队时若等于endGene就直接返回step，相当于按BFS层数天然实现了最短路"
    ],
+   "firstSolvedAt": 1770759607,
    "id": "433_minimum-genetic-mutation",
    "number": 433,
    "pseudocode": [
@@ -10297,6 +10456,7 @@
     "slow 含义：本题不涉及，没有慢指针概念，binarySearch里的ans变量记录的是当前找到的最小满足条件的下标",
     "停止条件：二分查找中left大于right时停止，即left超过right表示查找区间为空"
    ],
+   "firstSolvedAt": 1765231390,
    "id": "436_find-right-interval",
    "number": 436,
    "pseudocode": [
@@ -10349,6 +10509,7 @@
     "出窗口时机：当窗口大小大于等于len(p)时就要移动left缩小窗口，把s[left]的频率-1，如果减到0就从sCount里删掉这个字符",
     "记结果时机：在窗口大小达到len(p)、还没缩窗之前，先比较pCount和sCount是否相等，相等就把left加入结果列表"
    ],
+   "firstSolvedAt": 1764445704,
    "id": "438_find-all-anagrams-in-a-string",
    "number": 438,
    "pseudocode": [
@@ -10397,6 +10558,7 @@
     "判定条件：判定条件是比较前mid行硬币总数cnt=(1+mid)*mid/2和n的大小关系，是单调递增的check函数",
     "边界收缩：cnt==n时直接返回mid（找到恰好排满的行数）；cnt>n说明mid行数多了，right=mid-1；cnt<n说明还能排更多行，left=mid+1，循环结束后返回right作为最大完整行数"
    ],
+   "firstSolvedAt": 1757014761,
    "id": "441_arranging-coins",
    "number": 441,
    "pseudocode": [
@@ -10457,6 +10619,7 @@
     "拓扑排序：需要，用 Kahn 入度法做 BFS 拓扑排序，且每一步要求队列里只能有一个入度为0的节点（否则说明顺序不唯一），跑完后把结果序列 res 和 nums 逐一比较判断是否唯一重建成功。",
     "最短路松弛：本题不涉及，因为这题只关心拓扑顺序是否唯一确定，不涉及边权和最短路径计算。"
    ],
+   "firstSolvedAt": 1768433503,
    "id": "444_sequence-reconstruction",
    "number": 444,
    "pseudocode": [
@@ -10500,6 +10663,7 @@
     "指针关系：本题不是快慢指针找位置，而是两个链表各自反转后同步用curr1、curr2两个指针逐位遍历相加，两者步调一致地各自前进",
     "停止条件：当curr1为空且curr2为空且进位carry为0时才停止遍历，只要有一个不为空或还有进位就要继续"
    ],
+   "firstSolvedAt": 1763503064,
    "id": "445_add-two-numbers-ii",
    "number": 445,
    "pseudocode": [
@@ -10559,6 +10723,7 @@
     "局部最优判据：用当前最小饼干s[j]和当前最小胃口g[i]比较，只要s[j]>=g[i]就判定这块饼干能满足这个孩子，是局部最优的一次匹配，否则说明这块饼干太小只能舍弃换下一块",
     "正确性理由：如果最小的饼干都能满足当前最小胃口的孩子，那么把它留给更大胃口的孩子也不会更优（大孩子需要更大饼干），所以先满足小胃口孩子不会减少总满足数；如果最小饼干满足不了最小胃口孩子，那它也满足不了任何孩子，直接丢弃不影响结果，这样贪心每一步都不损失最优解"
    ],
+   "firstSolvedAt": 1754253786,
    "id": "455_assign-cookies",
    "number": 455,
    "pseudocode": [
@@ -10615,6 +10780,7 @@
     "弹栈条件：当栈顶元素小于当前遍历到的元素nums[i]时，说明栈顶可以被淘汰当作‘2’，弹出栈顶并更新k为这个被弹出的值",
     "遍历方向：倒着遍历（从数组末尾往前遍历），这样能先确定‘3’和‘2’再往前找‘1’"
    ],
+   "firstSolvedAt": 1765234432,
    "id": "456_132-pattern",
    "number": 456,
    "pseudocode": [
@@ -10683,6 +10849,7 @@
     "visited 时机：起点入队时立刻标记visited，每次发现未访问的陆地邻居准备入队时也立刻标记，避免同一格子被多次加入队列重复计算",
     "是否分层：本题不涉及分层，因为不需要按层数（如最短路径步数）统计结果，只需要遍历完所有陆地格子累加周长即可"
    ],
+   "firstSolvedAt": 1768515449,
    "id": "463_island-perimeter",
    "number": 463,
    "pseudocode": [
@@ -10755,6 +10922,7 @@
     "判定条件：判定条件是比较heaters[mid]和当前房子坐标h的大小：相等、大于、小于三种情况。",
     "边界收缩：heaters[mid]==h时直接返回0（距离为0）；heaters[mid]>h时right=mid-1（往左找）；heaters[mid]<h时left=mid+1（往右找），循环结束后用left和right分别取右侧/左侧最近供暖器算距离。"
    ],
+   "firstSolvedAt": 1765236599,
    "id": "475_heaters",
    "number": 475,
    "pseudocode": [
@@ -10806,6 +10974,7 @@
     "slow 含义：本题不涉及，因为没有用到需要写入位置的慢指针，只有一个计数变量cnt记录当前连续1的长度",
     "停止条件：遍历指针（fast）扫到数组末尾就停，也就是普通for循环遍历完整个数组结束"
    ],
+   "firstSolvedAt": 1598967589,
    "id": "485_max-consecutive-ones",
    "number": 485,
    "pseudocode": [
@@ -10854,6 +11023,7 @@
     "出窗口时机：当cnt里0的数量大于1时移动left，把nums[left]的计数减1，直到窗口内0的数量不超过1",
     "记结果时机：每次right移动完并且窗口内0的数量不超过1后，用right-left更新maxLen"
    ],
+   "firstSolvedAt": 1764449902,
    "id": "487_max-consecutive-ones-ii",
    "number": 487,
    "pseudocode": [
@@ -10898,6 +11068,7 @@
     "弹栈条件：当栈顶元素小于等于当前遍历到的num时，说明栈顶元素找到了更大的元素（就是num），把它弹出",
     "遍历方向：倒着遍历nums2（从后向前），这样能保证每个元素在入栈时，栈里保留的都是它右边还没被淘汰的更大候选"
    ],
+   "firstSolvedAt": 1763052870,
    "id": "496_next-greater-element-i",
    "number": 496,
    "pseudocode": [
@@ -10986,6 +11157,7 @@
     "单层主体：比较当前节点值node.val和prev：相等就cnt+1，不等就cnt重置为1并更新prev；然后看cnt是否超过max_cnt来更新res列表（超过则清空res只留当前值，等于则把当前值加进res）",
     "代码位置：写在中序位置，即先traverse(node.left)，中间处理当前节点的计数和众数更新逻辑，再traverse(node.right)，这样能保证按升序处理节点值"
    ],
+   "firstSolvedAt": 1760372399,
    "id": "501_find-mode-in-binary-search-tree",
    "number": 501,
    "pseudocode": [
@@ -11037,6 +11209,7 @@
     "局部最优判据：当前堆顶（负值最小即原值最大）的分数就是还没分配名次里排名最靠前的，直接给它下一个名次编号即可，不用比较其他还没处理的分数",
     "正确性理由：名次本来就是按分数从高到低唯一确定的，每次取出最大值分配当前名次后，剩下的分数排名关系不变，所以逐步取最大值分配名次和整体排序结果完全一致"
    ],
+   "firstSolvedAt": 1761239086,
    "id": "506_relative-ranks",
    "number": 506,
    "pseudocode": [
@@ -11088,6 +11261,7 @@
     "slow 含义：本题不涉及slow指向待写入位置这个含义，因为这里不是原地覆盖数组，而是j指向word中下一个待匹配的字符位置",
     "停止条件：当i走到s末尾（i==len(s)）或者j已经走完整个word（j==len(word)，说明匹配成功）时停止，取先满足的那个"
    ],
+   "firstSolvedAt": 1780085107,
    "id": "524_longest-word-in-dictionary-through-deleting",
    "number": 524,
    "pseudocode": [
@@ -11188,6 +11362,7 @@
     "单层主体：用当前节点值减去pre（上一个中序遍历到的节点值），如果这个差比minDiff小就更新minDiff，然后把pre更新成当前节点值",
     "代码位置：写在中序位置，即先递归左子树，再执行比较更新的代码，最后递归右子树，这样保证遍历顺序是从小到大，相邻比较才有意义"
    ],
+   "firstSolvedAt": 1760374374,
    "id": "530_minimum-absolute-difference-in-bst",
    "number": 530,
    "pseudocode": [
@@ -11232,6 +11407,7 @@
     "单层主体：分别递归求左子树深度leftDepth和右子树深度rightDepth，用leftDepth+rightDepth去更新max_diameter（这条路径经过当前节点的最长路径长度），然后返回1+max(leftDepth, rightDepth)作为当前节点的深度",
     "代码位置：后序位置，因为要先拿到左右子树的深度结果才能计算当前节点的直径贡献并返回自己的深度"
    ],
+   "firstSolvedAt": 1760375554,
    "id": "543_diameter-of-binary-tree",
    "number": 543,
    "pseudocode": [
@@ -11276,6 +11452,7 @@
     "拓扑排序：本题不涉及，因为省份数量只是求无向图的连通分量个数，跟节点先后顺序或依赖关系无关，不需要拓扑排序",
     "最短路松弛：本题不涉及，因为题目只要统计连通分量数，不需要计算任何路径长度或距离"
    ],
+   "firstSolvedAt": 1770069482,
    "id": "547_number-of-provinces",
    "number": 547,
    "pseudocode": [
@@ -11359,6 +11536,7 @@
     "局部最优判据：排序后相邻两个数配对时，取较小的那个纳入求和才能让被舍弃的数尽量小、留下的数尽量大",
     "正确性理由：排序后任意分组方案中，把相邻两数配对能让每组的min值达到最大，因为如果把较小值和更远的数配对会让某个较大数被迫和更小的数配对导致min变小，所以相邻配对+取前者是全局最优"
    ],
+   "firstSolvedAt": 1762562041,
    "id": "561_array-partition",
    "number": 561,
    "pseudocode": [
@@ -11415,6 +11593,7 @@
     "单层主体：分别递归拿到左子树和leftSum、右子树和rightSum，用abs(leftSum-rightSum)累加到坡度累加器res里，然后返回node.val+leftSum+rightSum作为当前子树的和",
     "代码位置：后序位置，因为要先拿到左右子树的和才能算当前节点的坡度并累加"
    ],
+   "firstSolvedAt": 1760377518,
    "id": "563_binary-tree-tilt",
    "number": 563,
    "pseudocode": [
@@ -11467,6 +11646,7 @@
     "出窗口时机：当窗口长度right-left大于s1长度时就要把s2[left]的计数减一（减到0就删掉这个键），然后left加一，保证窗口始终不超过s1长度",
     "记结果时机：每次窗口长度恰好等于s1长度时就比较s1Count和s2Count是否相等，相等就返回True，遍历完还没匹配就返回False"
    ],
+   "firstSolvedAt": 1764455046,
    "id": "567_permutation-in-string",
    "number": 567,
    "pseudocode": [
@@ -11498,7 +11678,7 @@
      "name": "solution_1.py"
     }
    ],
-   "solvedAt": 1779726463,
+   "solvedAt": 1787527529,
    "statement": "给你两个字符串 s1 和 s2 ，写一个函数来判断 s2 是否包含 s1 的 排列。如果是，返回 true ；否则，返回 false 。\n\n换句话说，s1 的排列之一是 s2 的 子串 。\n\n示例 1：\n\n输入：s1 = \"ab\" s2 = \"eidbaooo\"\n输出：true\n解释：s2 包含 s1 的排列之一 (\"ba\").\n\n示例 2：\n\n输入：s1= \"ab\" s2 = \"eidboaoo\"\n输出：false",
    "technique": "滑动窗口",
    "title": "567. 字符串的排列"
@@ -11511,6 +11691,7 @@
     "单层主体：isSubtree的单层主体是：先判断当前节点和目标子树是否isSame相同，如果相同就返回True，否则去左右子节点里继续递归找（当左右子树的查找结果已经算对，只需or起来）；isSame的单层主体是先比较p和q当前节点的值是否相等，再看左子树和右子树的比较结果（已经算对）是否都为True。",
     "代码位置：isSubtree属于前序位置写法，先处理当前节点（判断isSame）再递归左右子节点；isSame也是前序，先比较当前节点值再递归比较左右子树。"
    ],
+   "firstSolvedAt": 1760381590,
    "id": "572_subtree-of-another-tree",
    "number": 572,
    "pseudocode": [
@@ -11567,6 +11748,7 @@
     "出窗口时机：当nums[right]-nums[left]>1时说明窗口内最大最小差超过1，要移动left缩小窗口，直到差值回到1或0，出窗口时不需要更新其他数据，因为直接用两端下标做差判断。",
     "记结果时机：当nums[right]-nums[left]==1时说明窗口内是和谐子序列，此时用right-left+1更新最大长度max_length。"
    ],
+   "firstSolvedAt": 1755900039,
    "id": "594_longest-harmonious-subsequence",
    "number": 594,
    "pseudocode": [
@@ -11642,6 +11824,7 @@
     "局部最优判据：局部最优判据是看当前位置i及其前一位i-1、后一位i+1是否都为0，三个都是0就在i位置种花并计数加一",
     "正确性理由：能种就种不会让后面能种的位置变得不能种，因为种花只占用当前位置，不会影响再往后隔一个以上的位置，所以尽早种花只会让剩余空间更宽松，最终种的花数量一定不少于任何其他种法，所以只要贪心种完的总数大于等于n就一定可行"
    ],
+   "firstSolvedAt": 1762563717,
    "id": "605_can-place-flowers",
    "number": 605,
    "pseudocode": [
@@ -11689,6 +11872,7 @@
     "slow 含义：本题不涉及，因为用的是相向双指针而不是快慢指针，没有慢指针写入位置的概念",
     "停止条件：内层while循环在left<right时进行，当left与right相遇（left>=right）时停止，然后外层i继续向前固定下一个最大边"
    ],
+   "firstSolvedAt": 1780007132,
    "id": "611_valid-triangle-number",
    "number": 611,
    "pseudocode": [
@@ -11761,6 +11945,7 @@
     "单层主体：把root1和root2的值相加放进新节点（或直接累加到root1上），然后分别对左子树对(root1.left, root2.left)和右子树对(root1.right, root2.right)递归合并，结果挂到新节点的左右孩子上",
     "代码位置：前序位置，先算当前节点的合并值，再递归处理左右子树"
    ],
+   "firstSolvedAt": 1760385110,
    "id": "617_merge-two-binary-trees",
    "number": 617,
    "pseudocode": [
@@ -11817,6 +12002,7 @@
     "单层主体：看当前 depth 是否是新出现的层（等于 stats 长度就新建一个[0,0]），然后把 node.val 累加进 stats[depth][0]，节点数 stats[depth][1] 加一",
     "代码位置：前序位置，因为要先统计当前节点的值，再递归处理左右子节点"
    ],
+   "firstSolvedAt": 1760396299,
    "id": "637_average-of-levels-in-binary-tree",
    "number": 637,
    "pseudocode": [
@@ -11881,6 +12067,7 @@
     "出窗口时机：每次right前进后，同时把left右移一位，并从ksum里减去nums[left]（滑出的旧元素），因为窗口长度固定必须同步移出一个元素",
     "记结果时机：每次更新完ksum后立刻用ksum和msum比较，取较大值更新msum，最后返回msum/k"
    ],
+   "firstSolvedAt": 1755906900,
    "id": "643_maximum-average-subarray-i",
    "number": 643,
    "pseudocode": [
@@ -11925,6 +12112,7 @@
     "单层主体：先判断k-node.val是否已经在res集合里，是就直接返回True，否则把node.val加入res集合，再分别递归左右子树看是否找到，最后返回left或right的结果",
     "代码位置：前序位置，因为要先处理当前节点（判断+加入集合）再递归左右子树，保证子树递归时集合里已包含祖先和之前兄弟节点的值"
    ],
+   "firstSolvedAt": 1760388035,
    "id": "653_two-sum-iv-input-is-a-bst",
    "number": 653,
    "pseudocode": [
@@ -11981,6 +12169,7 @@
     "判定条件：判定条件是比较x-arr[mid]和arr[mid+k]-x哪个更大：如果x-arr[mid]>arr[mid+k]-x说明左边这个元素太远，起点该往右移",
     "边界收缩：如果x-arr[mid]>arr[mid+k]-x，说明mid这个起点太靠左，令left=mid+1；否则说明mid+k这一侧更远或相等，令right=mid（收缩到更靠左的位置），最终left==right就是答案的起始下标，不存在“命中即返回”的情况，因为这里找的是最优位置而非精确匹配值"
    ],
+   "firstSolvedAt": 1764455968,
    "id": "658_find-k-closest-elements",
    "number": 658,
    "pseudocode": [
@@ -12033,6 +12222,7 @@
     "单层主体：如果当前节点值大于min1，说明找到一个候选的第二小值，更新second_min为它和当前节点值中较小的那个，然后不再往下递归（剪枝）；否则说明当前节点值等于min1，需要继续往左右子树找",
     "代码位置：主体代码写在前序位置，先判断当前节点值再决定要不要继续递归左右子树，这样可以提前剪枝避免不必要的遍历"
    ],
+   "firstSolvedAt": 1760478372,
    "id": "671_second-minimum-node-in-a-binary-tree",
    "number": 671,
    "pseudocode": [
@@ -12100,6 +12290,7 @@
     "局部最优判据：当s[left]!=s[right]时，局部最优判据就是只尝试跳过left或跳过right这两种删法，分别用双指针检查剩下的子串s[left+1..right]和s[left..right-1]是否回文",
     "正确性理由：因为前面left到right之间已经匹配的字符不可能通过删除中间某个字符变得更优，第一次出现不匹配就是必须处理的关键点，只有跳过左或跳过右两种可能，只要有一种能使剩余部分回文就整体成立，所以局部两种试探穷尽了所有可能，能保证不遗漏正确答案"
    ],
+   "firstSolvedAt": 1762570429,
    "id": "680_valid-palindrome-ii",
    "number": 680,
    "pseudocode": [
@@ -12144,6 +12335,7 @@
     "进出时机：遇到数字直接压栈；遇到'C'弹出栈顶（作废上一次得分）；遇到'D'弹出栈顶再把原值和双倍值都压回去；遇到'+'弹出最上面两个再把它们和它们的和都压回去",
     "剩余元素含义：循环结束后栈里剩下的就是所有当前有效的得分记录，把它们全部加起来就是最终答案"
    ],
+   "firstSolvedAt": 1763079657,
    "id": "682_baseball-game",
    "number": 682,
    "pseudocode": [
@@ -12188,6 +12380,7 @@
     "拓扑排序：本题不涉及拓扑排序，因为岛屿遍历不涉及依赖顺序或环检测，只是单纯的连通块遍历。",
     "最短路松弛：本题不涉及最短路径计算，题目关心的是岛屿的形状去重计数，不是求路径长度或距离。"
    ],
+   "firstSolvedAt": 1768767165,
    "id": "694_number-of-distinct-islands",
    "number": 694,
    "pseudocode": [
@@ -12280,6 +12473,7 @@
     "visited 时机：格子一入队（刚被发现是陆地邻居时）就立刻标记visited，避免同一格子被多次加入队列重复计算面积。",
     "是否分层：本题不涉及分层，因为只需要统计连通块大小（面积），不需要区分BFS的层数或步数。"
    ],
+   "firstSolvedAt": 1768512985,
    "id": "695_max-area-of-island",
    "number": 695,
    "pseudocode": [
@@ -12360,6 +12554,7 @@
     "拓扑排序：本题不涉及，网格DFS找连通块不存在依赖关系，不需要对节点排序",
     "最短路松弛：本题不涉及，题目要的是统计不同岛屿形状的数量而不是求最短路径长度"
    ],
+   "firstSolvedAt": 1768850510,
    "id": "711_number-of-distinct-islands-ii",
    "number": 711,
    "pseudocode": [
@@ -12404,6 +12599,7 @@
     "出窗口时机：当res大于等于k时移动left缩小窗口，每次把res除以nums[left]再left自增，直到res小于k为止",
     "记结果时机：每轮内层while结束后（窗口乘积已小于k），用ans += right - left 累加以当前right-1为结尾的合法子数组个数"
    ],
+   "firstSolvedAt": 1764457618,
    "id": "713_subarray-product-less-than-k",
    "number": 713,
    "pseudocode": [
@@ -12449,6 +12645,7 @@
     "base case：base case是dp[0][j]和dp[i][0]都为0，表示某一个数组还没取元素时公共长度为0",
     "遍历顺序：按i从1到n、j从1到m的顺序双重遍历，因为dp[i][j]只依赖dp[i-1][j-1]，从前往后算即可保证子问题已算好"
    ],
+   "firstSolvedAt": 1764521634,
    "id": "718_maximum-length-of-repeated-subarray",
    "number": 718,
    "pseudocode": [
@@ -12492,6 +12689,7 @@
     "preSum[0] 定义：preSum[0] 定义为0，这样左侧和直接取curr[j]就行，不用单独判断j=0时左侧没有元素的情况",
     "差分下标位置：本题不涉及差分，因为不需要对区间做批量加减操作，只是求区间和"
    ],
+   "firstSolvedAt": 1759703272,
    "id": "724_find-pivot-index",
    "number": 724,
    "pseudocode": [
@@ -12536,6 +12734,7 @@
     "拓扑排序：本题不涉及拓扑排序，因为图里可能有环（网络延迟场景边权为正但图不是DAG），求的是最短路而不是依赖顺序",
     "最短路松弛：dist数组初始化为无穷大，起点k的dist设为0，然后按选中的算法（Dijkstra每次取未访问中最小的节点松弛邻居，或Floyd三重循环用中转点k更新dist[i][j]=min(dist[i][j], dist[i][k]+dist[k][j])）不断更新，最后取dist数组里的最大值作为答案，若有节点不可达则返回-1"
    ],
+   "firstSolvedAt": 1769032513,
    "id": "744_network-delay-time",
    "number": 744,
    "pseudocode": [
@@ -12640,6 +12839,7 @@
     "判定条件：判定条件是letters[mid]是否大于target，这是个单调条件（一旦大于target，后面都大于target），不是判断等于target",
     "边界收缩：如果letters[mid]>target说明mid可能是答案也可能还有更小的满足条件的，收缩right=mid；否则letters[mid]<=target，答案在mid右边，收缩left=mid+1；循环结束后判断letters[left]是否大于target，是则返回它，否则说明没有比target大的字母，循环取第一个字母letters[0]"
    ],
+   "firstSolvedAt": 1757089468,
    "id": "745_find-smallest-letter-greater-than-target",
    "number": 745,
    "pseudocode": [
@@ -12701,6 +12901,7 @@
     "base case：base case是dp[0]=cost[0]，dp[1]=cost[1]，即起始的两个台阶花费就是它们自身的cost",
     "遍历顺序：从下标2开始一直遍历到n（楼梯顶部，即数组外一格），保证计算dp[i]时dp[i-1]和dp[i-2]都已经算出来"
    ],
+   "firstSolvedAt": 1761949742,
    "id": "747_min-cost-climbing-stairs",
    "number": 747,
    "pseudocode": [
@@ -12745,6 +12946,7 @@
     "单层主体：对 root 的每个子节点 child 递归求 maxDepth(child)，取所有子节点结果中的最大值，再加 1 作为当前节点的深度",
     "代码位置：属于后序位置，因为必须先递归算出所有子节点的深度，才能在当前节点汇总取最大值再加一"
    ],
+   "firstSolvedAt": 1760376365,
    "id": "774_maximum-depth-of-n-ary-tree",
    "number": 774,
    "pseudocode": [
@@ -12801,6 +13003,7 @@
     "单层主体：单层主体是先把当前 node 的值加入 res，然后依次对 node 的每个子节点调用 traverse（每个子树的遍历结果已经算作正确完成）。",
     "代码位置：主体代码写在前序位置，即先处理当前节点值再递归处理子节点，这正是前序遍历要求的“根在前”。"
    ],
+   "firstSolvedAt": 1760382485,
    "id": "775_n-ary-tree-preorder-traversal",
    "number": 775,
    "pseudocode": [
@@ -12877,6 +13080,7 @@
     "单层主体：先对node的每个子节点依次递归调用traverse，等所有子节点都处理完了，再把node自己的值加进res",
     "代码位置：属于后序位置，因为要等所有子节点（for循环遍历children递归完）都处理完之后，才把当前节点的值加入结果"
    ],
+   "firstSolvedAt": 1760382575,
    "id": "776_n-ary-tree-postorder-traversal",
    "number": 776,
    "pseudocode": [
@@ -12945,6 +13149,7 @@
     "单层主体：比较root.val和val：相等就直接返回root，val小于root.val就去左子树找，否则去右子树找（只会往一边递归，不用管另一边）",
     "代码位置：前序位置，先处理当前节点（判断相等或决定往哪边走），再递归进入子树"
    ],
+   "firstSolvedAt": 1760390061,
    "id": "783_search-in-a-binary-search-tree",
    "number": 783,
    "pseudocode": [
@@ -13001,6 +13206,7 @@
     "进出时机：新数进来时：如果堆里元素不够K个就直接放进去；如果堆满了K个且新数比堆顶大，就把堆顶弹出、新数放进去，堆顶始终是第K大的值",
     "剩余元素含义：最终堆里剩下的K个元素就是数据流里最大的K个数，堆顶那个就是第K大元素"
    ],
+   "firstSolvedAt": 1760588982,
    "id": "789_kth-largest-element-in-a-stream",
    "number": 789,
    "pseudocode": [
@@ -13069,6 +13275,7 @@
     "判定条件：判定条件就是nums[mid]是否等于target，这是单点查找不是找边界",
     "边界收缩：nums[mid]==target时直接返回mid；nums[mid]>target时right=mid-1；nums[mid]<target时left=mid+1，循环结束还没找到就返回-1"
    ],
+   "firstSolvedAt": 1757015049,
    "id": "792_binary-search",
    "number": 792,
    "pseudocode": [
@@ -13125,6 +13332,7 @@
     "单层主体：利用BST中序遍历值递增的性质，先递归左子树，再比较当前节点值和prev的差值来更新min_diff，最后把prev更新为当前节点值，再递归右子树",
     "代码位置：主体代码写在中序位置，即先处理左子树、再处理当前节点（比较并更新prev和min_diff）、最后处理右子树"
    ],
+   "firstSolvedAt": 1760402000,
    "id": "799_minimum-distance-between-bst-nodes",
    "number": 799,
    "pseudocode": [
@@ -13180,6 +13388,7 @@
     "指针关系：本题不涉及快慢双指针，只用了单指针（或prev/cur一对相邻指针）顺序遍历链表查找key，不存在fast/slow速度差关系",
     "停止条件：遍历到当前节点cur为null时停止（即到链表末尾还没找到key），找到key等于目标值时提前返回"
    ],
+   "firstSolvedAt": 1753393854,
    "id": "816_design-hashset",
    "number": 816,
    "pseudocode": [
@@ -13227,6 +13436,7 @@
     "指针关系：本题不涉及快慢指针，这里链表只是用来存同一个桶里的键值对，操作都是单指针遍历查找键是否相等",
     "停止条件：遍历到当前指针为null（即到达链表末尾）就停止，找不到匹配的键就返回-1或不做删除"
    ],
+   "firstSolvedAt": 1753463511,
    "id": "817_design-hashmap",
    "number": 817,
    "pseudocode": [
@@ -13270,6 +13480,7 @@
     "slow 含义：本题不涉及写入位置的slow指针，tmp表示的是当前遍历方向上最近一次出现目标字符c的下标，用来算距离，不是数组写入位置",
     "停止条件：两次遍历都是指针（i）从字符串一端走到另一端，遇到越界（i超出0到n-1范围）就停止，不存在相遇的情况"
    ],
+   "firstSolvedAt": 1754259991,
    "id": "841_shortest-distance-to-a-character",
    "number": 841,
    "pseudocode": [
@@ -13334,6 +13545,7 @@
     "visited 时机：visited通过直接把网格值改成岛屿ID来标记，一旦格子被赋予了岛屿ID就不会再被重复访问和计算面积",
     "是否分层：本题不涉及分层，因为不是求最短路径或层级距离，只是找连通块面积和枚举填海后的合并面积，用普通标记遍历即可"
    ],
+   "firstSolvedAt": 1768759871,
    "id": "854_making-a-large-island",
    "number": 854,
    "pseudocode": [
@@ -13389,6 +13601,7 @@
     "slow 含义：本题不涉及，因为这里用的是左右相向指针翻转数组，不是快慢指针同向遍历的场景",
     "停止条件：每行翻转时用left小于right作为循环条件，当left和right相遇或交错（left>=right）就停止交换"
    ],
+   "firstSolvedAt": 1754355242,
    "id": "861_flipping-an-image",
    "number": 861,
    "pseudocode": [
@@ -13434,6 +13647,7 @@
     "base case：dp[0]=1.0，表示还没抽牌时点数为0的概率是1，另外若k为0或n>=k+maxPts则直接返回1.0（不用真的算dp）",
     "遍历顺序：从i=1正序遍历到n，同时维护一个大小为maxPts的滑动窗口和windowSum，保证计算dp[i]时窗口里存的是i-maxPts到i-1（且<k）这些已经算好的dp值之和"
    ],
+   "firstSolvedAt": 1764527918,
    "id": "867_new-21-game",
    "number": 867,
    "pseudocode": [
@@ -13502,6 +13716,7 @@
     "进出时机：遇到非'#'字符就压入栈，遇到'#'且栈非空就弹出栈顶（模拟退格）",
     "剩余元素含义：循环结束后栈里剩下的就是退格处理完之后的最终字符串内容，两个字符串各自构建完的栈内容相等则返回true"
    ],
+   "firstSolvedAt": 1763080624,
    "id": "874_backspace-string-compare",
    "number": 874,
    "pseudocode": [
@@ -13557,6 +13772,7 @@
     "局部最优判据：每次找零时看当前手里5美元和10美元的数量够不够按优先顺序凑出该找的零钱，不够就立刻判False",
     "正确性理由：5美元用途更广（既能找10也能找20），优先消耗10美元找零能让通用性强的5美元尽量留到后面，不会让后续交易更难成功，所以每步这样选不会比其他方式更差"
    ],
+   "firstSolvedAt": 1762576564,
    "id": "890_lemonade-change",
    "number": 890,
    "pseudocode": [
@@ -13605,6 +13821,7 @@
     "单层主体：判断当前node是不是叶子（左右孩子都为空），如果是就把node.val加入res，左右子树的遍历已经在递归调用里完成不用管",
     "代码位置：后序位置，因为要先递归完左右子树，最后再判断并处理当前节点是否是叶子"
    ],
+   "firstSolvedAt": 1760457880,
    "id": "904_leaf-similar-trees",
    "number": 904,
    "pseudocode": [
@@ -13656,6 +13873,7 @@
     "指针关系：fast每次走两步、slow每次走一步，保持fast的速度是slow的两倍，这样fast到头时slow正好在中间",
     "停止条件：循环条件是fast不为空且fast.next不为空，一旦fast为空或fast.next为空就停止，此时slow即为中间结点（偶数长度时取第二个中间结点）"
    ],
+   "firstSolvedAt": 1753463975,
    "id": "908_middle-of-the-linked-list",
    "number": 908,
    "pseudocode": [
@@ -13715,6 +13933,7 @@
     "preSum[0] 定义：这道题prefixSum是从第一个矩形的面积开始累加的（没有额外加一个0开头），二分查找时直接用target在1到ttl之间取值来对应下标，不需要用preSum[0]=0去省特判",
     "差分下标位置：本题不涉及，因为这里没有对区间做批量增减操作，只是单纯累加每个矩形的面积构成前缀和数组"
    ],
+   "firstSolvedAt": 1765239201,
    "id": "914_random-point-in-non-overlapping-rectangles",
    "number": 914,
    "pseudocode": [
@@ -13762,6 +13981,7 @@
     "slow 含义：本题不涉及快慢指针，因为没有原地覆盖数组的操作",
     "停止条件：本题不涉及双指针停止条件，遍历aliceSizes时一旦找到satisfies条件的i和res就直接返回，否则遍历完整个数组返回-1"
    ],
+   "firstSolvedAt": 1757105332,
    "id": "924_fair-candy-swap",
    "number": 924,
    "pseudocode": [
@@ -13806,6 +14026,7 @@
     "单层主体：先递归处理左子树，再新建一个只含当前节点值的节点接到curr.right，curr后移，再递归处理右子树",
     "代码位置：中序位置，即先traverse左子树，再处理当前节点（新建节点接到curr.right），最后traverse右子树"
    ],
+   "firstSolvedAt": 1760471463,
    "id": "933_increasing-order-search-tree",
    "number": 933,
    "pseudocode": [
@@ -13878,6 +14099,7 @@
     "出窗口时机：当哈希表res中水果种类数超过2时移动left，把fruits[left]计数减一，减到0就从哈希表删除该水果，直到种类数不超过2",
     "记结果时机：每次right移动、窗口调整完毕后，用当前窗口长度right-left更新maxSum为较大值"
    ],
+   "firstSolvedAt": 1764531121,
    "id": "940_fruit-into-baskets",
    "number": 940,
    "pseudocode": [
@@ -13921,6 +14143,7 @@
     "slow 含义：本题不涉及，因为用的是左右相向指针而不是快慢指针，没有slow这个角色",
     "停止条件：当i和j相遇（i小于j不成立）时停止"
    ],
+   "firstSolvedAt": 1754357287,
    "id": "941_sort-array-by-parity",
    "number": 941,
    "pseudocode": [
@@ -13972,6 +14195,7 @@
     "slow 含义：本题不涉及slow这种单指针写入语义，even_ptr和odd_ptr各自代表当前需要被填正确奇偶值的偶数位/奇数位置，不是待写入位置的收缩指针",
     "停止条件：当even_ptr超过n-2（越界到最后偶数位之后）或odd_ptr超过n-1（越界到最后奇数位之后）时循环停止，即两指针中任一个先走出数组范围"
    ],
+   "firstSolvedAt": 1754357716,
    "id": "958_sort-array-by-parity-ii",
    "number": 958,
    "pseudocode": [
@@ -14020,6 +14244,7 @@
     "出窗口时机：当res>k（窗口和超过k）时，就减去nums[left]并left+1，一直缩到res<=k为止",
     "记结果时机：每次内层while结束后，把(right-left)累加到cnt里，代表以right-1结尾且和不超过k的子数组个数，最后用atMost(goal)-atMost(goal-1)得到答案"
    ],
+   "firstSolvedAt": 1764531844,
    "id": "966_binary-subarrays-with-sum",
    "number": 966,
    "pseudocode": [
@@ -14064,6 +14289,7 @@
     "单层主体：判断当前节点root.val是否在[low, high]范围内，如果在就把它算进结果（midVal=root.val），不在就当0，然后和左右子树已经算好的和相加",
     "代码位置：后序位置，因为要先拿到左右子树的和（leftSum、rightSum）再加上当前节点的值一起返回"
    ],
+   "firstSolvedAt": 1760463762,
    "id": "975_range-sum-of-bst",
    "number": 975,
    "pseudocode": [
@@ -14123,6 +14349,7 @@
     "局部最优判据：局部最优判据就是看当前字符：'I'要求下一个数比当前大，所以填剩余最小值最保险；'D'要求下一个数比当前小，所以填剩余最大值最保险",
     "正确性理由：因为剩余可用数字是一个连续区间[left,right]，取端点填入后剩下的仍是连续区间，不会影响后续可选数字的取值范围，所以每步取端点不会破坏后面构造合法序列的可能性，最终能拼出满足所有I/D关系的排列"
    ],
+   "firstSolvedAt": 1754413283,
    "id": "979_di-string-match",
    "number": 979,
    "pseudocode": [
@@ -14170,6 +14397,7 @@
     "slow 含义：本题不涉及，因为本题是相向双指针而非快慢指针，没有写入位置的概念",
     "停止条件：当left>right（两指针相遇交叉）或者能量不足且score为0无法继续操作时停止"
    ],
+   "firstSolvedAt": 1780021417,
    "id": "985_bag-of-tokens",
    "number": 985,
    "pseudocode": [
@@ -14242,6 +14470,7 @@
     "单层主体：当前节点值如果不等于 targetVal 就直接返回 False，否则返回左子树结果和右子树结果的与。",
     "代码位置：前序位置就能判掉当前节点（值不对立刻 False），左右结果的合并在后序位置返回。"
    ],
+   "firstSolvedAt": 1760466982,
    "id": "1005_univalued-binary-tree",
    "number": 1005,
    "pseudocode": [
@@ -14291,6 +14520,7 @@
     "base case：dp[0]=0，dp[1]=1，递归里 n==0 返回 0、n==1 返回 1 直接结束。",
     "遍历顺序：从小到大算：递推写法 i 从 2 递增到 n；记忆化递归是从 n 往下拆，回溯时天然保证 n-1、n-2 已算好。"
    ],
+   "firstSolvedAt": 1761942411,
    "id": "1013_fibonacci-number",
    "number": 1013,
    "pseudocode": [
@@ -14346,6 +14576,7 @@
     "slow 含义：本题不涉及 slow 指针，因为不需要原地写回或去重，只是读取判断 nums[i] < nums[i+1]+nums[i+2]",
     "停止条件：i 走到 len(nums)-3 为止（保证 i+2 不越界），一旦某个 i 满足三角形条件就立刻返回这三边之和，全程没找到就返回 0"
    ],
+   "firstSolvedAt": 1762581326,
    "id": "1018_largest-perimeter-triangle",
    "number": 1018,
    "pseudocode": [
@@ -14389,6 +14620,7 @@
     "slow 含义：本题不涉及快慢指针；对应的写入指针 k 从结果数组末尾开始，指向下一个要填的位置，每填一个就左移一位。",
     "停止条件：外层循环条件是 i <= j，当 i > j（两指针交错）时停止，此时正好填满 n 个位置；注意必须用 <=，否则中间那个元素会漏填。"
    ],
+   "firstSolvedAt": 1599055494,
    "id": "1019_squares-of-a-sorted-array",
    "number": 1019,
    "pseudocode": [
@@ -14449,6 +14681,7 @@
     "出窗口时机：不是逐步收缩，而是一旦发现断裂就直接跳左边界：若 curr==0（两数相等）则 left=right，若 curr==prev（同向）则 left=right-1，然后把 isBroken 重置为 False。",
     "记结果时机：每次 right 前进并处理完左边界后都更新一次 maxLen = max(maxLen, right-left+1)，最后返回 maxLen（数组长度小于 2 时直接返回其长度）。"
    ],
+   "firstSolvedAt": 1764568515,
    "id": "1020_longest-turbulent-subarray",
    "number": 1020,
    "pseudocode": [
@@ -14496,6 +14729,7 @@
     "slow 含义：本题不涉及，因为不是原地覆盖写入类问题，没有慢指针表示已处理区间的写入位置",
     "停止条件：当 left 达到 firstList 长度或 right 达到 secondList 长度（任一列表遍历完）时循环停止"
    ],
+   "firstSolvedAt": 1780176270,
    "id": "1028_interval-list-intersections",
    "number": 1028,
    "pseudocode": [
@@ -14564,6 +14798,7 @@
     "单层主体：看当前节点值是不是 x 或 y，是就把 depth 和 prev 存到对应的 dx/px 或 dy/py，然后带着 self 作为父节点、depth+1 递归左右子树。",
     "代码位置：前序位置，一进节点就判断并记录，因为深度和父节点在往下走之前就已知，不依赖子树结果。"
    ],
+   "firstSolvedAt": 1760482174,
    "id": "1035_cousins-in-binary-tree",
    "number": 1035,
    "pseudocode": [
@@ -14611,6 +14846,7 @@
     "局部最优判据：本题不涉及分步的局部最优；唯一的判定是遍历 1..n 时对单个 i 直接看两个计数是否满足「被所有其他 n-1 人信任且自己谁也不信」，这个判断只依赖已经统计完的全量度数，不是走一步选一步。",
     "正确性理由：正确性来自法官定义本身而非贪心交换论证：满足入度 n-1、出度 0 的人至多只有一个（若有两人，彼此都得信任对方，与出度 0 矛盾），所以一旦找到就是答案，找不到就返回 -1。"
    ],
+   "firstSolvedAt": 1761071743,
    "id": "1039_find-the-town-judge",
    "number": 1039,
    "pseudocode": [
@@ -14655,6 +14891,7 @@
     "出窗口时机：只在cnt>k（窗口里0太多）时缩左边，移出nums[left]若为0就cnt--，然后left++，直到cnt<=k。",
     "记结果时机：每次缩完左边、窗口重新合法后，用maxLen=max(maxLen, right-left)更新一次（right已加过1，所以长度就是right-left）。"
    ],
+   "firstSolvedAt": 1764620622,
    "id": "1046_max-consecutive-ones-iii",
    "number": 1046,
    "pseudocode": [
@@ -14698,6 +14935,7 @@
     "局部最优判据：每一步只看当前数组里谁最小，把它取反收益最大：最小的是负数就变正，增量2|x|最大；全是非负数了，翻最小的那个损失最少（有0就损失为0）。",
     "正确性理由：总和等于各元素绝对值之和减去仍为负的那部分的两倍，先翻绝对值大的负数能最快消掉负项；负数翻完后k还有剩，必须继续翻，翻绝对值最小的数带来的减损最少，所以每步的最优选择都不会挡住后面的更好选择，累起来就是全局最大和。"
    ],
+   "firstSolvedAt": 1762619238,
    "id": "1047_maximize-sum-of-array-after-k-negations",
    "number": 1047,
    "pseudocode": [
@@ -14741,6 +14979,7 @@
     "preSum[0] 定义：这里连前缀和数组都不用建，只用一个 curr 从 0 开始累加、到达 targetSum 就归零；curr 初始为 0 就相当于 preSum[0]=0，省掉了第一段左边界的特判。",
     "差分下标位置：本题不涉及，因为没有对区间做加减操作，只是顺序扫描累加求和。"
    ],
+   "firstSolvedAt": 1762621175,
    "id": "1062_partition-array-into-three-parts-with-equal-sum",
    "number": 1062,
    "pseudocode": [
@@ -14805,6 +15044,7 @@
     "出窗口时机：本题不涉及出窗口：没有需要收缩的非法条件，n>2000 直接返回 False 也只是提前剪枝；套定长窗口时才是窗口长度超过 L 就把 s[left] 的最高位权重减掉（val -= (s[left]-'0')<<(L-1)）并 left++。",
     "记结果时机：结果不是在某次窗口移动时记的，而是枚举完毕后：只要有一个 bin(i) 不在 s 里立刻返回 False，全部找到才返回 True。"
    ],
+   "firstSolvedAt": 1764636341,
    "id": "1065_binary-string-with-substrings-representing-1-to-n",
    "number": 1065,
    "pseudocode": [
@@ -14849,6 +15089,7 @@
     "判定条件：比较 arr[mid] 和 mid 本身：相等就是不动点，arr[mid] > mid 说明不动点只可能在左边，arr[mid] < mid 说明只可能在右边（严格递增数组里 arr[i]-i 单调不减）。",
     "边界收缩：arr[mid]==mid 时不立刻返回，先记 res=mid 再让 right=mid-1 继续往左找更小的不动点；arr[mid]>mid 时 right=mid-1；arr[mid]<mid 时 left=mid+1；循环结束返回 res，没找到就是 -1。"
    ],
+   "firstSolvedAt": 1757105491,
    "id": "1066_fixed-point",
    "number": 1066,
    "pseudocode": [
@@ -14921,6 +15162,7 @@
     "visited 时机：格子一出队/一入队就直接把 grid[r][c] 改成 0 当作已访问标记，靠原地淹没代替额外 visited 数组，改过的格子不会再被当作陆地入队。",
     "是否分层：不用分层，这题只要把与边界相连的陆地全部淹掉，不关心走了几步，所以不需要记录层数。"
    ],
+   "firstSolvedAt": 1768760825,
    "id": "1073_number-of-enclaves",
    "number": 1073,
    "pseudocode": [
@@ -14968,6 +15210,7 @@
     "局部最优判据：当前这条成绩来了，只看两点：堆里不足5个就直接放进去；堆已满就只和堆顶最小值比一次，大就换、不大就丢，完全不用看后面还有什么成绩。",
     "正确性理由：要求前五科均分最大，等价于选出最大的5个分数求和；任何被丢掉的分数都比当前保留的5个都小，它永远不可能进入最终的前五名，所以每一步丢弃都不会损失最优解，遍历完堆里就是全局最大的5个分数。"
    ],
+   "firstSolvedAt": 1761265143,
    "id": "1074_high-five",
    "number": 1074,
    "pseudocode": [
@@ -15012,6 +15255,7 @@
     "进出时机：遇到 '(' 先判断栈是否非空（非空才写进结果）再压入；遇到 ')' 先判断栈长度是否大于 1（大于 1 才写进结果）再弹出",
     "剩余元素含义：因为输入是合法的有效括号串，遍历结束时栈一定为空、计数器回到 0，没有剩余元素"
    ],
+   "firstSolvedAt": 1763138416,
    "id": "1078_remove-outermost-parentheses",
    "number": 1078,
    "pseudocode": [
@@ -15068,6 +15312,7 @@
     "单层主体：先把当前节点并入路径：ttl = ttl*2 + node.val；若左右孩子都为空说明是叶子，直接返回/累加 ttl；否则把新 ttl 传下去，返回左右子树结果之和。",
     "代码位置：前序位置——必须先用父节点传来的 ttl 更新出当前值，再往下递归；叶子判断和求和顺带在向下的路上完成。"
    ],
+   "firstSolvedAt": 1760554367,
    "id": "1079_sum-of-root-to-leaf-binary-numbers",
    "number": 1079,
    "pseudocode": [
@@ -15155,6 +15400,7 @@
     "slow 含义：本题不涉及，这里不做原地写入或去重，没有 slow 指针，两个指针都是用来试探两数之和的边界。",
     "停止条件：当 left 和 right 相遇时停（while left < right），因为同一个元素不能用两次；循环结束返回 max_num，没找到任何小于 k 的组合就返回初始值 -1。"
    ],
+   "firstSolvedAt": 1754492678,
    "id": "1083_two-sum-less-than-k",
    "number": 1083,
    "pseudocode": [
@@ -15232,6 +15478,7 @@
     "base case：dp[1]=False，因为面对 1 找不到合法的 x，先手直接输。",
     "遍历顺序：i 从 2 递增到 n，因为 dp[i] 只依赖比 i 小的 dp[i-x]，小的先算好。"
    ],
+   "firstSolvedAt": 1762144186,
    "id": "1086_divisor-game",
    "number": 1086,
    "pseudocode": [
@@ -15312,6 +15559,7 @@
     "判定条件：判定的是 nums[mid] 与 target 的大小关系，但命中 target 时不返回，而是把它当成「候选的最后位置」继续往右压。",
     "边界收缩：nums[mid] < target 时 left = mid+1；nums[mid] > target 时 right = mid-1；nums[mid] == target 时记下 last = mid 并 left = mid+1 继续右探，循环结束后用 last-first+1 和 n/2 比较得出答案。"
    ],
+   "firstSolvedAt": 1757273496,
    "id": "1102_check-if-a-number-is-majority-element-in-a-sorted-array",
    "number": 1102,
    "pseudocode": [
@@ -15380,6 +15628,7 @@
     "进出时机：入堆：初始化时所有石头重量入堆，以及每次碰撞后差值 y-x 不为 0 时把它入堆；出堆：只要堆里还有 2 块以上石头，就连续弹出最大的 y 和次大的 x。",
     "剩余元素含义：循环结束后堆里最多剩 1 个元素，就是最后一块石头的重量（取负还原）；堆空说明全部两两抵消，返回 0。"
    ],
+   "firstSolvedAt": 1761256638,
    "id": "1127_last-stone-weight",
    "number": 1127,
    "pseudocode": [
@@ -15432,6 +15681,7 @@
     "进出时机：遍历到某个字符时，若栈非空且栈顶等于它，就弹出栈顶且这个字符也不入栈（两个一起消掉）；否则把它压进栈。",
     "剩余元素含义：栈里剩的就是所有相邻重复都消完后的结果字符，从栈底到栈顶拼起来即答案。"
    ],
+   "firstSolvedAt": 1763140782,
    "id": "1128_remove-all-adjacent-duplicates-in-string",
    "number": 1128,
    "pseudocode": [
@@ -15480,6 +15730,7 @@
     "出窗口时机：当窗口大小超过minutes（即i>=minutes）时，同时移除left=i-minutes位置，如果该位置grumpy为1就从flex里减去customers[i-minutes]，left随之右移",
     "记结果时机：每次窗口滑动更新完flex后都要立即计算fixed+flex并更新maxres，取最大值"
    ],
+   "firstSolvedAt": 1779725686,
    "id": "1138_grumpy-bookstore-owner",
    "number": 1138,
    "pseudocode": [
@@ -15547,6 +15798,7 @@
     "局部最优判据：看当前累加重量 sum 加上这个苹果的重量 w 是否还 ≤ 5000，是就装并计数加一，否则直接停。",
     "正确性理由：要装的个数固定时，选最轻的那几个总重最小、最容易满足 5000 的限制；如果某个方案里用了较重的苹果，把它换成没用过的更轻苹果总重只会更小，个数不变，所以按重量从小到大贪心取到装不下为止就是最多个数。"
    ],
+   "firstSolvedAt": 1762623581,
    "id": "1141_how-many-apples-can-you-put-into-the-basket",
    "number": 1141,
    "pseudocode": [
@@ -15594,6 +15846,7 @@
     "枚举范围：本题不涉及枚举范围缩减，因为求gcd用的是辗转相除法而不是枚举，验证候选串也只需固定次数的重复比较，没有可以缩到sqrt(n)或只看质因数的枚举过程",
     "数值边界：字符串长度和内容都是普通int范围内的值，不涉及大数运算，也不需要取模，唯一要注意的是重复构造字符串时长度不能算错导致越界"
    ],
+   "firstSolvedAt": 1785172134,
    "id": "1146_greatest-common-divisor-of-strings",
    "number": 1146,
    "pseudocode": [
@@ -15681,6 +15934,7 @@
     "slow 含义：本题不涉及：不是原地覆盖写入，三个指针都只是各数组的读取位置，结果单独存进 res 列表。",
     "停止条件：任一指针走到自己数组末尾（p1>=len(arr1) 或 p2>=len(arr2) 或 p3>=len(arr3)）就结束循环，因为后面再不可能凑出三方相同的值。"
    ],
+   "firstSolvedAt": 1757281074,
    "id": "1149_intersection-of-three-sorted-arrays",
    "number": 1149,
    "pseudocode": [
@@ -15724,6 +15978,7 @@
     "slow 含义：这里的写指针 j 指的是结果数组中下一个要填的位置（从 n-1 往前走），遇到 0 就在 j 和 j-1 连填两个零，非零就把 arr[i] 搬到 arr[j]。",
     "停止条件：先用 slot 累加（0 计 2、非零计 1）扫到 slot>=n 停下，确定读指针 i 的边界；之后复制阶段 i 从该位置递减到 0（或 j<0）为止，注意 slot==n+1 的边界要先在 arr[n-1] 单独补一个 0 再开始。"
    ],
+   "firstSolvedAt": 1599568582,
    "id": "1168_duplicate-zeros",
    "number": 1168,
    "pseudocode": [
@@ -15797,6 +16052,7 @@
     "base case：dp[0]=0，dp[1]=1，dp[2]=1。",
     "遍历顺序：递归写法是从 n 往下递归、回来时自然由小到大填表；改成迭代就从 i=3 递增到 n 顺序算，保证 i-1、i-2、i-3 已算好。"
    ],
+   "firstSolvedAt": 1761950430,
    "id": "1236_n-th-tribonacci-number",
    "number": 1236,
    "pseudocode": [
@@ -15841,6 +16097,7 @@
     "出窗口时机：每次 right 进一个就必须马上出一个，T 减去 calories[left] 再 left++，保证窗口长度还是 k。",
     "记结果时机：每形成一个完整的 k 长度窗口就判一次：T<lower 则 cnt--，T>upper 则 cnt++，中间不动；包括初始那个窗口也要判，最后返回 cnt。"
    ],
+   "firstSolvedAt": 1755908557,
    "id": "1280_diet-plan-performance",
    "number": 1280,
    "pseudocode": [
@@ -15889,6 +16146,7 @@
     "出窗口时机：当ttl超过maxCost时就要移动left收缩窗口，移出s[left]和t[left]的差值，从ttl中减去，直到ttl不超过maxCost为止",
     "记结果时机：每次right移动、窗口调整合法后，用right-left+1更新最大长度maxlen"
    ],
+   "firstSolvedAt": 1779810850,
    "id": "1321_get-equal-substrings-within-budget",
    "number": 1321,
    "pseudocode": [
@@ -15980,6 +16238,7 @@
     "局部最优判据：每一步只看当前筹码所在下标是奇是偶，奇数位计入oddCount、偶数位计入evenCount，不用管其他筹码在哪，最后哪个计数小就选哪个当代价。",
     "正确性理由：移动2格免费，所以同奇偶的位置之间可以随便搬、代价为0，等于所有奇数位筹码能白白聚成一堆、偶数位也一样；剩下只有奇偶两堆之间要跨1格，每个筹码花1，那自然是把数量少的那堆搬过去最省，不存在更优的其他搬法。"
    ],
+   "firstSolvedAt": 1762626319,
    "id": "1329_minimum-cost-to-move-chips-to-the-same-position",
    "number": 1329,
    "pseudocode": [
@@ -16023,6 +16282,7 @@
     "局部最优判据：只看当前前缀的 cnt 是否等于 0，等于 0 就说明这段 R 和 L 数量相等，是个合法的平衡串，立刻计数 res+1 并重新开始累计。",
     "正确性理由：每次都在最早能切的位置切，切出的段最短，剩下的后缀依然是整体平衡的（总 R=总 L），仍能继续切；如果推迟切分，只会把两段并成一段，分割数只会变少不会变多，所以最早切一定得到最多段数。"
    ],
+   "firstSolvedAt": 1762706673,
    "id": "1341_split-a-string-in-balanced-strings",
    "number": 1341,
    "pseudocode": [
@@ -16067,6 +16327,7 @@
     "visited 时机：本题不用额外 visited 数组，把格子值直接改成 1（水）就等于标记已访问，出队/入队时立刻改，避免同一块陆地反复入队。",
     "是否分层：不用分层，只要把连通的陆地全部淹没并计数，不关心步数或距离。"
    ],
+   "firstSolvedAt": 1768762275,
    "id": "1380_number-of-closed-islands",
    "number": 1380,
    "pseudocode": [
@@ -16110,6 +16371,7 @@
     "指针关系：本题不涉及双指针，只有一个 curr 指针从头往后走，没有快慢之分。",
     "停止条件：单指针遍历，条件就是 while curr != null，走到空就结束返回 total_value。"
    ],
+   "firstSolvedAt": 1753483402,
    "id": "1411_convert-binary-number-in-a-linked-list-to-integer",
    "number": 1411,
    "pseudocode": [
@@ -16153,6 +16415,7 @@
     "枚举范围：只需从头到尾扫一遍 nums，每个数各自判断一次位数，没有嵌套枚举；若不转字符串，就是对每个数反复除以 10 最多 5 次（题目数字不超过 10^5）。",
     "数值边界：nums[i] 最大 10^5，位数最多 6 位，全在 int 范围内，计数器最大等于数组长度 500，不会溢出也不用取模。"
    ],
+   "firstSolvedAt": 1598968536,
    "id": "1421_find-numbers-with-even-number-of-digits",
    "number": 1421,
    "pseudocode": [
@@ -16205,6 +16468,7 @@
     "出窗口时机：窗口凑满 k 位后每次右移就同步把 left 那位吐掉，维护数值时减去 最高位数字 * 10^(k-1)，然后 left++。",
     "记结果时机：每次窗口正好为 k 位时判一次：子串值不为 0 且 num % 子串值 == 0 就 cnt++，全部滑完返回 cnt。"
    ],
+   "firstSolvedAt": 1756082937,
    "id": "1430_find-the-k-beauty-of-a-number",
    "number": 1430,
    "pseudocode": [
@@ -16249,6 +16513,7 @@
     "拓扑排序：本题不涉及，无向的好友关系图没有先后依赖，只是按层扩散",
     "最短路松弛：本题不涉及严格的 distTo 松弛，因为边权都是 1，BFS 一层层走，第一次访问到某人时的层数就是最短距离，靠 visited 保证不被更长的路径覆盖"
    ],
+   "firstSolvedAt": 1770938547,
    "id": "1436_get-watched-videos-by-your-friends",
    "number": 1436,
    "pseudocode": [
@@ -16293,6 +16558,7 @@
     "出窗口时机：从i=k开始每次right前进一格就同时移出最旧元素arr[i-k]，即窗口和=窗口和+arr[i]-arr[i-k]，左右指针同步滑动",
     "记结果时机：每次窗口和确定后（包括初始窗口和之后每次滑动后）立即判断窗口和是否>=threshold*k，满足就把计数器加1"
    ],
+   "firstSolvedAt": 1779652969,
    "id": "1445_number-of-sub-arrays-of-size-k-and-average-greater-than-or-equal-to-threshold",
    "number": 1445,
    "pseudocode": [
@@ -16360,6 +16626,7 @@
     "局部最优判据：每一步只看当前这一位是不是 '6'：是 '9' 就跳过继续找，是第一次遇到的 '6' 就立刻换成 '9' 并停下，不用管后面还有几个 6。",
     "正确性理由：位数不变，越靠左的位权重越大（高位加 3 比后面所有低位改动加起来还多），所以把最高位上的那个 6 变成 9 收益最大；而只能改一次，改别的 6 得到的数一定更小。"
    ],
+   "firstSolvedAt": 1762710166,
    "id": "1448_maximum-69-number",
    "number": 1448,
    "pseudocode": [
@@ -16404,6 +16671,7 @@
     "进出时机：遍历每一行时先算出该行1的个数就入堆；一旦堆里超过 k 个，立刻把堆顶那个战斗力最强（或战斗力相同但行号最大）的弹出。",
     "剩余元素含义：遍历结束后堆里剩下的正好是战斗力最弱的 k 行；因为是大顶堆，逐个弹出得到的是从弱到强的倒序，取出 -idx 后整体反转才是答案。"
    ],
+   "firstSolvedAt": 1757284490,
    "id": "1463_the-k-weakest-rows-in-a-matrix",
    "number": 1463,
    "pseudocode": [
@@ -16487,6 +16755,7 @@
     "slow 含义：本题不涉及：没有原地覆写或去重的动作，不存在「下一个待写入位置」这种 slow，唯一的下标 i 只是普通遍历游标。",
     "停止条件：停止条件就是普通遍历走完：哈希法 num 遍历完整个 arr 仍没命中就返回 False；暴力法 i、j 都跑到 n-1（且跳过 i==j）后返回 False，中途一旦发现 arr[i]==2*arr[j] 就立刻返回 True。"
    ],
+   "firstSolvedAt": 1754494470,
    "id": "1468_check-if-n-and-its-double-exist",
    "number": 1468,
    "pseudocode": [
@@ -16546,6 +16815,7 @@
     "slow 含义：本题不涉及快慢指针，没有原地写入或删除元素的需求；这里的 row/col 只是行列游标，row 表示当前正在检查的行，col 表示当前列位置，col 右边的元素在这一行都还没被判定为负。",
     "停止条件：当 row < 0（往上越出矩阵）或 col >= n（往右越出矩阵）时停止；遇到 grid[row][col] < 0 就一次加上 n - col 个负数并上移一行，否则右移一列。二分写法则是 left > right 时停，答案取 len(lst) - left。"
    ],
+   "firstSolvedAt": 1757354703,
    "id": "1476_count-negative-numbers-in-a-sorted-matrix",
    "number": 1476,
    "pseudocode": [
@@ -16605,6 +16875,7 @@
     "slow 含义：本题不涉及原地写入，所以没有「下一个待写入位置」的 slow；这里的 j 只是 arr2 里的扫描位置，表示当前候选的最小可能落在 [arr1[i]-d, arr1[i]+d] 内的元素下标。",
     "停止条件：j 在 arr2[j] < arr1[i]-d 时继续右移，一旦 j 越界（j == arr2.length）或 arr2[j] >= arr1[i]-d 就停；此时若 j 越界或 arr2[j] > arr1[i]+d，说明这个 arr1[i] 距离合格，计数加一；外层 i 走完 arr1 结束。"
    ],
+   "firstSolvedAt": 1754502409,
    "id": "1486_find-the-distance-value-between-two-arrays",
    "number": 1486,
    "pseudocode": [
@@ -16665,6 +16936,7 @@
     "单层主体：只判断当前的 p 是不是 target（比较引用相等），是就把对应的 q 记下来，然后分别递归 (p.left,q.left) 和 (p.right,q.right)。",
     "代码位置：写在前序位置——先判当前节点再往下递归，这样一命中就能直接返回，不用等子树算完。"
    ],
+   "firstSolvedAt": 1760556373,
    "id": "1498_find-a-corresponding-node-of-a-binary-tree-in-a-clone-of-that-tree",
    "number": 1498,
    "pseudocode": [
@@ -16728,6 +17000,7 @@
     "局部最优判据：每走一步只做一件事：把当前累积和 curr 和已记录的最小值比一比，比它小就更新，不需要知道后面还有什么数。",
     "正确性理由：起始值 x 加到每个前缀和上是整体平移，所有位置同时抬高同样的量，所以只要保证最低的那个前缀和 +x ≥ 1，其他位置必然也 ≥ 1；再小一点最低点就会掉到 0 或负数，所以这个值就是最小的可行解。"
    ],
+   "firstSolvedAt": 1759705069,
    "id": "1514_minimum-value-to-get-positive-step-by-step-sum",
    "number": 1514,
    "pseudocode": [
@@ -16771,6 +17044,7 @@
     "局部最优判据：每加一个数就看前缀和 arr[i] 是不是已经严格大于剩下的 ttl-arr[i]，一旦大于就立刻停下返回前 i 个数，不用管后面还有什么。",
     "正确性理由：要让子序列长度最短，同样个数下取最大的几个数总和最大，最容易先超过一半；而先满足长度最短、再要求和最大，降序取前缀正好同时做到这两点，所以第一个超过一半的前缀就是答案。"
    ],
+   "firstSolvedAt": 1762711440,
    "id": "1519_minimum-subsequence-in-non-increasing-order",
    "number": 1519,
    "pseudocode": [
@@ -16814,6 +17088,7 @@
     "枚举范围：本题不涉及枚举优化，只需遍历一遍candies数组求最大值，再遍历一遍做比较判断，没有可以缩小的范围",
     "数值边界：糖果数量和extraCandies都是很小的正整数（题目范围通常在1到100以内），不会溢出，也不需要取模"
    ],
+   "firstSolvedAt": 1785174475,
    "id": "1528_kids-with-the-greatest-number-of-candies",
    "number": 1528,
    "pseudocode": [
@@ -16885,6 +17160,7 @@
     "preSum[0] 定义：arr0[0]=arr1[0]=0，表示空前缀里啥都没有，这样分割点i处直接用arr0[i]和arr1[n]-arr1[i]，不用特判i=0或边界。",
     "差分下标位置：本题不涉及，因为只做区间求和查询，没有区间增减操作。"
    ],
+   "firstSolvedAt": 1759723479,
    "id": "1537_maximum-score-after-splitting-a-string",
    "number": 1537,
    "pseudocode": [
@@ -16933,6 +17209,7 @@
     "出窗口时机：窗口大小固定，每进一个新元素就要同时移出最左边的元素 cardPoints[i-length]，把它从 windowSum 中减掉，实现窗口整体右移",
     "记结果时机：每次更新完 windowSum 后立刻比较并更新 minWindowSum，遍历结束后用 total - minWindowSum 得到最终答案"
    ],
+   "firstSolvedAt": 1779670240,
    "id": "1538_maximum-points-you-can-obtain-from-cards",
    "number": 1538,
    "pseudocode": [
@@ -16993,6 +17270,7 @@
     "拓扑排序：可以用 Kahn 入度法：入度为 0 入队，出队时把自己的先修集合并上自己传给后继，后继入度减到 0 再入队，这样保证一门课出队时先修集合已完整；也可以不排序直接 Floyd 传递闭包。",
     "最短路松弛：本题不涉及，只问「能不能到达」的是非题，不需要距离，dist 退化成布尔可达矩阵，松弛变成 f[i][j] |= f[i][k] && f[k][j]。"
    ],
+   "firstSolvedAt": 1770494176,
    "id": "1558_course-schedule-iv",
    "number": 1558,
    "pseudocode": [
@@ -17069,6 +17347,7 @@
     "出窗口时机：每次滑动窗口时同步移出左端字符（即滑动前窗口最左边那个字符），如果它是元音字母就把cnt减1，出窗口和进窗口是同一步完成的",
     "记结果时机：每次滑动窗口更新完cnt后立刻用maxCnt和cnt比较取较大值，遍历结束后maxCnt就是答案"
    ],
+   "firstSolvedAt": 1779645364,
    "id": "1567_maximum-number-of-vowels-in-a-substring-of-given-length",
    "number": 1567,
    "pseudocode": [
@@ -17145,6 +17424,7 @@
     "弹栈条件：正序：while 栈非空且 prices[栈顶] >= 当前 prices[i] 就弹出，弹出的那个商品的折扣就是 prices[i]；倒序：while 栈非空且栈顶价格 > 当前价格就丢掉（它不可能当折扣）。",
     "遍历方向：两种都行——正序遍历是「我给前面等着的人发折扣」，倒序遍历是「我从后面留下的候选里找折扣」，本题推荐正序，一次减法即可。"
    ],
+   "firstSolvedAt": 1763144808,
    "id": "1570_final-prices-with-a-special-discount-in-a-shop",
    "number": 1570,
    "pseudocode": [
@@ -17204,6 +17484,7 @@
     "局部最优判据：每扫到一个 num，只看它是否比当前记录的最大值大（大就顶替最大、原最大降为次大），否则看是否比次大值大（大就替换次大），不用管后面还有什么数。",
     "正确性理由：因为题目约束元素都是正整数（≥1），(x-1) 随 x 单调不减，所以两个乘数各自取到最大时乘积必然最大，任何换成更小的数都只会让结果不增，不存在“选小的反而更优”的情况。"
    ],
+   "firstSolvedAt": 1761345432,
    "id": "1574_maximum-product-of-two-elements-in-an-array",
    "number": 1574,
    "pseudocode": [
@@ -17247,6 +17528,7 @@
     "局部最优判据：本题不涉及选择判定，每一步没有「选或不选」，第 i 位的答案被唯一确定为前 i+1 个数之和，没得挑。",
     "正确性理由：本题不涉及贪心正确性证明；正确性来自前缀和的定义递推：arr[i+1]=arr[i]+nums[i]，数学归纳即可保证每个位置都是前缀和。"
    ],
+   "firstSolvedAt": 1759724727,
    "id": "1603_running-sum-of-1d-array",
    "number": 1603,
    "pseudocode": [
@@ -17299,6 +17581,7 @@
     "单层主体：看 parent 是否存在且 parent 的左右子节点里只有一个不为空（parent.left 和 parent.right 一个是 None 一个不是），是就把 cur.val 加入 res，然后分别递归左右孩子。",
     "代码位置：写在前序位置：先判断并记录当前节点，再往下递归左右子树；因为判断只依赖父子关系，跟子树结果无关，放哪都行但前序最自然。"
    ],
+   "firstSolvedAt": 1760561018,
    "id": "1609_find-all-the-lonely-nodes",
    "number": 1609,
    "pseudocode": [
@@ -17362,6 +17645,7 @@
     "指针关系：不是同时跑的快慢指针，而是交替走：每一轮 slow 从当前段起点往前走 M 步停在这段保留部分的最后一个节点，fast 从 slow.next 出发再往前走 N 步跳过要删的节点，两者之间恰好隔着 N 个待删节点，然后 slow.next = fast，再把 slow 当作下一轮的起点。",
     "停止条件：两处都要判空即停：走 M 步时 slow 变成 null 就说明链表已走完，直接结束外层循环；走 N 步时 fast 变成 null 就说明尾部不足 N 个，此时 slow.next = null 把尾巴全删掉；外层循环以 slow/curr 为 null 作为整体终止。"
    ],
+   "firstSolvedAt": 1753643003,
    "id": "1618_delete-n-nodes-after-m-nodes-of-a-linked-list",
    "number": 1618,
    "pseudocode": [
@@ -17414,6 +17698,7 @@
     "判定条件：不是比 target，而是算 cnt = arr[mid]-(mid+1)（前 mid+1 个数前面缺了多少个），判断 cnt < k 是否成立。",
     "边界收缩：cnt<k 时 left=mid+1；cnt>=k 时 right=mid-1，中间命中也不提前返回，一直缩到 left 为分界点，最后返回 left+k。"
    ],
+   "firstSolvedAt": 1757375524,
    "id": "1646_kth-missing-positive-number",
    "number": 1646,
    "pseudocode": [
@@ -17482,6 +17767,7 @@
     "拓扑排序：用到了 Kahn 入度法的第一步思想——收集入度为 0 的点，但不需要真的做完整拓扑排序（不用队列、不用逐层删边）。",
     "最短路松弛：本题不涉及，题目只问哪些点必须当起点，跟距离长短没关系。"
    ],
+   "firstSolvedAt": 1768857720,
    "id": "1661_minimum-number-of-vertices-to-reach-all-nodes",
    "number": 1661,
    "pseudocode": [
@@ -17530,6 +17816,7 @@
     "进出时机：遍历到某字符时，若栈顶和它同字母但大小写不同就弹出栈顶且当前字符也不入栈（一起抵消掉）；否则把当前字符压栈。",
     "剩余元素含义：栈里从底到顶剩下的字符就是再也无法配对消除的部分，按顺序拼接即为整理后的字符串。"
    ],
+   "firstSolvedAt": 1763142798,
    "id": "1666_make-the-string-great",
    "number": 1666,
    "pseudocode": [
@@ -17581,6 +17868,7 @@
     "preSum[0] 定义：preSum[0] = 0，preSum[i+1] 表示前 i+1 个元素之和，这样任意区间和写成 preSum[j+1]-preSum[i]，起点 i=0 也不用特判。",
     "差分下标位置：本题不涉及，题目只查询区间和、从不对区间做加减，用不到差分数组。"
    ],
+   "firstSolvedAt": 1759771586,
    "id": "1693_sum-of-all-odd-length-subarrays",
    "number": 1693,
    "pseudocode": [
@@ -17641,6 +17929,7 @@
     "单层主体：本题不涉及树的单层处理；对应的单步是取出当前最小边 (dist,u,v)，若 u、v 不同根就 union 并把 dist 累加进 cost，否则跳过（Prim 则是取出堆顶最小点、标记已访问、累加 dist 并用曼哈顿距离更新其余未访问点）。",
     "代码位置：本题不涉及前中后序，点集没有树结构；顺序上关键是先把所有点对的曼哈顿距离边排好序（或用最小堆保证每次拿到最小边），再依次判断连通性。"
    ],
+   "firstSolvedAt": 1770407726,
    "id": "1706_min-cost-to-connect-all-points",
    "number": 1706,
    "pseudocode": [
@@ -17733,6 +18022,7 @@
     "进出时机：遇到普通文件夹名 \"xxx/\" 就压栈；遇到 \"../\" 且栈非空就弹一个；遇到 \"./\" 不动。",
     "剩余元素含义：栈里剩几个元素就是当前离主文件夹的层数，也就是要退回主文件夹所需的最少「../」次数，直接返回栈的大小。"
    ],
+   "firstSolvedAt": 1763151177,
    "id": "1720_crawler-log-folder",
    "number": 1720,
    "pseudocode": [
@@ -17776,6 +18066,7 @@
     "slow 含义：本题不涉及：没有原地删除/覆盖元素的动作，不存在「下一个待写入位置」，降序排序后的下标 i 只表示「前面已有 i+1 个元素≥nums[i]」这个计数含义。",
     "停止条件：二分版在 left > right 时结束并返回 -1（每轮用 cnt 与 guess 比较来收缩区间）；线性扫描版在 i 走到 n（越界）时结束返回 -1，中途一旦 nums[i]>=i+1 且下一个元素小于 i+1 就直接返回 i+1。"
    ],
+   "firstSolvedAt": 1757440556,
    "id": "1730_special-array-with-x-elements-greater-than-or-equal-x",
    "number": 1730,
    "pseudocode": [
@@ -17840,6 +18131,7 @@
     "进出时机：遇到 '(' 就入栈（或计数器 +1）并立刻用当前深度更新 maxDepth，遇到 ')' 就出栈（计数器 -1）；数字和 '+'、'-'、'*'、'/' 一律跳过。",
     "剩余元素含义：题目保证输入是有效括号表达式，所以遍历结束后栈必然是空的（计数器回到 0），没有剩余元素；答案是过程中记录的最大栈高 maxDepth，而不是结束时的栈内容。"
    ],
+   "firstSolvedAt": 1763151513,
    "id": "1737_maximum-nesting-depth-of-the-parentheses",
    "number": 1737,
    "pseudocode": [
@@ -17892,6 +18184,7 @@
     "出窗口时机：每次进一个就必须出一个来保持长度 |k|：k>0 时减掉刚滑出右侧窗口左端的 code[i]，k<0 时减掉 code[(i-1-|k|+n)%n]，减完窗口和就是当前位置对应的结果",
     "记结果时机：每完成一次“加新的、减旧的”之后立刻把当前窗口和写进 arr[i]，n 个位置各记一次，最后返回 arr"
    ],
+   "firstSolvedAt": 1755974863,
    "id": "1755_defuse-the-bomb",
    "number": 1755,
    "pseudocode": [
@@ -17957,6 +18250,7 @@
     "base case：i < m-1 时返回 0，因为前面字符数不够一个 word；另外子串不等于 word 时也直接是 0。",
     "遍历顺序：i 从小到大（0 到 n-1），因为 dp[i] 依赖更靠前的 dp[i-m]，最后对所有 dp[i] 取最大值。"
    ],
+   "firstSolvedAt": 1762198863,
    "id": "1764_maximum-repeating-substring",
    "number": 1764,
    "pseudocode": [
@@ -18017,6 +18311,7 @@
     "进出时机：队首学生和栈顶三明治口味相同就两个一起弹出、尝试次数归零；不同就把队首学生弹出塞到队尾、尝试次数加一；当尝试次数等于当前学生人数（转了一整圈没人要）时结束循环。",
     "剩余元素含义：学生队列里剩下的人就是没人能配上现存三明治的学生，队列长度即答案；剩下的三明治则是永远没人吃的那些。"
    ],
+   "firstSolvedAt": 1763163410,
    "id": "1802_number-of-students-unable-to-eat-lunch",
    "number": 1802,
    "pseudocode": [
@@ -18065,6 +18360,7 @@
     "出窗口时机：当nums[right]的计数大于1（说明窗口内出现重复）时，就不断移动left，把nums[left]计数减1（减到0就从哈希表删掉）、窗口和减去nums[left]，直到不再重复",
     "记结果时机：每次right移动完成、窗口收缩到不含重复元素后，用当前窗口和更新历史最大得分"
    ],
+   "firstSolvedAt": 1779817276,
    "id": "1813_maximum-erasure-value",
    "number": 1813,
    "pseudocode": [
@@ -18128,6 +18424,7 @@
     "局部最优判据：每一步只看当前剩余容量 remain 和当前这类箱子：能全装就加 boxes*units，装不下就只装 remain 箱加 remain*units 并结束，不用管后面还有什么箱子。",
     "正确性理由：卡车限制的是箱子总数而不是重量体积，每个箱子占的位置都一样是 1，所以同一个位置放单元数更大的箱子一定不亏；把任何一个低单元箱换成还没装的高单元箱结果只会更大或相等，因此按单元数从高到低装满就是最优解。"
    ],
+   "firstSolvedAt": 1762728917,
    "id": "1829_maximum-units-on-a-truck",
    "number": 1829,
    "pseudocode": [
@@ -18171,6 +18468,7 @@
     "局部最优判据：每加完一个增量就比一次：curr_altitude 比当前 max_altitude 大就替换，不用回头看后面的元素。",
     "正确性理由：最大值本来就是逐个比较出来的，前缀和又只依赖前面的元素，所以扫一遍就能得到全局最大海拔；本题严格说不算贪心，只是前缀和加打擂台。"
    ],
+   "firstSolvedAt": 1759777361,
    "id": "1833_find-the-highest-altitude",
    "number": 1833,
    "pseudocode": [
@@ -18214,6 +18512,7 @@
     "局部最优判据：每扫到一个候选起点 i，只看 nums[i] 是否比当前记录的 maxRes 大，大就把 maxRes 和 idx 换成它，完全不用去看它后面 k-1 个数长什么样。",
     "正确性理由：因为子数组按字典序比大小是先比第一个数，而题目里 nums 是 1~n 的排列、元素互不相同，首元素最大的那条一定严格大于其他所有候选，所以首位取最大这个局部选择就直接锁死了全局最优（若允许重复，则首位相同的还得往后逐位比）。"
    ],
+   "firstSolvedAt": 1762716048,
    "id": "1847_largest-subarray-length-k",
    "number": 1847,
    "pseudocode": [
@@ -18273,6 +18572,7 @@
     "局部最优判据：每一位只看当前位能取到的、不让整体超过23:59的最大数字就定下来，不用回头改也不用看后面还没填的位。",
     "正确性理由：时间字符串是定长且按位比大小的，高位越大整个时间就越晚，任何高位让步换来的低位收益都补不回来；同时高位取最大后低位仍有合法取值（如十位取2时个位还能取0~3），所以逐位取最大不会导致无解，拼出来就是全局最晚。"
    ],
+   "firstSolvedAt": 1762731709,
    "id": "1858_latest-time-by-replacing-hidden-digits",
    "number": 1858,
    "pseudocode": [
@@ -18317,6 +18617,7 @@
     "出窗口时机：当 seen 里字母种类数超过 k 时收缩：把 s[left] 对应的大小写计数减一，若它原来大小写齐全现在缺了一边就 matched 减一，若大小写计数都为 0 就把这个字母从 seen 删掉，然后 left++。",
     "记结果时机：每次收缩完后，若 seen 的种类数正好等于 k 且 matched 也等于 k（说明这 k 种字母全都大小写齐全），就用 s[left..right] 和 max_res 比长度，更长则替换。"
    ],
+   "firstSolvedAt": 1756063173,
    "id": "1873_longest-nice-substring",
    "number": 1873,
    "pseudocode": [
@@ -18376,6 +18677,7 @@
     "slow 含义：本题不涉及slow指针，因为不是原地覆盖数组的场景，而是把字符依次append到新结果列表里",
     "停止条件：循环变量i从0走到max(n1,n2)-1，即以两个字符串中较长的那个长度为界，跑完就停，中途通过i<n1和i<n2判断各自是否越界"
    ],
+   "firstSolvedAt": 1785096327,
    "id": "1894_merge-strings-alternately",
    "number": 1894,
    "pseudocode": [
@@ -18447,6 +18749,7 @@
     "局部最优判据：局部最优就是每一步都选当前gains列表里数值最大的那个改变量，不用管后面还剩多少差值",
     "正确性理由：因为每次操作独立且互不影响，要用最少次数补齐固定的diff，肯定优先用单次贡献最大的操作，这样用的操作次数一定最少（类似用最大面值凑钱，次数最少）"
    ],
+   "firstSolvedAt": 1780026820,
    "id": "1901_equal-sum-arrays-with-minimum-number-of-operations",
    "number": 1901,
    "pseudocode": [
@@ -18523,6 +18826,7 @@
     "拓扑排序：本题不涉及，星型图无向且只问中心点，没有依赖顺序要排。",
     "最短路松弛：本题不涉及，不求距离，中心到任何点都是一步。"
    ],
+   "firstSolvedAt": 1761070234,
    "id": "1916_find-center-of-star-graph",
    "number": 1916,
    "pseudocode": [
@@ -18586,6 +18890,7 @@
     "局部最优判据：每到位置 i 只看前一个数：不满足严格递增就补 nums[i-1]+1-nums[i] 次操作，把当前元素设成 nums[i-1]+1，完全不看后面的数。",
     "正确性理由：因为只能加不能减，nums[i] 至少要达到 nums[i-1]+1，这是硬下界；而把它抬得更高只会让后面的数被迫抬得更多，操作数不减反增，所以每步取最小合法值累加就是全局最少。"
    ],
+   "firstSolvedAt": 1762735450,
    "id": "1938_minimum-operations-to-make-the-array-increasing",
    "number": 1938,
    "pseudocode": [
@@ -18630,6 +18935,7 @@
     "出窗口时机：当cost > k时移动left收缩窗口，移出nums[left]时要把ttl减去nums[left]、left加1，并重新计算cost直到cost <= k",
     "记结果时机：每次right移动、窗口调整满足cost <= k后，用当前窗口长度right-left+1去更新最大频数maxlen"
    ],
+   "firstSolvedAt": 1779815897,
    "id": "1966_frequency-of-the-most-frequent-element",
    "number": 1966,
    "pseudocode": [
@@ -18701,6 +19007,7 @@
     "slow 含义：本题不涉及原地写入，所以没有「下一个待写入位置」的 slow；这里的 i 只表示当前比较到的下标，也就是第一个出现分歧的候选点。",
     "停止条件：主循环 i 走到 n-1 就停（最后一位是丢数据后补的随机值，不参与判断）；错位比较时较短的一边走到末尾即止，全程无分歧则返回 -1。"
    ],
+   "firstSolvedAt": 1754507497,
    "id": "1980_faulty-sensor",
    "number": 1980,
    "pseudocode": [
@@ -18744,6 +19051,7 @@
     "指针关系：不是快慢指针，是 prev 紧跟在 curr 后面一位的前驱关系：curr 保留时 prev 才前移到 curr，curr 要删就让 prev.next 直接跳到 curr.next、prev 原地不动。",
     "停止条件：第二趟遍历的条件就是 curr != null，走到链表尾部（curr 为空）就停，不需要判断 curr.next；第一趟统计计数同样走到 curr == null 为止。"
    ],
+   "firstSolvedAt": 1763498153,
    "id": "1982_remove-duplicates-from-an-unsorted-linked-list",
    "number": 1982,
    "pseudocode": [
@@ -18787,6 +19095,7 @@
     "preSum[0] 定义：这里的差分数组 delta 全部初始化为 0，累加变量 curr 从 0 开始，扫到 1950 那格直接加上 delta[0] 就是当年人口，不用对第一年做特判。",
     "差分下标位置：活着的区间是 [birth, death-1]，所以 delta[birth-1950] += 1、delta[death-1950] -= 1（即 (death-1)+1 那格减 1）。"
    ],
+   "firstSolvedAt": 1759785843,
    "id": "1983_maximum-population-year",
    "number": 1983,
    "pseudocode": [
@@ -18831,6 +19140,7 @@
     "出窗口时机：因为长度固定，right 进一个 left 就必须跟着往右一格，把 s[right-3] 移出，保证窗口始终只有3个字符。",
     "记结果时机：每当窗口凑满3个字符（right>=2）时判断一次，三个字符互不相同就给 cnt 加1，遍历结束返回 cnt；串长小于3直接返回0。"
    ],
+   "firstSolvedAt": 1756071697,
    "id": "1987_substrings-of-size-three-with-distinct-characters",
    "number": 1987,
    "pseudocode": [
@@ -18883,6 +19193,7 @@
     "结束条件：没有显式的终止判断，for 循环里 idx 走到数组末尾自然就不再递归了；每进一层就先把当前 curr 累加进 res，所以空集和所有子集都能被统计。",
     "撤销：本题不涉及显式撤销，因为 curr 是以参数 curr ^ nums[i] 的形式传下去的，函数返回后上一层的 curr 本来就没被改动。"
    ],
+   "firstSolvedAt": 1761182446,
    "id": "1993_sum-of-all-subset-xor-totals",
    "number": 1993,
    "pseudocode": [
@@ -18934,6 +19245,7 @@
     "preSum[0] 定义：本题不涉及经典 preSum[0]，因为最后是把 diff 累加成覆盖次数 cnt 从 1 开始扫（数值范围 1..50），cnt 初始为 0 就相当于第 0 位前缀和为 0，不需要额外特判。",
     "差分下标位置：对每个区间 [start,end] 做 diff[start] += 1、diff[end+1] -= 1；因为 end 最大 50，diff 开到长度 100（或 52）就不会越界。"
    ],
+   "firstSolvedAt": 1759860190,
    "id": "2005_check-if-all-the-integers-in-a-range-are-covered",
    "number": 2005,
    "pseudocode": [
@@ -18989,6 +19301,7 @@
     "局部最优判据：每一步只看当前字符 num[i] 是不是奇数（末位是1/3/5/7/9），是就立刻截断返回，不管前面还有什么。",
     "正确性理由：因为答案必须是原串的前缀（不能删中间和开头的字符，否则位数变少或数值变小），前缀长度越长数值越大，而合法前缀的唯一要求是末位为奇数，所以最靠右的奇数位给出的前缀就是最长也是最大的；若一个奇数都没有，则任何前缀都是偶数，返回空串。"
    ],
+   "firstSolvedAt": 1762736551,
    "id": "2032_largest-odd-number-in-string",
    "number": 2032,
    "pseudocode": [
@@ -19041,6 +19354,7 @@
     "visited 时机：入队（入栈）的同时就把 grid2[nr][nc] 直接改成 0 当作已访问，起点在入栈时也立刻置 0，避免同一格重复入队。",
     "是否分层：不用分层，只要把整个岛屿的格子全遍历一遍并检查 grid1 对应位置是否都是 1，不关心步数。"
    ],
+   "firstSolvedAt": 1768763771,
    "id": "2035_count-sub-islands",
    "number": 2035,
    "pseudocode": [
@@ -19100,6 +19414,7 @@
     "局部最优判据：只看当前字符 curr 到目标字符 w 的两种绕法距离，直接取 min，不用管后面还有哪些字母。",
     "正确性理由：打完一个字符后指针必然停在这个字符上，后续代价只取决于这个固定的起点，前后步骤互不牵连，所以每步各自取最短转法加起来就是全局最短时间。"
    ],
+   "firstSolvedAt": 1762739017,
    "id": "2088_minimum-time-to-type-word-using-special-typewriter",
    "number": 2088,
    "pseudocode": [
@@ -19147,6 +19462,7 @@
     "slow 含义：slow 就是 s 上已经匹配掉的字符个数（下一个要比对的 s 下标），words 里每拼进一个词就往后推该词的长度。",
     "停止条件：外层指针遍历完 words 就停；只要拼接结果等于 s（即 slow 正好走到 s 末尾）就立刻返回 true，中途出现字符对不上或长度超过 s 也能直接返回 false。"
    ],
+   "firstSolvedAt": 1754510240,
    "id": "2093_check-if-string-is-a-prefix-of-array",
    "number": 2093,
    "pseudocode": [
@@ -19198,6 +19514,7 @@
     "preSum[0] 定义：arr[0] = 0，表示前 0 个元素的和；这样 j=0 时左侧和直接取 arr[0]=0，不用单独判断最左端。",
     "差分下标位置：本题不涉及，题目只查询区间和、没有区间增减操作，所以用不到差分数组。"
    ],
+   "firstSolvedAt": 1759870671,
    "id": "2102_find-the-middle-index-in-array",
    "number": 2102,
    "pseudocode": [
@@ -19241,6 +19558,7 @@
     "局部最优判据：每次窗口右端固定在 i 时，直接用 nums[i]-nums[i-k+1] 当这一步的差值，比当前 min_diff 小就更新，不用管后面的窗口。",
     "正确性理由：选出的 k 个人的差值只由最大值和最小值决定，若这 k 个数在排序后不连续，把中间跳过的数换进来只会让两端更靠近或不变，所以最优解一定是排序后连续的 k 个，枚举全部 n-k+1 个连续窗口就必然覆盖到最优答案。"
    ],
+   "firstSolvedAt": 1756077008,
    "id": "2112_minimum-difference-between-highest-and-lowest-of-k-scores",
    "number": 2112,
    "pseudocode": [
@@ -19289,6 +19607,7 @@
     "拓扑排序：本题不涉及，无向图判连通性没有依赖顺序可排。",
     "最短路松弛：本题不涉及，只问「有没有路径」不问长度，不需要 distTo 和松弛。"
    ],
+   "firstSolvedAt": 1761007541,
    "id": "2121_find-if-path-exists-in-graph",
    "number": 2121,
    "pseudocode": [
@@ -19344,6 +19663,7 @@
     "slow 含义：本题不涉及快慢指针，不需要 slow 做写入位置——反转是原地两两交换，没有「筛掉元素再写回」的动作。",
     "停止条件：两个指针在 left >= right 时停（相遇或交错即完成前缀反转）；另外找 ch 的那一遍扫描若走到字符串末尾都没找到，就直接返回原串。"
    ],
+   "firstSolvedAt": 1763165837,
    "id": "2128_reverse-prefix-of-word",
    "number": 2128,
    "pseudocode": [
@@ -19396,6 +19716,7 @@
     "出窗口时机：当窗口内目标字符数cnt超过k时（说明非目标字符数太多，超过k次可翻转次数），就移动left缩小窗口，移出answerKey[left]时如果它等于c就把cnt减1，然后left加1",
     "记结果时机：每次right右移完成、窗口收缩到合法状态后，用当前窗口长度right-left+1去更新maxlen"
    ],
+   "firstSolvedAt": 1779814183,
    "id": "2134_maximize-the-confusion-of-an-exam",
    "number": 2134,
    "pseudocode": [
@@ -19471,6 +19792,7 @@
     "局部最优判据：每一步不需要比较别的方案，直接让当前剩下最靠左的学生去坐当前剩下最靠左的座位，这一对的距离就是这步的选择。",
     "正确性理由：如果两对匹配交叉了（小学生配大座位、大学生配小座位），把它们换回不交叉的配法，总距离只会变小不会变大（区间重叠部分被抵消），所以反复交换后最优解一定是排序后一一对应的形式。"
    ],
+   "firstSolvedAt": 1762750448,
    "id": "2148_minimum-number-of-moves-to-seat-everyone",
    "number": 2148,
    "pseudocode": [
@@ -19514,6 +19836,7 @@
     "局部最优判据：只要当前位置是 'X'，就必须立刻用一次操作，并且这次操作的起点就定在它身上（让覆盖窗口尽量往右延伸），不用看后面还有几个 X。",
     "正确性理由：最左边这个 'X' 必须被某次操作覆盖，而任何能覆盖它的长度为 3 的窗口，覆盖范围都不会超过以它为左端点的那个窗口，所以选它当起点不会更差；每次都这样选，操作次数不会多于任意其他方案，故全局最少。"
    ],
+   "firstSolvedAt": 1762750020,
    "id": "2154_minimum-moves-to-convert-string",
    "number": 2154,
    "pseudocode": [
@@ -19557,6 +19880,7 @@
     "slow 含义：本题不涉及，因为不需要原地写入或去重，两个指针都只是读取比较，没有「待写入位置」这种含义。",
     "停止条件：i 一旦碰到 colors[i] != colors[n-1] 就停下并记 dis1 = n-1-i；j 一旦碰到 colors[j] != colors[0] 就停下并记 dis2 = j；兜底条件是 i < n、j > 0，不会越界，最后取两者最大值。"
    ],
+   "firstSolvedAt": 1762750774,
    "id": "2199_two-furthest-houses-with-different-colors",
    "number": 2199,
    "pseudocode": [
@@ -19600,6 +19924,7 @@
     "局部最优判据：每遇到一个数就看它是否比当前已选 k 个里最小的那个（堆顶）大，大就换掉堆顶，不用管后面还有什么数。",
     "正确性理由：子序列和只取决于选了哪 k 个数、跟顺序无关，所以要和最大就必须选最大的 k 个；如果某个被选的数比没选的小，把它换成更大的那个和一定变大，说明不选最大 k 个不可能最优；而任意 k 个数都能按原下标排出一个合法子序列，所以这个选法一定可行且最优。"
    ],
+   "firstSolvedAt": 1761346088,
    "id": "2204_find-subsequence-of-length-k-with-the-largest-sum",
    "number": 2204,
    "pseudocode": [
@@ -19663,6 +19988,7 @@
     "slow 含义：本题不涉及，因为没有原地覆盖写入的动作，结果是往 res 里 append 下标，不需要一个「下一个写入位置」的指针",
     "停止条件：二分部分在 left > right 时停（此时 left 就是第一个 >= target 的下标）；收集部分在 left 越出数组长度或 nums[left] != target（排序后即出现比 target 大的值）时停"
    ],
+   "firstSolvedAt": 1757446271,
    "id": "2210_find-target-indices-after-sorting-array",
    "number": 2210,
    "pseudocode": [
@@ -19747,6 +20073,7 @@
     "出窗口时机：i每往右移一步（i>k时）就把nums[i-k-1]从windowSum中减掉，即左端点跟着i-k-1同步右移，保持窗口长度恒为2k+1",
     "记结果时机：每次窗口和windowSum更新完（对每个满足k<=i<=n-k-1的i）就立刻算res[i]=windowSum//(2k+1)，不需要等窗口结束"
    ],
+   "firstSolvedAt": 1779655316,
    "id": "2211_k-radius-subarray-averages",
    "number": 2211,
    "pseudocode": [
@@ -19827,6 +20154,7 @@
     "拓扑排序：需要，主推 Kahn 入度法：把 supplies 全部入队当起点，出队时若是菜就加进答案，再把它作为原料去减下游菜的入度，减到 0 就入队；DFS 版就是三色标记的记忆化写法。",
     "最短路松弛：本题不涉及，只问菜能不能做出来（可达性），没有边权也不求最少步数。"
    ],
+   "firstSolvedAt": 1768938356,
    "id": "2220_find-all-possible-recipes-from-given-supplies",
    "number": 2220,
    "pseudocode": [
@@ -19886,6 +20214,7 @@
     "slow 含义：本题不涉及，这里不是快慢指针，也没有原地改写数组，没有「下一个待写入位置」这种东西。",
     "停止条件：内层循环在 left >= right 时停（即两指针相遇或交错，说明整串都对称，是回文）；一旦 word[left] != word[right] 就提前跳出判为非回文；外层遍历到第一个回文就返回它，全部走完没找到则返回空字符串。"
    ],
+   "firstSolvedAt": 1754581316,
    "id": "2231_find-first-palindromic-string-in-the-array",
    "number": 2231,
    "pseudocode": [
@@ -19929,6 +20258,7 @@
     "slow 含义：起写入作用的是 k，它指向结果数组 res 里下一个待填的位置（从 n-1 往前填）；j 则表示当前还没处理的最靠后的那个空格下标。",
     "停止条件：i 走到 -1（s 的字符全部搬完）就结束循环，j 只是配合判断 i==spaces[j]，j 先耗尽也不影响，不存在相遇终止的说法。"
    ],
+   "firstSolvedAt": 1754584305,
    "id": "2232_adding-spaces-to-a-string",
    "number": 2232,
    "pseudocode": [
@@ -19980,6 +20310,7 @@
     "局部最优判据：当前还没处理的糖果里，直接买掉最贵的两个、免掉紧随其后的第三贵那个，不用管后面还剩哪些糖。",
     "正确性理由：免单糖必须比同组两颗都便宜，所以每次免单能省下的最大值就是当前剩余里第三大的价格；排序后每三个一组正好让每次免掉的都是能免的最大值，n/3 次免单各自取到上界，加起来总免额最大，付的钱就最少。"
    ],
+   "firstSolvedAt": 1762752817,
    "id": "2248_minimum-cost-of-buying-candies-with-discount",
    "number": 2248,
    "pseudocode": [
@@ -20023,6 +20354,7 @@
     "局部最优判据：每一位的分配只看当前数字大小和它占的权重：十位权重10，个位权重1，谁小谁去十位，不用管后面怎么拼。",
     "正确性理由：总和固定等于两个十位数字之和乘10加两个个位数字之和，要让总和最小就必须让乘以10的那两个数字尽量小，所以把最小的两个放十位一定最优；两位数字怎么互换配对不影响总和。"
    ],
+   "firstSolvedAt": 1762753532,
    "id": "2264_minimum-sum-of-four-digit-number-after-splitting-digits",
    "number": 2264,
    "pseudocode": [
@@ -20066,6 +20398,7 @@
     "slow 含义：本题的慢指针 j 不是「下一个待写入位置」，它指向 ind 里当前还可能满足 |i-ind[j]|<=k 的最靠前的 key 下标；结果是往 res 里 append，不做原地覆盖，所以没有写入位置这层含义。",
     "停止条件：外层 i 走到 nums 末尾（i == n）就结束；内层 j 要么越过 ind 末尾（说明这个 i 不合格），要么一旦 |i-ind[j]|<=k 就把 i 加入 res 并 break，不是相遇型停止。"
    ],
+   "firstSolvedAt": 1754591287,
    "id": "2320_find-all-k-distant-indices-in-an-array",
    "number": 2320,
    "pseudocode": [
@@ -20109,6 +20442,7 @@
     "局部最优判据：走到第 i 位时，只看这一位原来是奇是偶，就直接从对应组里取还没用过的最大数字放上去，不管后面几位怎么排。",
     "正确性理由：奇偶位置集合是固定不变的（只能同奇偶互换），所以奇数位和偶数位互不干扰；对每一组来说高位放尽可能大的数字一定不亏——高位大 1 带来的增益超过后面所有低位的总和，所以每位取当前最大就得到整体最大数。"
    ],
+   "firstSolvedAt": 1761348296,
    "id": "2327_largest-number-after-digit-swaps-by-parity",
    "number": 2327,
    "pseudocode": [
@@ -20172,6 +20506,7 @@
     "局部最优判据：只看当前这个字符 number[i]==digit 和它右边一位 number[i+1]：如果 number[i] < number[i+1]，删它就能把更大的字符提前到这个高位，立刻变大，不用管后面还有几个 digit。",
     "正确性理由：删一个字符后长度固定为 n-1，所以字符串字典序比较就等于数值大小比较，越高位越大越好；第一个 number[i]<number[i+1] 的位置是删除后能让最高位发生提升的最靠前位置，任何更靠后的删法都改不动这一位，所以它一定不劣；若不存在这种位置，说明每个 digit 都不小于右邻，删除只会让高位变小或不变，那就删最后一个 digit 使受影响的位最靠后，损失最小。"
    ],
+   "firstSolvedAt": 1762797765,
    "id": "2337_remove-digit-from-number-to-maximize-result",
    "number": 2337,
    "pseudocode": [
@@ -20219,6 +20554,7 @@
     "局部最优判据：每一步只看当前剩余差值 diff 能整除出多少个当前单位（如 diff//60），全都用掉，不用考虑后面剩下的零头怎么补。",
     "正确性理由：因为 60、15、5、1 这四个面额里每个大的都是小的整数倍（60=4×15，15=3×5，5=5×1），少用一个大单位就必须多用好几个小单位换，只会让次数变多，所以每步取最大面额一定不吃亏，加起来就是全局最少。"
    ],
+   "firstSolvedAt": 1762789837,
    "id": "2345_minimum-number-of-operations-to-convert-time",
    "number": 2345,
    "pseudocode": [
@@ -20263,6 +20599,7 @@
     "单层主体：就一层：取出 root.val、root.left.val、root.right.val，直接比较 root.val == 左值+右值 并返回结果。",
     "代码位置：本题不涉及遍历顺序，只访问根和它的两个直接孩子，一次比较就结束，没有递归下探。"
    ],
+   "firstSolvedAt": 1760563809,
    "id": "2384_root-equals-sum-of-children",
    "number": 2384,
    "pseudocode": [
@@ -20318,6 +20655,7 @@
     "局部最优判据：只看当前堆顶两个最大值，把它们各减 1，秒数加 1；如果只剩一种杯子有量，就单独接一杯，秒数加 1，完全不管后面还剩多少。",
     "正确性理由：每秒最多减少 2 杯，先削最大的两个能让三个数尽量拉平，避免最后剩下一堆同种杯子只能一杯一杯接；总答案下界是 max(最大值, 向上取整总和/2)，这个贪心恰好能达到这个下界，所以最优。"
    ],
+   "firstSolvedAt": 1761351170,
    "id": "2412_minimum-amount-of-time-to-fill-cups",
    "number": 2412,
    "pseudocode": [
@@ -20362,6 +20700,7 @@
     "单层主体：当前节点只负责拿左右子树的结果做运算：val==2 就返回 left||right，val==3 就返回 left&&right。",
     "代码位置：后序位置——必须先递归算完左右子树的布尔值，再用当前节点的 2/3 做运算。"
    ],
+   "firstSolvedAt": 1760573255,
    "id": "2416_evaluate-boolean-binary-tree",
    "number": 2416,
    "pseudocode": [
@@ -20413,6 +20752,7 @@
     "slow 含义：本题不涉及真正的写入位置，唯一类似 slow 的是 last 变量，它记录上一次统计过的正数值，用来判断当前值是否是新的一档。",
     "停止条件：扫完整个数组（或堆弹空）就停，不存在相遇终止；然后返回统计出的不同正数个数 cnt。"
    ],
+   "firstSolvedAt": 1761352146,
    "id": "2436_make-array-zero-by-subtracting-equal-amounts",
    "number": 2436,
    "pseudocode": [
@@ -20472,6 +20812,7 @@
     "slow 含义：本题没有「待写入位置」的含义，慢的那个是枚举三元组最小值的 i，而 j、k 是各自单调右移的指针，分别停在第一个 ≥ nums[i]+diff 和第一个 ≥ nums[i]+2*diff 的下标",
     "停止条件：j、k 只在 nums[j] < nums[i]+diff、nums[k] < nums[i]+2*diff 时右移，一旦越界就结束：k>=n 直接 break（i 再大也没救），j>=n 或 nums[j] > nums[i]+diff 则 continue 换下一个 i；外层 i 遍历到 n-2 结束"
    ],
+   "firstSolvedAt": 1754592301,
    "id": "2442_number-of-arithmetic-triplets",
    "number": 2442,
    "pseudocode": [
@@ -20539,6 +20880,7 @@
     "局部最优判据：在第 i 场前，若当前经验 cur <= experience[i]，就只训练 experience[i]+1-cur 小时让它刚好等于对手+1，不多练一分钟；能同理，能量不够就补到总和+1。",
     "正确性理由：每小时训练只能让经验加1，而打赢第i场至少要求经验达到 experience[i]+1，这是硬下界；提前多练的经验不会白费但也没有额外收益（赢了就自动加对手经验），所以每步取最小补足量的总和就是全局最小；能量方面消耗是固定的 sum(energy)，与顺序无关，补到 sum+1 即最少。"
    ],
+   "firstSolvedAt": 1762804716,
    "id": "2459_minimum-hours-of-training-to-win-a-competition",
    "number": 2459,
    "pseudocode": [
@@ -20587,6 +20929,7 @@
     "出窗口时机：窗口字符数超过 k 就立刻左移一格，移出的 blocks[left] 如果是 'W' 就把 cnt 减 1，保持窗口恰好 k 长。",
     "记结果时机：每次窗口刚好凑满 k 个字符时（即 right>=k-1 时）用 min_cnt = min(min_cnt, cnt) 更新答案，最后返回 min_cnt。"
    ],
+   "firstSolvedAt": 1756141705,
    "id": "2463_minimum-recolors-to-get-k-consecutive-black-blocks",
    "number": 2463,
    "pseudocode": [
@@ -20631,6 +20974,7 @@
     "判定条件：不是找等于 target，而是判单调条件 pre[mid] <= target（排序后前缀和递增，所以合法性是前面全真后面全假）。",
     "边界收缩：pre[mid] <= target 时说明 mid 个元素能选，记下 ans = mid 并把 left = mid + 1 继续往右找更长的；pre[mid] > target 时 right = mid - 1；不因为凑巧相等就提前返回，循环结束后把 ans 作为该查询的答案。"
    ],
+   "firstSolvedAt": 1757527551,
    "id": "2469_longest-subsequence-with-limited-sum",
    "number": 2469,
    "pseudocode": [
@@ -20698,6 +21042,7 @@
     "slow 含义：本题不涉及——这里不是原地覆盖写数据的快慢指针，没有「下一个待写入位置」，用的是排序后从两端夹逼",
     "停止条件：当 left >= right（两指针相遇或交错）就停；过程中若 -nums[left] == nums[right] 则直接返回 nums[right]，否则谁的绝对值大就把那一侧指针往里挪，走到相遇还没配上就返回 -1"
    ],
+   "firstSolvedAt": 1754595839,
    "id": "2524_largest-positive-integer-that-exists-with-its-negative",
    "number": 2524,
    "pseudocode": [
@@ -20741,6 +21086,7 @@
     "slow 含义：slow 指向下一个非零元素该放的位置，也就是 [0, slow) 里已经排好了所有非零数，遇到 nums[fast]!=0 就交换到 slow 处再 slow++。",
     "停止条件：fast 一直往右走到越界为止（fast == nums.length 停），不存在两指针相遇的情况；之后 slow 之后的位置自然全是 0。"
    ],
+   "firstSolvedAt": 1754598394,
    "id": "2551_apply-operations-to-an-array",
    "number": 2551,
    "pseudocode": [
@@ -20789,6 +21135,7 @@
     "出窗口时机：因为窗口定长，元素nums[i]进窗口的同时nums[i-k]就要出窗口，出窗口时sum减去nums[i-k]，counter[nums[i-k]]减1，若减到0就把这个key从counter里删掉",
     "记结果时机：每次窗口更新完后，判断counter里不同key的个数是否等于k（即窗口内元素互不相同），是的话才用当前sum去更新maxSum"
    ],
+   "firstSolvedAt": 1779667117,
    "id": "2552_maximum-sum-of-distinct-subarrays-with-length-k",
    "number": 2552,
    "pseudocode": [
@@ -20852,6 +21199,7 @@
     "slow 含义：本题不涉及，因为不用原地覆写数组，双指针只是取两端配对求平均值，没有「待写入位置」这个角色。",
     "停止条件：当 i < j 不再成立时停，即两指针相遇（奇数长度剩中间一个）或交错（偶数长度取完所有对），不靠越界判断。"
    ],
+   "firstSolvedAt": 1754604180,
    "id": "2561_number-of-distinct-averages",
    "number": 2561,
    "pseudocode": [
@@ -20895,6 +21243,7 @@
     "preSum[0] 定义：arr[0]=0，表示前 0 个数的和；有了它，判断中枢时 j=1 也能直接写 arr[n]-arr[j-1]，不用单独处理左边为空的情况。",
     "差分下标位置：本题不涉及，只做查询不做区间加减，没有 diff 数组。"
    ],
+   "firstSolvedAt": 1759878033,
    "id": "2571_find-the-pivot-integer",
    "number": 2571,
    "pseudocode": [
@@ -20938,6 +21287,7 @@
     "slow 含义：本题不涉及原地覆盖写入，指针i的含义是t中下一个待匹配字符的下标，不是写入位置",
     "停止条件：遍历s的指针（fast）在越过s末尾时停止，同时t的指针一旦匹配完（i等于t长度）就不再继续增加"
    ],
+   "firstSolvedAt": 1780171539,
    "id": "2572_append-characters-to-string-to-make-subsequence",
    "number": 2572,
    "pseudocode": [
@@ -21010,6 +21360,7 @@
     "拓扑排序：本题不涉及，图是无向的且不要求任何先后顺序，只要判断哪些城市和城市1连通。",
     "最短路松弛：本题不涉及最短路松弛，答案是路径上边权的最小值而不是和，且能无限往返，所以只要在城市1所在连通块里对所有边权取 min，初始 res=正无穷。"
    ],
+   "firstSolvedAt": 1771453523,
    "id": "2582_minimum-score-of-a-path-between-two-cities",
    "number": 2582,
    "pseudocode": [
@@ -21102,6 +21453,7 @@
     "进出时机：入：一开始把每行元素一次性全压进对应行的堆；出：每一轮（每一列）每个行堆各弹出一个当前最大值，取这些值里的最大者加到 ttl。",
     "剩余元素含义：循环跑完 n 轮后所有堆都空了，没有剩余元素；因为每行元素个数相同，正好被 n 轮删干净。"
    ],
+   "firstSolvedAt": 1761366053,
    "id": "2585_delete-greatest-value-in-each-row",
    "number": 2585,
    "pseudocode": [
@@ -21145,6 +21497,7 @@
     "slow 含义：这里的 slow 就是 idx，指向上一次遇到的非零城堡下标，不是写入位置，而是用来算 i - idx - 1 这段空地长度的左端点。",
     "停止条件：没有相遇一说，fast 指针 i 从 0 走到 forts.length-1 遍历完就停，然后返回 max_cnt。"
    ],
+   "firstSolvedAt": 1754672007,
    "id": "2602_maximum-enemy-forts-that-can-be-captured",
    "number": 2602,
    "pseudocode": [
@@ -21189,6 +21542,7 @@
     "判定条件：不是找等于 target，而是 check：nums[mid] >= 0 就算「满足」，往左继续找更早的满足位置。",
     "边界收缩：nums[mid] >= 0 时不返回、令 right = mid - 1 继续往左找边界；nums[mid] < 0 时 left = mid + 1；循环退出后 left 就是第一个非负数下标，负数个数 = left，再把 left 跳过所有 0（nums[left] <= 0 时 left++），正数个数 = n - left，取两者较大值。"
    ],
+   "firstSolvedAt": 1757528993,
    "id": "2614_maximum-count-of-positive-integer-and-negative-integer",
    "number": 2614,
    "pseudocode": [
@@ -21240,6 +21594,7 @@
     "slow 含义：本题不涉及，这里没有原地写入，两根指针分别属于两个数组，只做比较和推进，不存在「下一个待写入位置」。",
     "停止条件：当 i 走到 nums1 末尾或 j 走到 nums2 末尾（任一越界）就停，循环里一旦 nums1[i]==nums2[j] 立即返回该值，正常退出循环则返回 -1。"
    ],
+   "firstSolvedAt": 1754675730,
    "id": "2634_minimum-common-value",
    "number": 2634,
    "pseudocode": [
@@ -21295,6 +21650,7 @@
     "局部最优判据：每次取当前剩下的最小数字，放到当前位数较少的那个数（即下一个更高位置权重更小的那边），不用管后面还剩什么。",
     "正确性理由：两数总和等于各位数字乘以它所在的位权（1、10、100…）之和，两个数位数尽量平均时位权集合固定，剩下就是把小数字配大位权、大数字配小位权，按排序交替分配正好实现这个最优配对，所以结果最小。"
    ],
+   "firstSolvedAt": 1762811901,
    "id": "2650_split-with-minimum-sum",
    "number": 2650,
    "pseudocode": [
@@ -21358,6 +21714,7 @@
     "局部最优判据：每一步只看当前剩余钱是否≥7，够就升级一个孩子到8美元，不够就停止，不需要考虑具体升的是哪个孩子",
     "正确性理由：因为孩子之间完全等价，谁拿8美元都一样，所以把能升级的名额都用满就是全局最多能达到8美元的孩子数，唯一要防的是money==8*children-4这种会把最后一个孩子逼到只剩4美元（不上不下）的特殊情况，需要提前少升一个来避免浪费"
    ],
+   "firstSolvedAt": 1762818350,
    "id": "2663_distribute-money-to-maximum-children",
    "number": 2663,
    "pseudocode": [
@@ -21418,6 +21775,7 @@
     "进出时机：每次循环开始时弹出堆顶最大值，计算其平方根取整后再把结果压回堆中，重复k次",
     "剩余元素含义：循环k次结束后，堆中剩下的所有元素就是最终每堆礼物的数量，把它们求和取负就是答案"
    ],
+   "firstSolvedAt": 1761367495,
    "id": "2692_take-gifts-from-the-richest-pile",
    "number": 2692,
    "pseudocode": [
@@ -21461,6 +21819,7 @@
     "slow 含义：本题不涉及，因为不是原地覆写数组的快慢指针，只是把首尾两数拼接后累加，没有写入位置",
     "停止条件：当 left > right 时停止；left == right 时是最后一次，直接把 nums[left] 加进答案再结束"
    ],
+   "firstSolvedAt": 1754677444,
    "id": "2698_find-the-array-concatenation-value",
    "number": 2698,
    "pseudocode": [
@@ -21504,6 +21863,7 @@
     "局部最优判据：每一步只看当前字符是否等于目标数字（'9'或'0'），一旦找到第一个不等的字符就立刻选它替换，不用比较其他位置",
     "正确性理由：数字越靠前的位权重越大，把最高位能变的数字尽量变大（变9）或变小（变0）对整体数值的提升/降低幅度最大，且因为原数字所有出现的相同字符位置都同步替换，所以第一次出现即是全局收益最大的选择"
    ],
+   "firstSolvedAt": 1762810552,
    "id": "2704_maximum-difference-by-remapping-a-digit",
    "number": 2704,
    "pseudocode": [
@@ -21559,6 +21919,7 @@
     "slow 含义：本题不涉及slow指针，这是合并两个有序数组的场景，不是原地覆盖写入的场景，没有慢指针概念",
     "停止条件：停止条件是i超出nums1长度或j超出nums2长度（越界），之后再用两个补充循环把剩余元素加进去"
    ],
+   "firstSolvedAt": 1754681296,
    "id": "2707_merge-two-2d-arrays-by-summing-values",
    "number": 2707,
    "pseudocode": [
@@ -21602,6 +21963,7 @@
     "局部最优判据：当前左指针指向的数 nums[left] 乘以2如果小于等于右指针指向的数 nums[right]，就立即配对标记两个下标，否则说明右边这个数太小不够用，右指针右移换更大的数再试",
     "正确性理由：因为数组已排序，若某个较大值能满足与当前最小值配对（2*nums[left]<=nums[right]），那它一定也能满足后面更大的左值，所以把最小的可行右值留给当前最小的左值不会浪费资源，反而给后续的左值留出更多更大的右值可选，这样贪心配对能使总配对数最多"
    ],
+   "firstSolvedAt": 1780064921,
    "id": "2712_find-the-maximum-number-of-marked-indices",
    "number": 2712,
    "pseudocode": [
@@ -21689,6 +22051,7 @@
     "preSum[0] 定义：left[0]定义为0，表示第一个元素左边没有数，这样不用单独判断i=0的情况",
     "差分下标位置：本题不涉及，因为这道题只用前缀和和后缀和求左右两侧的和，不需要用差分数组去做区间增减操作"
    ],
+   "firstSolvedAt": 1759881422,
    "id": "2714_left-and-right-sum-differences",
    "number": 2714,
    "pseudocode": [
@@ -21732,6 +22095,7 @@
     "局部最优判据：当前这一步只要看剩下还能不能拿1（k是否≤numOnes），拿不完1再看能不能用0补足（k-numOnes是否≤numZeros），不需要考虑后面怎么拿。",
     "正确性理由：因为总和是各元素独立相加，拿1永远比拿0多1、拿0永远比拿-1多1，所以在数量固定为k的前提下，按值从大到小取满，任何一次用小值替换大值都会让总和变小，所以每步选最大值就是全局最优。"
    ],
+   "firstSolvedAt": 1762820973,
    "id": "2715_k-items-with-the-maximum-sum",
    "number": 2715,
    "pseudocode": [
@@ -21779,6 +22143,7 @@
     "slow 含义：本题不涉及，因为没有快慢指针的写入/覆盖操作，只是简单取排序后前两个元素",
     "停止条件：本题不涉及，没有指针移动过程，只需一次性排序后取前两项做判断即可结束"
    ],
+   "firstSolvedAt": 1762824956,
    "id": "2756_buy-two-chocolates",
    "number": 2756,
    "pseudocode": [
@@ -21822,6 +22187,7 @@
     "枚举范围：本题不涉及枚举，只需一次遍历或排序找出数组最大值即可，不存在缩小范围的问题",
     "数值边界：结果可能较大（k和max都可能较大导致乘积很大），Python不用担心溢出，但Java/C++等语言需用long类型防止整数溢出，题目不要求取模"
    ],
+   "firstSolvedAt": 1762822141,
    "id": "2767_maximum-sum-with-exactly-k-elements",
    "number": 2767,
    "pseudocode": [
@@ -21866,6 +22232,7 @@
     "出窗口时机：当cnt>1（窗口内重复对超过1个）时收缩left，若s[left]==s[left+1]说明左边界处的重复对被移除，cnt减1，然后left右移一位",
     "记结果时机：每次right移动完成、窗口调整合法（cnt≤1）后，用right-left+1更新maxlen"
    ],
+   "firstSolvedAt": 1779821321,
    "id": "2786_find-the-longest-semi-repetitive-substring",
    "number": 2786,
    "pseudocode": [
@@ -21934,6 +22301,7 @@
     "进出时机：每读一个新字符就尝试和栈顶配对：如果栈顶和当前字符组成'AB'或'CD'就弹出栈顶（不压入当前字符）；否则把当前字符压入栈",
     "剩余元素含义：循环结束后栈里剩下的字符就是删除所有'AB'/'CD'子串后无法再消除的最终字符串，其长度就是答案"
    ],
+   "firstSolvedAt": 1763166986,
    "id": "2800_minimum-string-length-after-removing-substrings",
    "number": 2800,
    "pseudocode": [
@@ -21977,6 +22345,7 @@
     "局部最优判据：当前这一对字符只要都变成min(s[i],s[j])，这一对在保持回文的前提下就已经是能做到的最小值，不用管其它位置怎么变",
     "正确性理由：因为回文串每对对称位置的字符互不影响、彼此独立，把每一对都变成各自能取到的最小值，拼起来整体字典序自然最小"
    ],
+   "firstSolvedAt": 1762823937,
    "id": "2816_lexicographically-smallest-palindrome",
    "number": 2816,
    "pseudocode": [
@@ -22021,6 +22390,7 @@
     "单层主体：如果当前node是叶子节点（没有左右孩子），就把node.val拼接到res里；如果不是叶子就不处理，交给左右子树递归去拼",
     "代码位置：中序位置：先递归左子树，再判断当前节点是否叶子并拼接，最后递归右子树，这样保证拼出来的字符顺序和原字符串一致"
    ],
+   "firstSolvedAt": 1760588608,
    "id": "2843_extract-kth-character-from-the-rope-tree",
    "number": 2843,
    "pseudocode": [
@@ -22081,6 +22451,7 @@
     "出窗口时机：一旦不满足奇偶交替或者超过threshold，就把l直接跳到r（窗口整体右移到新起点），不是逐个缩小左边界",
     "记结果时机：每次成功扩展一次窗口（r右移时）就用r-l更新一次max_cnt，取最大值作为答案"
    ],
+   "firstSolvedAt": 1756145851,
    "id": "2866_longest-even-odd-subarray-with-threshold",
    "number": 2866,
    "pseudocode": [
@@ -22141,6 +22512,7 @@
     "出窗口时机：当nums[right]-nums[left]>2k时，说明窗口内最大值和最小值差太大，就把left右移，直到差值不超过2k为止，移出元素时也不需要额外维护数据，只是让left指针前移。",
     "记结果时机：每次right移动确定窗口合法后（即nums[right]-nums[left]<=2k），就用right-left+1更新一次最大长度maxlen。"
    ],
+   "firstSolvedAt": 1779825207,
    "id": "2891_maximum-beauty-of-an-array-after-applying-operation",
    "number": 2891,
    "pseudocode": [
@@ -22220,6 +22592,7 @@
     "slow 含义：本题不涉及，因为这里不是同向快慢指针场景，不存在写入位置的概念",
     "停止条件：当i>=j时停止，即左右指针相遇（i小于j才继续循环）"
    ],
+   "firstSolvedAt": 1754682862,
    "id": "2917_count-pairs-whose-sum-is-less-than-target",
    "number": 2917,
    "pseudocode": [
@@ -22264,6 +22637,7 @@
     "出窗口时机：窗口大小固定为k，所以每次right进窗口后立刻让left也同步右移移出nums[left-k]（即最左端旧元素），把它从windowSum减掉，并在counter里给它计数-1，若计数归零就把这个key从counter里删掉",
     "记结果时机：每次窗口滑动完（更新完windowSum和counter后），只要counter的键数量（不同元素个数）>=m，就用windowSum更新maxSum"
    ],
+   "firstSolvedAt": 1779662281,
    "id": "2954_maximum-sum-of-almost-unique-subarray",
    "number": 2954,
    "pseudocode": [
@@ -22331,6 +22705,7 @@
     "局部最优判据：本题不涉及局部最优判据，因为每个区间的覆盖标记是独立且互不影响的，不存在需要择优舍弃的选择",
     "正确性理由：本题的正确性来自差分数组前缀和的性质：每个点最终的前缀和就是覆盖它的区间数，只要该值大于0就说明被车覆盖，这是数学恒等而非贪心选择带来的"
    ],
+   "firstSolvedAt": 1759942906,
    "id": "3034_points-that-intersect-with-cars",
    "number": 3034,
    "pseudocode": [
@@ -22382,6 +22757,7 @@
     "局部最优判据：每一步只看能不能把'1'放在更靠左的位置：只要不是最后一位，能放'1'就放'1'，因为高位是'1'肯定比高位是'0'数值大",
     "正确性理由：二进制数的大小由高位决定，高位相同时越靠前是'1'数值越大，而奇偶性只由最后一位决定，所以把除最后一位外的所有'1'都堆到前面、最后一位保证是'1'，两者互不冲突，结果就是全局最大的奇数"
    ],
+   "firstSolvedAt": 1762828300,
    "id": "3055_maximum-odd-binary-number",
    "number": 3055,
    "pseudocode": [
@@ -22425,6 +22801,7 @@
     "局部最优判据：局部最优判据就是比较groups[i]与上一个被选中元素的groups值是否相等，不相等就必须选（选了不会变差，不选反而会丢长度）",
     "正确性理由：因为每个位置能否被选只取决于它和前一个已选元素的group值关系，跳过一个不相等的元素不会让后面能多选任何东西，反而少了一个，所以每次能选就选一定不劣，最终得到最长的合法子序列"
    ],
+   "firstSolvedAt": 1762207902,
    "id": "3143_longest-unequal-adjacent-groups-subsequence-i",
    "number": 3143,
    "pseudocode": [
@@ -22536,6 +22913,7 @@
     "slow 含义：本题不涉及slow指针写入位置的含义，因为这里不是原地覆盖数组的快慢指针题，min_idx/max_idx 只是记录当前窗口内最小值和最大值的下标",
     "停止条件：停止条件是 j 遍历到数组末尾（j 从 indexDifference 到 n-1 结束）或提前找到满足值差条件的下标对就直接返回"
    ],
+   "firstSolvedAt": 1754684769,
    "id": "3165_find-indices-with-index-and-value-difference-i",
    "number": 3165,
    "pseudocode": [
@@ -22592,6 +22970,7 @@
     "出窗口时机：左指针l从0扫到r，只要nums[r]<=2*nums[l]就说明l及其右边的数都满足条件（因为已排序），不满足条件的l被排除出有效窗口，不需要额外维护数据只是筛选范围",
     "记结果时机：每当找到满足nums[r]<=2*nums[l]的数对时，立即计算nums[l]异或nums[r]并与max_res比较更新"
    ],
+   "firstSolvedAt": 1756148586,
    "id": "3193_maximum-strong-pair-xor-i",
    "number": 3193,
    "pseudocode": [
@@ -22635,6 +23014,7 @@
     "局部最优判据：每次从堆里弹出当前最小的两个数num1、num2，直接判定这两个数在当前所有剩余数里最小，不用看后面剩下的数",
     "正确性理由：因为每对数只要保证第二小的排在第一小的前面就能让Alice和Bob轮流拿数时num2小于等于num1，这个关系只取决于这两个数自身大小，和其他对之间互不影响，所以逐对处理不会影响最终整体排列是否满足题目要求"
    ],
+   "firstSolvedAt": 1761367968,
    "id": "3226_minimum-number-game",
    "number": 3226,
    "pseudocode": [
@@ -22678,6 +23058,7 @@
     "slow 含义：本题不涉及快慢指针的写入场景，因为不是原地覆盖数组元素，而是找递增前缀/后缀的边界下标（l 和 r），slow 这个含义在此题不适用。",
     "停止条件：停止条件是遍历越界：从左到右遍历直到发现 nums[i]>=nums[i+1] 停止得到 l，从右到左遍历直到发现 nums[j-1]>=nums[j] 停止得到 r，内层指针 j 则在 j<n 且 nums[i]>=nums[j] 时持续右移，直到条件不满足或 j 越界为止。"
    ],
+   "firstSolvedAt": 1754765241,
    "id": "3252_count-the-number-of-incremovable-subarrays-i",
    "number": 3252,
    "pseudocode": [
@@ -22746,6 +23127,7 @@
     "拓扑排序：本题不涉及拓扑排序，因为图里有环（链+额外边构成环），不是DAG，也不需要求任何顺序关系。",
     "最短路松弛：距离数组dist初始化为全部无穷大（自己到自己为0），BFS版本每次从一个点出发，按层扩展时新距离=当前距离+1直接赋值（无权图不需要松弛比较）；Floyd版本用dist[i][k]+dist[k][j]和dist[i][j]比较取小来更新，作为标准三重循环松弛。"
    ],
+   "firstSolvedAt": 1771031443,
    "id": "3271_count-the-number-of-houses-at-a-certain-distance-i",
    "number": 3271,
    "pseudocode": [
@@ -22809,6 +23191,7 @@
     "局部最优判据：每一步只看当前处理到第几组：组号（cost）就是这组每个字符要按的次数，直接把这组字符数乘以组号累加到总数里就是局部最优。",
     "正确性理由：因为按键次数只取决于字符在第几组（每8个字符按键次数加1），各组之间互不影响，所以逐组按组号计算再相加，自然就等于整体最少按键总数，不存在因小失大的情况。"
    ],
+   "firstSolvedAt": 1762830609,
    "id": "3275_minimum-number-of-pushes-to-type-word-i",
    "number": 3275,
    "pseudocode": [
@@ -22864,6 +23247,7 @@
     "preSum[0] 定义：本题不涉及，因为不需要预先建立前缀和数组，用一个滚动变量cnt边走边累加就够了",
     "差分下标位置：本题不涉及，因为不涉及区间增减操作，没有差分数组"
    ],
+   "firstSolvedAt": 1759947749,
    "id": "3311_ant-on-the-boundary",
    "number": 3311,
    "pseudocode": [
@@ -22919,6 +23303,7 @@
     "局部最优判据：每一步都取当前剩余箱子里容量最大的那个加进累计容量，不用管后面还有哪些箱子",
     "正确性理由：箱子数量固定要用满足总苹果数的最少个数，用容量大的箱子每个能顶更多苹果数，同样个数下总容量最大，所以优先用大箱子一定能用最少数量达到或超过苹果总数"
    ],
+   "firstSolvedAt": 1762832008,
    "id": "3334_apple-redistribution-into-boxes",
    "number": 3334,
    "pseudocode": [
@@ -22964,6 +23349,7 @@
     "base case：base case是index等于字符串长度L时，说明已经填完所有位，返回1（表示这是一个合法方案）",
     "遍历顺序：按数位从高到低（index从0到L）递归展开，且mask随选择的digit增加，本质是自顶向下的记忆化搜索，子问题在递归返回时被填入memo，无需显式正序/逆序遍历"
    ],
+   "firstSolvedAt": 1761952489,
    "id": "3343_count-numbers-with-unique-digits-ii",
    "number": 3343,
    "pseudocode": [
@@ -23020,6 +23406,7 @@
     "出窗口时机：当seen[s[r]]大于2（说明当前字符出现超过两次）时就要移动left，把s[l]的计数减1，l右移一位，直到该字符出现次数不超过2",
     "记结果时机：每次内层while循环结束、窗口合法后，用r-l+1和max_length比较取较大值更新"
    ],
+   "firstSolvedAt": 1756158412,
    "id": "3349_maximum-length-substring-with-two-occurrences",
    "number": 3349,
    "pseudocode": [
@@ -23063,6 +23450,7 @@
     "指针关系：本题不涉及快慢指针关系，只用一个curr指针遍历原链表统计频率，再用一个curr指针在新链表尾部逐个追加节点",
     "停止条件：遍历原链表时curr==null（即到达链表末尾）就停止统计，构建新链表时字典遍历完所有键值对就停止"
    ],
+   "firstSolvedAt": 1753648627,
    "id": "3359_linked-list-frequency",
    "number": 3359,
    "pseudocode": [
@@ -23106,6 +23494,7 @@
     "指针关系：这里没有传统意义上的fast/slow双指针，而是curr每次跳两步（curr=curr.next.next）来实现按2的分组比较",
     "停止条件：当curr为空或curr.next为空时停止循环，即链表剩不足两个节点时结束遍历"
    ],
+   "firstSolvedAt": 1753644504,
    "id": "3368_winner-of-the-linked-list-game",
    "number": 3368,
    "pseudocode": [
@@ -23150,6 +23539,7 @@
     "出窗口时机：当窗口的或值orValue>=k时就尝试收缩左边界，移出nums[left]时把它的每一位从bitCount中减掉，如果某一位计数变为0则orValue对应位清零，然后left右移",
     "记结果时机：每次成功缩小窗口后（即或值仍>=k时），用当前窗口长度right-left+1去更新最小长度ans"
    ],
+   "firstSolvedAt": 1756163343,
    "id": "3381_shortest-subarray-with-or-at-least-k-i",
    "number": 3381,
    "pseudocode": [
@@ -23214,6 +23604,7 @@
     "进出时机：遇到字母就入栈；遇到数字时，如果栈不为空就弹出栈顶字母（表示这个字母被这个数字清除）",
     "剩余元素含义：循环结束后栈里剩下的字母就是最终没被清除、按原顺序组成答案的字符"
    ],
+   "firstSolvedAt": 1763168093,
    "id": "3447_clear-digits",
    "number": 3447,
    "pseudocode": [
@@ -23262,6 +23653,7 @@
     "出窗口时机：每次窗口固定为3个元素，l每次前进1就相当于移出最左边的元素，不需要额外维护累计状态",
     "记结果时机：当窗口内arr[l]≠arr[l+1]且arr[l+1]≠arr[l+2]时，说明这三个点构成交替组，cnt加1"
    ],
+   "firstSolvedAt": 1756328429,
    "id": "3463_alternating-groups-i",
    "number": 3463,
    "pseudocode": [
@@ -23305,6 +23697,7 @@
     "slow 含义：本题不涉及，因为本题不是同向快慢指针的原地覆盖/去重场景，而是排序后两端配对",
     "停止条件：当左指针i大于等于右指针j时停止，即i和j相遇或交叉就结束"
    ],
+   "firstSolvedAt": 1754765730,
    "id": "3471_minimum-average-of-smallest-and-largest-elements",
    "number": 3471,
    "pseudocode": [
@@ -23348,6 +23741,7 @@
     "局部最优判据：当nums[i-1]和nums[i]奇偶性相同且nums[i-1]>nums[i]时，交换这两个字符能让字符串在这个位置变小，就是局部最优",
     "正确性理由：因为只允许交换一次，字典序由高位决定，所以尽早在最靠前的位置把能变小的一对同奇偶数字交换，一定能得到全局最小的字符串，交换靠后的位置或多次交换都不会更优"
    ],
+   "firstSolvedAt": 1762833867,
    "id": "3484_lexicographically-smallest-string-after-a-swap",
    "number": 3484,
    "pseudocode": [
@@ -23392,6 +23786,7 @@
     "拓扑排序：本题不涉及，因为不需要按依赖顺序处理全部节点，只需要每次查询后从0出发做一次BFS求到n-1的距离",
     "最短路松弛：不用dist数组，而是在BFS队列里直接携带(节点,深度)二元组，起点深度为0，每扩展一层邻居深度加1，第一次弹出n-1时的深度就是最短距离"
    ],
+   "firstSolvedAt": 1770859456,
    "id": "3517_shortest-distance-after-road-addition-queries-i",
    "number": 3517,
    "pseudocode": [
@@ -23444,6 +23839,7 @@
     "出窗口时机：当seen里'0'和'1'的计数都大于k时（即窗口已经不满足最多有一种字符超过k次的约束），就把seen[s[l]]减1并让left右移，直到不再同时超过k",
     "记结果时机：每次right移动、窗口收缩完成后，立刻把(r-l+1)累加到cnt里，因为此时以r为右端点、l到r之间的每个起点构成的子串都满足条件"
    ],
+   "firstSolvedAt": 1756329634,
    "id": "3543_count-substrings-that-satisfy-k-constraint-i",
    "number": 3543,
    "pseudocode": [
@@ -23488,6 +23884,7 @@
     "进出时机：初始化时把所有元素连同下标一起入堆；每次循环从堆顶弹出最小元素，乘以乘数后再重新压入堆，共重复K次",
     "剩余元素含义：循环结束后堆中剩余的所有元素就是最终结果，把它们按各自保存的原始下标写回结果数组即可"
    ],
+   "firstSolvedAt": 1761368455,
    "id": "3555_final-array-state-after-k-multiplication-operations-i",
    "number": 3555,
    "pseudocode": [
@@ -23527,6 +23924,7 @@
     "指针关系：本题不涉及双指针，只用一个指针curr从head开始逐个向后移动访问每个节点",
     "停止条件：用单指针curr遍历，停止条件是curr为空（curr==null）时结束循环"
    ],
+   "firstSolvedAt": 1753654580,
    "id": "3577_convert-doubly-linked-list-to-array-i",
    "number": 3577,
    "pseudocode": [
@@ -23570,6 +23968,7 @@
     "局部最优判据：当前候选元素的频率是否排在本窗口所有元素频率的前x名（用最小堆或排序后取前x比较）",
     "正确性理由：因为x-sum的定义就是取频率最高的x个元素加权求和，每个子数组的计算相互独立，只要保证窗口内选出的x个元素是频率最大的x个即为该子数组的最优解，不存在跨窗口的依赖关系"
    ],
+   "firstSolvedAt": 1756336039,
    "id": "3610_find-x-sum-of-all-k-long-subarrays-i",
    "number": 3610,
    "pseudocode": [
@@ -23633,6 +24032,7 @@
     "preSum[0] 定义：本题没有单独设prefix[0]=0这种哨兵值，而是直接令prefix[0]=0（左边没元素），suffix[n-1]=0（右边没元素），本质上就是靠它自然省去了边界特判。",
     "差分下标位置：本题不涉及，因为这题用的是前缀和/后缀和判断而不是区间批量增减的差分数组，没有diff[i]、diff[j+1]这种操作。"
    ],
+   "firstSolvedAt": 1759965685,
    "id": "3616_make-array-elements-equal-to-zero",
    "number": 3616,
    "pseudocode": [
@@ -23709,6 +24109,7 @@
     "拓扑排序：本题不涉及拓扑排序，因为图是无向网格且存在环（可以来回走），不是DAG，不能用拓扑排序求解",
     "最短路松弛：dist矩阵初始化为正无穷，起点dist[0][0]=0，松弛时新时间newTime=max(当前时间d, moveTime[nr][nc])+1，如果newTime比dist[nr][nc]小就更新并把新状态压入优先队列，用Dijkstra的贪心方式保证每次弹出的都是当前最短的"
    ],
+   "firstSolvedAt": 1769114970,
    "id": "3627_find-minimum-time-to-reach-last-room-i",
    "number": 3627,
    "pseudocode": [
@@ -23752,6 +24153,7 @@
     "preSum[0] 定义：preSum[0]定义为0，这样子数组[i,j]的和直接用preSum[j+1]-preSum[i]计算，不用单独判断i=0的情况",
     "差分下标位置：本题不涉及差分，因为题目只是求区间和的最小正值，不需要对区间做批量增减操作"
    ],
+   "firstSolvedAt": 1756339073,
    "id": "3644_minimum-positive-sum-subarray",
    "number": 3644,
    "pseudocode": [
@@ -23831,6 +24233,7 @@
     "局部最优判据：局部最优判据就是nums[i-1]>=nums[i]时，把nums[i]改成nums[i-1]+1，这是让当前元素满足递增要求且加的次数最少的做法。",
     "正确性理由：每列各元素只依赖前一个元素的最终值，把当前元素抬到刚好比前一个大1不会影响前面已确定的结果，还给后面元素留出了最小的基准值，所以逐个贪心调整的总操作数就是全局最少。"
    ],
+   "firstSolvedAt": 1762837142,
    "id": "3691_minimum-operations-to-make-columns-strictly-increasing",
    "number": 3691,
    "pseudocode": [
@@ -23875,6 +24278,7 @@
     "出窗口时机：当加入nums[right]导致某个质因子在窗口内出现次数大于1（说明窗口内存在两个数不互质）时，就不断移动left，把nums[left]的质因子计数减一，直到窗口内所有质因子计数都不超过1",
     "记结果时机：每次right移动完成、窗口调整合法后，用right-left+1更新最大长度max_pairwise_coprime_len，最后返回时和2取最大值"
    ],
+   "firstSolvedAt": 1756341960,
    "id": "3702_maximum-subarray-with-equal-products",
    "number": 3702,
    "pseudocode": [
@@ -23934,6 +24338,7 @@
     "preSum[0] 定义：preSum[0]定义为0，这样curr[i]就代表nums前i个数的和，分区点i从1到n-1都能直接用curr[i]和curr[n]-curr[i]取到左右和，不用特判空数组的情况",
     "差分下标位置：本题不涉及，因为这道题只是求前缀和判断分区，没有对区间做批量加减的差分操作"
    ],
+   "firstSolvedAt": 1759956212,
    "id": "3704_count-partitions-with-even-sum-difference",
    "number": 3704,
    "pseudocode": [
@@ -23977,6 +24382,7 @@
     "preSum[0] 定义：curr[0]定义为0，表示空前缀的和，这样计算curr[end+1]-curr[start]时start=0也不用特判",
     "差分下标位置：本题不涉及，因为这题用的是前缀和而不是差分，没有对区间做批量增减的操作"
    ],
+   "firstSolvedAt": 1759961918,
    "id": "3731_sum-of-variable-length-subarrays",
    "number": 3731,
    "pseudocode": [
@@ -24036,6 +24442,7 @@
     "指针关系：本题不涉及，本题没有快慢指针，只有遍历数组找相邻元素和最小值的普通索引变量",
     "停止条件：本题不涉及，循环的停止条件是数组变为非递减顺序（if_non_decreasing为True时退出），不是链表遍历到某个节点为空"
    ],
+   "firstSolvedAt": 1753723344,
    "id": "3773_minimum-pair-removal-to-sort-array-i",
    "number": 3773,
    "pseudocode": [
@@ -24079,6 +24486,7 @@
     "局部最优判据：对去重后的每个数单独判断：如果它≥0就一定要加进结果（因为加正数或0只会让和变大或不变），否则就不选。",
     "正确性理由：因为数组元素之间没有位置或数量限制（重复元素去重后互不影响、可任意子集组合），所以每个非负数独立决策是否加入不会影响其他数的选择，局部选“非负就加”累加起来自然是全局最大；而当没有非负数时，只能选一个数，选最大的负数显然最优。"
    ],
+   "firstSolvedAt": 1762878840,
    "id": "3788_maximum-unique-subarray-sum-after-deletion",
    "number": 3788,
    "pseudocode": [
@@ -24122,6 +24530,7 @@
     "局部最优判据：局部最优判据就是：当前篮子没被用过、且容量够大，找到第一个满足条件的篮子就立刻放入，不用比较后面篮子容量是否更合适",
     "正确性理由：因为篮子一旦分给某个水果就不能再给别的水果用，且题目只统计能放下的总数，不要求容量利用最优分配，所以每个水果贪心占用第一个可行篮子不会让后续水果变得更难放（后面水果能用的篮子集合只会因为已用篮子变少，跟选哪个可行篮子无关），所以局部选择不影响全局能放置的总数最大化"
    ],
+   "firstSolvedAt": 1758313418,
    "id": "3790_fruits-into-baskets-ii",
    "number": 3790,
    "pseudocode": [
@@ -24169,6 +24578,7 @@
     "局部最优判据：每次都选当前频率最小的字符种类整体删除，因为删除频率最小的字符花费的删除次数最少，能最省地减少一个字符种类",
     "正确性理由：要删掉(n-k)种字符才能使种类数不超过K，删除总数只取决于选哪些种类删，与顺序无关，所以选频率最小的l个种类删除，其删除次数之和必然最小，局部最优即全局最优"
    ],
+   "firstSolvedAt": 1762880646,
    "id": "3871_minimum-deletions-for-at-most-k-distinct-characters",
    "number": 3871,
    "pseudocode": [
@@ -24216,6 +24626,7 @@
     "slow 含义：本题不涉及，因为没有快慢指针结构，只是遍历两个数组求组合的最小完成时间",
     "停止条件：本题不涉及相遇或越界停止条件，两层循环分别在遍历完陆地设施数组和水上设施数组后自然结束"
    ],
+   "firstSolvedAt": 1758476134,
    "id": "3965_earliest-finish-time-for-land-and-water-rides-i",
    "number": 3965,
    "pseudocode": [
@@ -24267,6 +24678,7 @@
     "slow 含义：本题不涉及，因为没有使用快慢指针进行原地写入或覆盖操作",
     "停止条件：本题不涉及双指针停止条件，实际的循环终止条件是已经选出了K个不同元素或遍历完去重排序后的列表"
    ],
+   "firstSolvedAt": 1762881118,
    "id": "3997_maximize-sum-of-at-most-k-distinct-elements",
    "number": 3997,
    "pseudocode": [
@@ -24304,5 +24716,5 @@
    "title": "3997. 至多 K 个不同元素的最大和"
   }
  ],
- "version": 3
+ "version": 4
 }

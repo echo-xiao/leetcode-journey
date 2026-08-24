@@ -45,6 +45,13 @@ struct Problem: Codable, Identifiable, Hashable {
     /// backfill that can be interrupted, and because a problem the fetch
     /// could not answer for is genuinely unknown rather than very old.
     let solvedAt: Int?
+    /// The day this problem stopped being unsolved, in unix seconds.
+    ///
+    /// Distinct from `solvedAt`, which moves forward every time the
+    /// problem is practised again. One says "new", the other says
+    /// "recent", and telling a day's new problems from its revisits
+    /// needs both.
+    let firstSolvedAt: Int?
 }
 
 /// The whole downloaded file.

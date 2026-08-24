@@ -7,7 +7,8 @@ final class SessionBuilderTests: XCTestCase {
     private let now = Date(timeIntervalSince1970: 1_800_000_000)
 
     private func problem(
-        _ id: String, technique: String = "数组双指针", solvedDaysAgo: Double? = nil
+        _ id: String, technique: String = "数组双指针",
+        solvedDaysAgo: Double? = nil, firstSolvedDaysAgo: Double? = nil
     ) -> Problem {
         Problem(
             id: id, number: Int(id.prefix(while: \.isNumber)) ?? 0, title: id,
@@ -15,6 +16,9 @@ final class SessionBuilderTests: XCTestCase {
             elements: ["e"], pseudocode: [PseudocodeBlock(kind: .text, text: "p")],
             retrospective: "", solutions: [],
             solvedAt: solvedDaysAgo.map {
+                Int(now.addingTimeInterval(-$0 * 86_400).timeIntervalSince1970)
+            },
+            firstSolvedAt: firstSolvedDaysAgo.map {
                 Int(now.addingTimeInterval(-$0 * 86_400).timeIntervalSince1970)
             }
         )

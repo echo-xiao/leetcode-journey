@@ -226,3 +226,21 @@ def test_entry_solved_date_is_null_when_the_index_has_none(fixture_problems):
         fixture_problems / "9999_fixture-long", TECHNIQUES, ac_times={}
     )
     assert entry["solvedAt"] is None
+
+
+def test_entry_carries_both_dates(fixture_problems):
+    entry = app_export.problem_entry(
+        fixture_problems / "9999_fixture-long",
+        TECHNIQUES,
+        ac_times={"9999_fixture-long": 1_787_184_000},
+        first_ac={"9999_fixture-long": 1_700_000_000},
+    )
+    assert entry["solvedAt"] == 1_787_184_000
+    assert entry["firstSolvedAt"] == 1_700_000_000
+
+
+def test_entry_first_solved_is_null_when_unknown(fixture_problems):
+    entry = app_export.problem_entry(
+        fixture_problems / "9999_fixture-long", TECHNIQUES, ac_times={}, first_ac={}
+    )
+    assert entry["firstSolvedAt"] is None

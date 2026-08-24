@@ -137,6 +137,7 @@ def run(dry_run: bool = True, limit: int | None = None) -> list[dict]:
             # no half-written date behind -- the folder is skipped below and
             # the next run retries the whole problem.
             solved_at = ac_times.latest_ac_timestamp(subs)
+            first_at = ac_times.earliest_ac_timestamp(subs)
             codes: dict[str, str] = {}
             for index, sub in enumerate(subs):
                 code = fetcher.get_submission_code(sub["id"])
@@ -158,6 +159,8 @@ def run(dry_run: bool = True, limit: int | None = None) -> list[dict]:
             )
             if solved_at is not None:
                 ac_times.record(folder.name, solved_at)
+            if first_at is not None:
+                ac_times.record_first(folder.name, first_at)
             downloaded.append(
                 {"question_id": q_id, "slug": slug, "title": title, "folder": folder.name}
             )

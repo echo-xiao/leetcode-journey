@@ -110,3 +110,40 @@ def test_merge_recent_skips_problems_not_in_the_library():
     )
     assert changed == 0
     assert index == {}
+
+
+def test_earliest_ac_timestamp_takes_the_first_pass():
+    subs = [
+        {"id": "3", "timestamp": "1787184000"},
+        {"id": "1", "timestamp": "1700000000"},
+        {"id": "2", "timestamp": "1750000000"},
+    ]
+    assert ac_times.earliest_ac_timestamp(subs) == 1_700_000_000
+
+
+def test_earliest_ac_timestamp_is_none_without_submissions():
+    assert ac_times.earliest_ac_timestamp([]) is None
+
+
+def test_first_index_round_trips(tmp_path):
+    path = tmp_path / "_first_ac.json"
+    ac_times.record("1_two-sum", 1_700_000_000, path=path)
+    assert ac_times.load(path) == {"1_two-sum": 1_700_000_000}
+
+
+def test_record_first_never_moves_a_date_forward(tmp_path):
+    # The first pass is a fact about the past; a later run that sees a newer
+    # submission must not overwrite it.
+    path = tmp_path / "_first_ac.json"
+    ac_times.record_first("15_3sum", 1_700_000_000, path=path)
+    ac_times.record_first("15_3sum", 1_787_184_000, path=path)
+
+    assert ac_times.load(path) == {"15_3sum": 1_700_000_000}
+
+
+def test_record_first_takes_an_earlier_date_if_one_turns_up(tmp_path):
+    path = tmp_path / "_first_ac.json"
+    ac_times.record_first("15_3sum", 1_787_184_000, path=path)
+    ac_times.record_first("15_3sum", 1_700_000_000, path=path)
+
+    assert ac_times.load(path) == {"15_3sum": 1_700_000_000}
