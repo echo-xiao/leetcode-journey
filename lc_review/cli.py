@@ -84,6 +84,18 @@ def export_app_command(apply: bool = True) -> None:
     run(dry_run=not apply)
 
 
+def refresh_changed_command(apply: bool, limit: int | None) -> None:
+    """Refresh the recently-touched problems whose code changed shape.
+
+    Sits between sync-new and build-answers in the pipeline: after the new
+    problems have arrived (they need no refresh) and before the elements are
+    answered (a refresh rewrites the pseudocode they are answered against).
+    """
+    from .refresh_changed import run
+
+    run(dry_run=not apply, limit=limit)
+
+
 def refresh_problem_command(slug: str, apply: bool) -> None:
     """Re-download one problem's code and regenerate pseudocode and elements.
 
@@ -125,6 +137,7 @@ def sync_all_command(apply: bool) -> None:
     steps = (
         ("刷新最近重刷题目的通过时间", lambda: refresh_ac_times_command(apply)),
         ("拉取新 AC 题并在 Notion 建行", lambda: sync_new_command(apply, None)),
+        ("刷新写法变了的老题", lambda: refresh_changed_command(apply, None)),
         ("生成新题的要素答案", lambda: build_answers_command(apply, None)),
         ("复盘写入 Problems/*/review.md", lambda: sync_review_md_command(apply)),
         ("复盘写入 Notion 复盘列", lambda: sync_fupan_command(apply)),
@@ -164,6 +177,12 @@ def main() -> None:
     # Writes only into app/ inside the repo, so there is nothing to opt into.
     subparsers.add_parser("export-app", help="导出 app 内容 content.json")
 
+    changed = subparsers.add_parser(
+        "refresh-changed", help="刷新最近写法变了的老题"
+    )
+    changed.add_argument("--apply", action="store_true", help="实际写入")
+    changed.add_argument("--limit", type=int, help="只检查最近 N 道")
+
     problem = subparsers.add_parser(
         "refresh-problem", help="重下某道题的代码并重生成伪代码与要素"
     )
@@ -196,6 +215,8 @@ def main() -> None:
         export_anki_command()
     elif args.command == "export-app":
         export_app_command()
+    elif args.command == "refresh-changed":
+        refresh_changed_command(args.apply, args.limit)
     elif args.command == "refresh-problem":
         refresh_problem_command(args.slug, args.apply)
     elif args.command == "refresh-ac-times":
