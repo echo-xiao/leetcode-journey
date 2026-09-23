@@ -15,8 +15,8 @@ from __future__ import annotations
 
 from .notion_api import _request
 
-EASY_PAGE = "23e23475-3881-8070-bd8d-d452b95de664"      # Leetcode 刷题复盘 - easy
-MEDIUM_PAGE = "36a23475-3881-80f3-85ad-cced95b68fd0"    # LeetCode 刷题复盘 - medium
+EASY_PAGE = "23e23475-3881-8070-bd8d-d452b95de664"      # retrospective page - easy
+MEDIUM_PAGE = "36a23475-3881-80f3-85ad-cced95b68fd0"    # retrospective page - medium
 
 
 def _render_rich_text(runs: list[dict]) -> str:

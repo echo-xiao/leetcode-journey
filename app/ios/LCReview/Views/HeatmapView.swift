@@ -107,7 +107,7 @@ struct HeatmapView: View {
     /// belong to.
     private func monthLabels(_ weeks: [[HeatmapCell]]) -> [String] {
         let formatter = DateFormatter()
-        formatter.dateFormat = "M月"
+        formatter.dateFormat = "MMM"
         formatter.timeZone = TimeZone(secondsFromGMT: 0)
         var seen = Set<Int>()
         return weeks.map { week -> String in

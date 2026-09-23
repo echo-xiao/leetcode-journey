@@ -1,8 +1,9 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-"""用 answers.json 里逐题的答案重写 elements.md。
-answers.json 结构: {"<folder>": ["答案1", "答案2", ...], ...}
-答案条数必须和该题型的要素简槽位数一致，否则报错不写。
+"""Rewrite elements.md from the per-problem answers in answers.json.
+answers.json layout: {"<folder>": ["<answer 1>", "<answer 2>", ...], ...}
+The number of answers must match the pattern's slot count, otherwise it
+errors out and writes nothing.
 """
 
 import os
@@ -24,7 +25,7 @@ SPEC = {
 
 
 def load_map():
-    """Notion 标注的题型 + 模型判定的题型（后者补 Notion 没打标签的题）。"""
+    """Patterns tagged in Notion + model-inferred ones (the latter cover untagged problems)."""
     m = {}
     for name in ("yaosu_map.tsv", "inferred_tags.tsv"):
         p = os.path.join(SCRATCH, name)
@@ -57,7 +58,7 @@ def title_of(folder):
 def render(folder, tag, answers, tag_inferred=False):
     cat, slots, questions = SPEC[tag]
     if len(answers) != len(slots):
-        raise ValueError("{}: 需要 {} 条答案，给了 {} 条".format(folder, len(slots), len(answers)))
+        raise ValueError("{}: expected {} answers, got {}".format(folder, len(slots), len(answers)))
     title = title_of(folder)
     rows = []
     for i, (slot, a) in enumerate(zip(slots, answers), 1):
@@ -76,7 +77,7 @@ def main():
     for folder, ans in sorted(answers.items()):
         tag = ymap.get(folder)
         if not tag:
-            errs.append((folder, "无要素标签"))
+            errs.append((folder, "no pattern tag"))
             continue
         try:
             content = render(folder, tag, ans, folder in inferred)
@@ -86,12 +87,12 @@ def main():
         with open(os.path.join(PROBLEMS, folder, "elements.md"), "w", encoding="utf-8") as f:
             f.write(content)
         written += 1
-    print("写入 {} 个 elements.md，失败 {} 个".format(written, len(errs)))
+    print("wrote {} elements.md files, {} failed".format(written, len(errs)))
     for e in errs:
         print("  ", e)
     done = set(answers)
     todo = [f for f, t in ymap.items() if f not in done]
-    print("还没填答案的题目数:", len(todo))
+    print("problems still without answers:", len(todo))
 
 
 if __name__ == "__main__":

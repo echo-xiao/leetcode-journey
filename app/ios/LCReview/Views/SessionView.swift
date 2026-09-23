@@ -51,7 +51,7 @@ struct SessionView: View {
             // A repeat card is extra work appended past the advertised
             // length, not the Nth of N — `progress.done` is deliberately
             // capped at `total`, so the plain fraction would read the same
-            // as the genuinely last card. Naming it "加练" instead keeps the
+            // as the genuinely last card. Naming it "Bonus" instead keeps the
             // header truthful about which state this is.
             //
             // The remaining case is capped at total: once the last regular
@@ -59,16 +59,16 @@ struct SessionView: View {
             // would read as "4 / 3" — a real bug caught by looking at the
             // actual screenshot, not implied by the brief's literal formula.
             if runner.current?.isRepeat == true {
-                Text("加练一题")
+                Text("Bonus problem")
                     .font(Theme.tagFont)
                     .foregroundColor(Theme.secondaryText)
             } else {
-                Text("第 \(min(runner.progress.done + 1, runner.progress.total)) / \(runner.progress.total) 题")
+                Text("Problem \(min(runner.progress.done + 1, runner.progress.total)) / \(runner.progress.total)")
                     .font(Theme.tagFont)
                     .foregroundColor(Theme.secondaryText)
             }
             Spacer()
-            Button("结束") { onFinish() }
+            Button("End") { onFinish() }
                 .font(Theme.tagFont)
                 .foregroundColor(Theme.secondaryText)
         }
@@ -79,10 +79,10 @@ struct SessionView: View {
     private var finished: some View {
         VStack(spacing: 16) {
             Spacer()
-            Text("这一节做完了")
+            Text("Session complete")
                 .font(Theme.titleFont)
                 .foregroundColor(Theme.primaryText)
-            Button("回首页") { onFinish() }
+            Button("Back to home") { onFinish() }
                 .font(Theme.bodyFont)
                 .foregroundColor(Theme.accent)
             Spacer()

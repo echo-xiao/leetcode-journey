@@ -22,8 +22,8 @@ ENV_PATH = REPO / ".env"
 API = "https://api.notion.com/v1"
 NOTION_VERSION = "2022-06-28"
 
-REVIEW_DB = "7b103d6a-78eb-4dcb-9167-f038237e6ce7"      # LC 旧题回顾
-ELEMENTS_DB = "660316d4-125b-43e2-b5cc-7189d99815c7"    # LC 要素表
+REVIEW_DB = "7b103d6a-78eb-4dcb-9167-f038237e6ce7"      # the review-tracker database
+ELEMENTS_DB = "660316d4-125b-43e2-b5cc-7189d99815c7"    # the elements table
 
 
 def load_env() -> dict[str, str]:

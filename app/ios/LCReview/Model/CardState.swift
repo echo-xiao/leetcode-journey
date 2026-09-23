@@ -15,7 +15,7 @@ final class CardState {
     var due: Date
     var lastReview: Date?
     var reviewCount: Int
-    /// Entered on 不会, left once `consecutiveGood` reaches
+    /// Entered on an Again grade, left once `consecutiveGood` reaches
     /// `Grading.goodStreakToLeaveBank`.
     var inMistakeBank: Bool
     /// Counts toward leaving the bank. Good advances it, Again resets it to

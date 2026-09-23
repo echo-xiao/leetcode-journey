@@ -4,17 +4,17 @@ import SwiftUI
 ///
 /// Deliberately short: it is on screen the entire time now rather than
 /// appearing at two gates, so every point it takes is a point the card
-/// does not get. The weight difference stays -- 不会 a filled near-black
-/// block, 勉强 outlined, 会 filled green -- because that, not size, is what
+/// does not get. The weight difference stays -- Again a filled near-black
+/// block, Hard outlined, Good filled green -- because that, not size, is what
 /// makes the order readable at a glance.
 struct GradeBar: View {
     let onGrade: (Grade) -> Void
 
     var body: some View {
         HStack(spacing: 12) {
-            button("不会", grade: .again, style: .solidDark)
-            button("勉强", grade: .hard, style: .outlined)
-            button("会", grade: .good, style: .solidAccent)
+            button("Again", grade: .again, style: .solidDark)
+            button("Hard", grade: .hard, style: .outlined)
+            button("Good", grade: .good, style: .solidAccent)
         }
         .padding(.horizontal, 16)
         .padding(.vertical, 8)

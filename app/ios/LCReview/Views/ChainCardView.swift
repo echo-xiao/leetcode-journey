@@ -42,21 +42,21 @@ struct ChainCardView: View {
 
                             if revealed >= .elements {
                                 connector
-                                labeledCard(id: Self.elementsID, label: "要素") {
+                                labeledCard(id: Self.elementsID, label: "Elements") {
                                     elementsContent
                                 }
                             }
 
                             if revealed >= .pseudocode {
                                 connector
-                                labeledCard(id: Self.pseudocodeID, label: "伪代码") {
+                                labeledCard(id: Self.pseudocodeID, label: "Pseudocode") {
                                     pseudocodeContent
                                 }
                             }
 
                             if revealed >= .retrospective, !problem.retrospective.isEmpty {
                                 connector
-                                labeledCard(id: Self.retrospectiveID, label: "上次卡在哪") {
+                                labeledCard(id: Self.retrospectiveID, label: "Where I got stuck") {
                                     HighlightedText(markdown: problem.retrospective)
                                 }
                             }
@@ -107,11 +107,11 @@ struct ChainCardView: View {
         }
     }
 
-    /// "另有 N 版在仓库里", or nothing when the card shows everything.
+    /// "N more versions in the repo", or nothing when the card shows everything.
     private var hiddenVersions: String? {
         guard let total = problem.acceptedVersions else { return nil }
         let hidden = total - problem.solutions.count
-        return hidden > 0 ? "另有 \(hidden) 版在仓库里" : nil
+        return hidden > 0 ? "\(hidden) more version\(hidden == 1 ? "" : "s") in the repo" : nil
     }
 
     // MARK: Card identity, for `ScrollViewReader`
@@ -241,7 +241,7 @@ struct ChainCardView: View {
 
     /// One card: padded content on the flomo card background, rounded
     /// corners, a soft shadow, and a stable `id` so `ScrollViewReader` can
-    /// target it. Every layer of the chain — statement, 要素, 伪代码, 复盘,
+    /// target it. Every layer of the chain — statement, elements, pseudocode, retrospective,
     /// each solution file — renders through this one wrapper, which is what
     /// makes them read as identical beads on the same string rather than as
     /// different kinds of thing.

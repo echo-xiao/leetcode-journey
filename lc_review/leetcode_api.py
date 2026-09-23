@@ -5,27 +5,27 @@ import time
 import anthropic
 from dotenv import load_dotenv
 
-# 1. 初始化
+# 1. Initialization
 load_dotenv()
 
 # The analysis runs on Claude; the key lives in .env as CLAUDE_TOKEN.
 CLAUDE_MODEL = "claude-sonnet-5"
 claude = anthropic.Anthropic(api_key=os.getenv('CLAUDE_TOKEN'))
 
-# --- 环境检查 ---
+# --- Environment check ---
 LC_SESSION = os.getenv('LEETCODE_SESSION')
 LC_CSRF = os.getenv('LEETCODE_CSRFTOKEN')
 CLAUDE_KEY = os.getenv('CLAUDE_TOKEN')
 
-# ================= 核心：身份验证 Session 配置 =================
-# 创建一个全局 Session 对象，它会自动管理 Cookie 和 Header
+# ================= Core: authenticated session setup =================
+# A global Session object that manages cookies and headers automatically
 session = requests.Session()
 
-# 注入身份 Cookie（解决 0 题问题的关键）
+# Inject the identity cookies (the key to fixing the "0 problems" issue)
 session.cookies.set('LEETCODE_SESSION', LC_SESSION, domain='leetcode.com')
 session.cookies.set('csrftoken', LC_CSRF, domain='leetcode.com')
 
-# 设置全局通用的 Header
+# Shared default headers
 session.headers.update({
     'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/121.0.0.0 Safari/537.36',
     'Referer': 'https://leetcode.com',
@@ -41,45 +41,45 @@ def describe_environment() -> str:
     command that touched it dumped four lines of diagnostics first.
     """
     return (
-        f"Session: {'有' if LC_SESSION else '无'} | "
-        f"CSRF: {'有' if LC_CSRF else '无'} | "
-        f"Claude Key: {'有' if CLAUDE_KEY else '无'}"
+        f"Session: {'set' if LC_SESSION else 'missing'} | "
+        f"CSRF: {'set' if LC_CSRF else 'missing'} | "
+        f"Claude Key: {'set' if CLAUDE_KEY else 'missing'}"
     )
 
 
-# ================= 配置区 =================
+# ================= Configuration =================
 BASE_URL_EN = "https://leetcode.com"
 BASE_URL_CN = "https://leetcode.cn"
 
 
-# ================= 功能函数（已切换至 session） =================
+# ================= API functions (all going through the session) =================
 
 def get_total_ac_count():
-    """获取用户 AC 题目的真实总数"""
-    # 也可以直接访问 api/problems/all/ 获取 num_solved，更直接
+    """The user's true total of accepted problems."""
+    # api/problems/all/ exposes num_solved directly, which is the simplest way
     url = f"{BASE_URL_EN}/api/problems/all/"
     try:
-        resp = session.get(url)  # 使用 session 发起请求
+        resp = session.get(url)  # request through the authenticated session
         data = resp.json()
-        # 顺便打印一下当前用户名，确认没走错房间
-        print(f"👤 当前登录用户: {data.get('user_name', '未知')}")
+        # Print the username too, to confirm we're logged in as the right user
+        print(f"👤 Logged in as: {data.get('user_name', 'unknown')}")
         return data.get('num_solved', 0)
     except Exception as e:
-        print(f"获取总数失败: {e}")
+        print(f"Failed to fetch total: {e}")
         return 0
 
 
 def get_all_ac_questions(session):
     """
-    分页获取所有通过题目的 Slug
+    Fetch the slugs of all accepted problems, page by page.
     """
     total = get_total_ac_count()
-    print(f"📊 账户内已通过题目总数: {total}")
+    print(f"📊 Total accepted problems on the account: {total}")
 
     questions = []
     page_size = 100
 
-    # 1. 更新后的查询语句，加入了 $categorySlug 参数
+    # 1. Updated query with the $categorySlug parameter added
     query = """
     query problemsetQuestionList($limit: Int, $skip: Int, $filters: QuestionListFilterInput, $categorySlug: String) {
       problemsetQuestionList: questionList(limit: $limit, skip: $skip, filters: $filters, categorySlug: $categorySlug) {
@@ -89,12 +89,12 @@ def get_all_ac_questions(session):
     """
 
     for skip in range(0, total, page_size):
-        # 2. 在 vars 中增加 categorySlug，传空字符串 "" 代表获取所有分类
+        # 2. Add categorySlug to vars; the empty string "" means all categories
         vars = {
             "limit": page_size,
             "skip": skip,
             "filters": {"status": "AC"},
-            "categorySlug": ""  # 这里的空字符串是解决问题的关键
+            "categorySlug": ""  # the empty string here is what makes this work
         }
 
         try:
@@ -107,14 +107,14 @@ def get_all_ac_questions(session):
             data = resp.json()
             if 'data' in data and data['data']['problemsetQuestionList']:
                 questions.extend(data['data']['problemsetQuestionList']['questions'])
-                print(f"✅ 已抓取 {len(questions)} / {total}")
+                print(f"✅ Fetched {len(questions)} / {total}")
             else:
-                print(f"⚠️ 响应异常: {data}")
+                print(f"⚠️ Unexpected response: {data}")
                 break
 
             time.sleep(0.8)
         except Exception as e:
-            print(f"❌ 请求出错: {e}")
+            print(f"❌ Request failed: {e}")
             break
 
     return questions
@@ -147,7 +147,7 @@ def get_recent_ac_submissions(username, limit=20):
 
 
 def get_problem_details(slug):
-    """跨站获取元数据与中文内容"""
+    """Fetch metadata and the Chinese statement across both sites."""
     q_meta = """
     query singleQuestion($titleSlug: String!) {
       question(titleSlug: $titleSlug) {
@@ -165,11 +165,11 @@ def get_problem_details(slug):
         meta = \
         session.post(f"{BASE_URL_EN}/graphql", json={'query': q_meta, 'variables': {'titleSlug': slug}}).json()['data'][
             'question']
-        # 先尝试从中文站获取
+        # Try the Chinese site first
         cn = \
         requests.post(f"{BASE_URL_CN}/graphql", json={'query': q_cn, 'variables': {'titleSlug': slug}}).json()['data'][
             'question']
-        # 如果中文站没有返回描述，用英文站的 content 补充
+        # If the Chinese site returned no statement, fall back to the English content
         if not cn or not cn.get('translatedContent'):
             if cn is None:
                 cn = {}
@@ -181,7 +181,7 @@ def get_problem_details(slug):
 
 
 def get_all_ac_submissions(slug):
-    """获取该题目下所有 AC 提交记录"""
+    """All accepted submissions for one problem."""
     all_ac_subs = []
     offset, limit = 0, 20
     query = """
@@ -207,7 +207,7 @@ def get_all_ac_submissions(slug):
 
 
 def get_submission_code(sub_id):
-    """获取具体代码"""
+    """The source code of one submission."""
     query = "query submissionDetails($submissionId: Int!) { submissionDetails(submissionId: $submissionId) { code } }"
     try:
         resp = session.post(f"{BASE_URL_EN}/graphql",
@@ -299,16 +299,19 @@ def ai_analyze_all_versions(title, codes_dict):
         )
         return "".join(b.text for b in message.content if b.type == "text")
     except Exception as e:
-        return f"AI 复盘生成失败: {e}"
+        return f"AI analysis failed: {e}"
 
 
 def classify_question(tags, title):
     """
-    核心分类逻辑：基于 LeetCode 标签将题目映射至 12 大类体系
+    Core classification: map a problem into the 12-category system by its LeetCode tags.
+
+    The Chinese category names below are data, not UI — they are written into
+    Notion and README_CN.md and must stay byte-identical to existing rows.
     """
     tag_set = {t.lower() for t in tags}
 
-    # 映射配置：大类名称 -> 匹配的 LeetCode 英文标签或关键字
+    # Mapping: category name -> matching LeetCode tags/keywords (English and Chinese)
     mapping = {
         "1. 滑动窗口与双指针": ["sliding window", "two pointers", "双指针", "滑动窗口"],
         "2. 二分算法": ["binary search", "二分查找", "二分"],
@@ -329,7 +332,7 @@ def classify_question(tags, title):
 
     for main_cat, keywords in mapping.items():
         if any(k in tag_set for k in keywords):
-            # 取第一个原始标签作为小类，若无则设为 General
+            # Use the first raw tag as the subcategory, or General if there is none
             sub_cat = tags[0] if tags else "General"
             return main_cat, sub_cat
 

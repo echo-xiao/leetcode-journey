@@ -3,7 +3,7 @@
 Both retrospective pages are written as running logs — easy as
 ``20、valid parentheses：body`` lines, medium as ``N、LC 1456 title：body``
 under ``Day`` headings. ``lc_review.fupan`` already knows how to read them;
-this module decides where each entry lands in 「LC 旧题回顾」.
+this module decides where each entry lands in the review tracker.
 
 A problem can appear more than once across the two pages (echo revisited 34
 of them). Those bodies are joined rather than overwritten, so a later pass
@@ -91,7 +91,7 @@ def collect(easy_text: str, medium_text: str) -> dict[int, list[Retrospective]]:
 def combine(entries: list[Retrospective]) -> str:
     """One cell of text for a problem, keeping every pass echo wrote.
 
-    No Day/topic prefix: the row already carries 二级 and 三级 columns saying
+    No Day/topic prefix: the row already carries category columns saying
     the same thing, so repeating it in the cell is noise. review.md keeps the
     heading, because a standalone file has no columns to lean on.
     """
@@ -134,8 +134,8 @@ def apply_plan(plan: Plan, rows: list[dict], titles: dict[int, str], dry_run: bo
         if number is not None:
             by_number[int(number)] = row
 
-    print(f"更新已有行 {len(plan.update)} 条，新建行 {len(plan.create)} 条"
-          f"{'（试运行，不写入）' if dry_run else ''}")
+    print(f"Updating {len(plan.update)} existing rows, creating {len(plan.create)} new rows"
+          f"{' (dry run, not writing)' if dry_run else ''}")
     if dry_run:
         return
 
@@ -147,8 +147,8 @@ def apply_plan(plan: Plan, rows: list[dict], titles: dict[int, str], dry_run: bo
         update_page(row["id"], {"复盘": prop_rich(plan.segments[problem_id])})
         written += 1
         if written % 25 == 0:
-            print(f"  已更新 {written}/{len(plan.update)}", flush=True)
-    print(f"  更新完成 {written} 条")
+            print(f"  updated {written}/{len(plan.update)}", flush=True)
+    print(f"  updates done: {written}")
 
     for problem_id, body in sorted(plan.create.items()):
         create_page(
@@ -161,7 +161,7 @@ def apply_plan(plan: Plan, rows: list[dict], titles: dict[int, str], dry_run: bo
                 "链接": prop_url(None),
             },
         )
-    print(f"  新建完成 {len(plan.create)} 条")
+    print(f"  rows created: {len(plan.create)}")
 
 
 def sync(easy_text: str, medium_text: str, titles: dict[int, str], dry_run: bool = True) -> Plan:

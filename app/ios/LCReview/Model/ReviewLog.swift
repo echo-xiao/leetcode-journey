@@ -13,7 +13,7 @@ import SwiftData
 final class ReviewLog {
     var problemID: String
     var gradeRaw: Int
-    /// True for the extra ask appended inside a session after a 不会.
+    /// True for the extra ask appended inside a session after an Again grade.
     /// Counted as work in the heatmap, excluded from FSRS and the mistake bank.
     var isRepeat: Bool
     var timestamp: Date

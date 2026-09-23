@@ -27,7 +27,7 @@ def run(dry_run: bool = True) -> int:
 
     submissions = fetcher.get_recent_ac_submissions(USERNAME)
     if not submissions:
-        print("力扣没有返回最近通过记录，跳过")
+        print("LeetCode returned no recent accepted submissions, skipping")
         return 0
 
     index = ac_times.load()
@@ -37,8 +37,8 @@ def run(dry_run: bool = True) -> int:
     preview = dict(index)
     changed = ac_times.merge_recent(submissions, preview, folders)
 
-    print(f"最近通过 {len(submissions)} 条，其中 {changed} 道题的日期需要更新"
-          f"{'（试运行，不写入）' if dry_run else ''}")
+    print(f"{len(submissions)} recent accepted submissions, {changed} problems need their date updated"
+          f"{' (dry run, not writing)' if dry_run else ''}")
     if dry_run or not changed:
         return changed
 

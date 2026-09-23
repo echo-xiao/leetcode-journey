@@ -57,8 +57,8 @@ def run(dry_run: bool = True, limit: int | None = None, pause: float = 0.7) -> i
     if limit:
         pending = pending[:limit]
 
-    print(f"已有日期 {len(index)} 道 | 待补 {len(pending)} 道"
-          f"{'（试运行，不请求也不写入）' if dry_run else ''}")
+    print(f"{len(index)} already dated | {len(pending)} to backfill"
+          f"{' (dry run, no requests, no writes)' if dry_run else ''}")
     if dry_run or not pending:
         return 0
 
@@ -72,7 +72,7 @@ def run(dry_run: bool = True, limit: int | None = None, pause: float = 0.7) -> i
             solved_at = ac_times.latest_ac_timestamp(submissions)
             first_at = ac_times.earliest_ac_timestamp(submissions)
             if solved_at is None or first_at is None:
-                print(f"  跳过 {folder_name}: 没有取到通过记录")
+                print(f"  skipping {folder_name}: no accepted submissions retrieved")
                 continue
             # Written every iteration rather than once at the end: five
             # minutes is long enough that an interruption is a real
@@ -81,11 +81,11 @@ def run(dry_run: bool = True, limit: int | None = None, pause: float = 0.7) -> i
             ac_times.record_first(folder_name, first_at)
             recorded += 1
             if position % 25 == 0 or position == len(pending):
-                print(f"  已补 {position} / {len(pending)}")
+                print(f"  backfilled {position} / {len(pending)}")
         except Exception as error:
             print(f"  ✗ {folder_name}: {error}")
         time.sleep(pause)
 
-    print(f"补齐 {recorded} 道，最近通过索引 {len(ac_times.load())} 道，"
-          f"首次通过索引 {len(ac_times.load(ac_times.FIRST_PATH))} 道")
+    print(f"backfilled {recorded}; latest-accepted index has {len(ac_times.load())}, "
+          f"first-accepted index has {len(ac_times.load(ac_times.FIRST_PATH))}")
     return recorded

@@ -1,7 +1,7 @@
 import Foundation
 
-/// One stop in a session: a problem, and whether this is the extra pass a
-/// 不会 earned it earlier in the same sitting.
+/// One stop in a session: a problem, and whether this is the extra pass an
+/// Again grade earned it earlier in the same sitting.
 struct SessionStep: Equatable, Hashable {
     let problemID: String
     let isRepeat: Bool
@@ -64,7 +64,7 @@ final class SessionRunner: ObservableObject {
 
     /// Commit the one grade this problem gets, and move to the next stop.
     ///
-    /// A 不会 queues the problem again at the end of the session, at most
+    /// An Again grade queues the problem again at the end of the session, at most
     /// twice. A repeat that is failed again is not re-queued -- that is what
     /// the cap is for, and counting from the original grade keeps a bad
     /// problem from filling the session with itself.

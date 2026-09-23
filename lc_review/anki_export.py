@@ -85,4 +85,4 @@ def write(rows: list[str], name: str) -> Path:
 def run() -> None:
     rows = build_elements_deck()
     path = write(rows, "elements.tsv")
-    print(f"要素卡 {len(rows)} 张 -> {path}")
+    print(f"{len(rows)} element cards -> {path}")

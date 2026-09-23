@@ -221,7 +221,7 @@ final class SessionBuilderTests: XCTestCase {
         )
     }
 
-    // MARK: - 按最近刷
+    // MARK: - By recency
 
     func testRecentScopeIsOrderedByWhenItWasSolvedNewestFirst() {
         let problems = [
@@ -292,7 +292,7 @@ final class SessionBuilderTests: XCTestCase {
         XCTAssertEqual(session.map(\.id), ["known"])
     }
 
-    // MARK: - 积压
+    // MARK: - Backlog
 
     func testBacklogCountsEveryProblemDueNowNotJustOneSession() {
         // The number the home screen used to hide. It is not capped by
@@ -400,7 +400,7 @@ final class SessionBuilderTests: XCTestCase {
         }
     }
 
-    // MARK: - 范围总数
+    // MARK: - Scope totals
 
     func testTotalCountsEveryProblemInScopeIncludingOnesNotDue() {
         // The counterpart to backlog: what you have done, not what is

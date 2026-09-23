@@ -1,13 +1,17 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-"""调用 Claude API，按每道题的 pseudocode.md 推出该题型各个要素槽位的答案，
-写进 answers.json。之后由 render_elements.py 渲染成 elements.md。
+"""Call the Claude API to derive, from each problem's pseudocode.md, the answers
+to that pattern's element slots, and write them into answers.json. Afterwards
+render_elements.py renders them into elements.md.
 
-用法:
+The prompts below are deliberately in Chinese: they generate the Chinese
+element answers that ship as content.
+
+Usage:
     export ANTHROPIC_API_KEY=<your key>
-    python3 fill_answers.py            # 只补还没填的题
-    python3 fill_answers.py --limit 5  # 先试跑 5 道
-    python3 fill_answers.py --force    # 全部重跑
+    python3 fill_answers.py            # only fill problems still missing
+    python3 fill_answers.py --limit 5  # trial run on 5 problems
+    python3 fill_answers.py --force    # redo everything
 """
 
 import os
@@ -26,7 +30,7 @@ REPO_ENV = os.path.join(REPO, ".env")
 
 
 def load_key():
-    """key 在仓库 .env 的 CLAUDE_TOKEN 里；.env 已被 gitignore，不会进版本库。"""
+    """The key lives in the repo's .env as CLAUDE_TOKEN; .env is gitignored."""
     if os.environ.get("ANTHROPIC_API_KEY"):
         return
     if not os.path.exists(REPO_ENV):
@@ -113,7 +117,7 @@ def title_of(folder):
 
 
 def build_schema(slots):
-    """数组的 minItems/maxItems 不被支持，改成一槽一字段，全部 required。"""
+    """Array minItems/maxItems are unsupported, so use one field per slot, all required."""
     props = {}
     for i, s in enumerate(slots, 1):
         props["a{}".format(i)] = {"type": "string", "description": "第 {} 条槽位「{}」的答案".format(i, s)}
@@ -172,7 +176,7 @@ def main():
             limit = int(a.split("=", 1)[1]) if "=" in a else int(sys.argv[sys.argv.index(a) + 1])
 
     ymap = load_map()
-    # 仓库里有、但 Notion 没打标签的题：题型由模型判定
+    # Problems present in the repo but untagged in Notion: the model decides the pattern
     all_folders = sorted(
         f for f in os.listdir(PROBLEMS)
         if os.path.exists(os.path.join(PROBLEMS, f, "pseudocode.md"))
@@ -201,7 +205,7 @@ def main():
         todo = [f for f in sorted(ymap) if force or f not in answers]
     if limit:
         todo = todo[:limit]
-    print("待处理 {} 道（已有 {} 道，待判题型 {} 道）".format(len(todo), len(answers), len(need_class)))
+    print("{} to process ({} already done, {} awaiting classification)".format(len(todo), len(answers), len(need_class)))
     # Newly downloaded problems are not in ymap yet, so todo is empty until
     # they have been classified. Returning on `not todo` alone would skip the
     # classification step that is the only thing able to populate it.
@@ -210,12 +214,12 @@ def main():
 
     load_key()
     if not os.environ.get("ANTHROPIC_API_KEY"):
-        print("没找到 key：请设置 ANTHROPIC_API_KEY，或在仓库 .env 里放 CLAUDE_TOKEN")
+        print("No key found: set ANTHROPIC_API_KEY, or put CLAUDE_TOKEN in the repo's .env")
         sys.exit(1)
     client = anthropic.Anthropic()
 
     if need_class:
-        print("先判 {} 道无标签题的题型...".format(len(need_class)))
+        print("Classifying {} untagged problems first...".format(len(need_class)))
         cerr = []
 
         def do_class(folder):
@@ -234,7 +238,7 @@ def main():
         with open(INFERRED_PATH, "w", encoding="utf-8") as f:
             for k in sorted(inferred):
                 f.write("{}\t{}\n".format(k, inferred[k]))
-        print("  判定完成 {}，失败 {}".format(len(inferred), len(cerr)))
+        print("  classified {}, failed {}".format(len(inferred), len(cerr)))
         for e in cerr[:5]:
             print("   ", e)
         todo = [f for f in sorted(ymap) if force or f not in answers]
@@ -251,7 +255,7 @@ def main():
             with _lock:
                 errors.append((folder, repr(e)))
                 done[0] += 1
-                print("  [{}/{}] 失败 {}: {}".format(done[0], len(todo), folder, e))
+                print("  [{}/{}] failed {}: {}".format(done[0], len(todo), folder, e))
             return
         with _lock:
             answers[folder] = res
@@ -267,11 +271,11 @@ def main():
     with open(ANSWERS_PATH, "w", encoding="utf-8") as f:
         json.dump(answers, f, ensure_ascii=False, indent=1)
 
-    print("\n完成 {}，失败 {}".format(len(answers), len(errors)))
+    print("\ndone {}, failed {}".format(len(answers), len(errors)))
     for e in errors[:20]:
         print("  ", e)
-    print("答案已存到", ANSWERS_PATH)
-    print("下一步：python3 render_elements.py")
+    print("Answers saved to", ANSWERS_PATH)
+    print("Next step: python3 render_elements.py")
 
 
 if __name__ == "__main__":

@@ -7,7 +7,7 @@ import Foundation
 struct Grading {
     let fsrs: FSRS
 
-    /// Two consecutive 会 to leave the mistake bank. One is too loose: it
+    /// Two consecutive Good grades to leave the mistake bank. One is too loose: it
     /// usually means the answer was on screen minutes ago.
     static let goodStreakToLeaveBank = 2
 

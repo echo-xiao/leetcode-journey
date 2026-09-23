@@ -20,11 +20,11 @@ cd "$REPO" || exit 1
 find "$LOGS" -name 'sync-*.log' -mtime +14 -delete 2>/dev/null
 
 notify() {
-    /usr/bin/osascript -e "display notification \"$1\" with title \"LeetCode 同步失败\" sound name \"Basso\""
+    /usr/bin/osascript -e "display notification \"$1\" with title \"LeetCode sync failed\" sound name \"Basso\""
 }
 
 {
-    echo "=== $(date '+%Y-%m-%d %H:%M:%S') 开始 ==="
+    echo "=== $(date '+%Y-%m-%d %H:%M:%S') start ==="
 
     # A scheduled run must not commit onto whatever branch happened to be
     # checked out when the machine was left for the night. Found by running
@@ -32,14 +32,14 @@ notify() {
     # committed there and pushed main.
     BRANCH="$(git rev-parse --abbrev-ref HEAD)"
     if [ "$BRANCH" != "main" ]; then
-        echo "!!! 当前在 $BRANCH 分支，不是 main，跳过"
-        notify "当前在 $BRANCH 分支，没有同步"
+        echo "!!! currently on branch $BRANCH, not main, skipping"
+        notify "On branch $BRANCH, nothing was synced"
         exit 1
     fi
 
     if ! /usr/bin/env python3 -m lc_review.cli sync-all --apply; then
-        echo "!!! sync-all 失败"
-        notify "管线中断，日志：$LOG"
+        echo "!!! sync-all failed"
+        notify "Pipeline aborted, log: $LOG"
         exit 1
     fi
 
@@ -53,10 +53,10 @@ notify() {
     # rebase below, so the whole run failed at the last step.
     git add Problems app/content.json lc_review/data_elements
     if git diff --cached --quiet; then
-        echo "没有内容变化，不提交"
+        echo "no content changes, not committing"
     else
         if ! git commit -m "Daily sync: $(date +%Y-%m-%d)"; then
-            notify "提交失败，日志：$LOG"
+            notify "Commit failed, log: $LOG"
             exit 1
         fi
         # Rebase first: the owner may have pushed from this machine during the
@@ -65,15 +65,15 @@ notify() {
         # and put back, rather than stopping a run that has already done its
         # work.
         if ! git pull --rebase --autostash origin main; then
-            notify "pull --rebase 失败，日志：$LOG"
+            notify "pull --rebase failed, log: $LOG"
             exit 1
         fi
         if ! git push origin main; then
-            notify "push 失败，日志：$LOG"
+            notify "push failed, log: $LOG"
             exit 1
         fi
-        echo "已推送"
+        echo "pushed"
     fi
 
-    echo "=== $(date '+%Y-%m-%d %H:%M:%S') 完成 ==="
+    echo "=== $(date '+%Y-%m-%d %H:%M:%S') done ==="
 } >> "$LOG" 2>&1

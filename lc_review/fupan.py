@@ -1,6 +1,6 @@
 """Parse echo's own retrospectives out of two Notion pages.
 
-These are the only real retrospectives. The ``解题思路与复盘`` block inside each
+These are the only real retrospectives. The AI-analysis block inside each
 README_CN.md is GPT-4o output describing accepted code, and is handled
 separately as reference material.
 """
@@ -11,7 +11,7 @@ import re
 from dataclasses import dataclass
 
 # A colour span sometimes wraps the entry number itself, e.g.
-# ``<span color="orange">2、LC 904 水果成篮：</span>难点在于...``. The opening
+# ``<span color="orange">2、LC 904 <title>：</span><body>...``. The opening
 # tag is optional and consumed as part of the header (captured, so it can be
 # re-applied to the body below) so it never leaks into the body; the header
 # also swallows an immediate closing tag so a number-wrapping span does not
@@ -28,7 +28,7 @@ _SPAN_CLOSE = r"(?:</span>)?"
 EASY_ENTRY_RE = re.compile(
     _SPAN_OPEN + r"(?<!\d)(\d{1,4})、\s*[A-Za-z][^：\n]{3,80}：\s*" + _SPAN_CLOSE
 )
-# A few entries slip a stray word between the number and "LC" ("10、如果LC 658
+# A few entries slip a stray word between the number and "LC" ("10、<word>LC 658
 # ..."). Tolerating a short run of non-digits there costs nothing and stops the
 # entry from being dropped without a trace.
 MEDIUM_ENTRY_RE = re.compile(

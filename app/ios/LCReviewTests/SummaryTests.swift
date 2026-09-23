@@ -28,7 +28,7 @@ final class SummaryTests: XCTestCase {
         XCTAssertEqual(summary.totalReviews(logs: logs), 2)
     }
 
-    // MARK: - 今天
+    // MARK: - Today
 
     private func problem(_ id: String, firstSolvedDaysAgo: Double?) -> Problem {
         Problem(

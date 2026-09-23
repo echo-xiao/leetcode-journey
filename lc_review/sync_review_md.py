@@ -65,8 +65,9 @@ def folder_index() -> dict[int, Path]:
 
     The retrospectives number problems the way leetcode.cn does; the folders
     are named after leetcode.com ids, and for many problems the two differ
-    (509 斐波那契数 is folder 1013_fibonacci-number). 「LC 旧题回顾」carries both
-    — 题号 is the .cn id, 代码 links the repo folder — so it is the bridge.
+    (LC 509 fibonacci-number is folder 1013_fibonacci-number). The review tracker
+    carries both — its number column is the .cn id, its code column links the
+    repo folder — so it is the bridge.
     Folder-prefix matching is kept as a fallback for anything the table has
     not catalogued.
     """
@@ -87,7 +88,7 @@ def folder_index() -> dict[int, Path]:
     try:
         rows = query_all(REVIEW_DB)
     except Exception as error:                       # offline or unshared: keep the fallback
-        print(f"  (未能读取 Notion 映射，仅用文件夹前缀匹配: {error})")
+        print(f"  (could not read the Notion mapping, matching by folder prefix only: {error})")
         return index
 
     for row in rows:
@@ -150,10 +151,10 @@ def sync(dry_run: bool = True) -> tuple[int, int]:
             (folder / "review.md").write_text(content, encoding="utf-8")
         written += 1
 
-    print(f"写入 review.md {written} 个{'（试运行）' if dry_run else ''}；"
-          f"{len(orphans)} 条复盘在仓库里没有对应文件夹；"
-          f"{len(empty)} 条原文只有标题没有正文，跳过不建空文件")
+    print(f"wrote {written} review.md files{' (dry run)' if dry_run else ''}; "
+          f"{len(orphans)} retrospectives have no matching folder in the repo; "
+          f"{len(empty)} entries are title-only with no body, skipped instead of creating empty files")
     if orphans:
-        print("  无对应文件夹的题号:", ", ".join(str(i) for i in orphans[:20]),
+        print("  problem ids without a folder:", ", ".join(str(i) for i in orphans[:20]),
               "..." if len(orphans) > 20 else "")
     return written, len(orphans)

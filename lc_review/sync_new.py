@@ -1,8 +1,8 @@
 """Pull newly solved problems down and register them everywhere.
 
 Three things have to agree: LeetCode (what you actually solved), the Problems
-folder (code plus the four markdown files), and 「LC 旧题回顾」(the row you
-review from). This module walks that gap.
+folder (code plus the four markdown files), and the Notion review tracker (the
+row you review from). This module walks that gap.
 
 The LeetCode session expires every few weeks. When it does, the API keeps
 answering — with zero solved problems — so a silent run would look like a
@@ -34,8 +34,8 @@ def require_session() -> tuple[str, int]:
     solved = data.get("num_solved") or 0
     if not user or not solved:
         raise SystemExit(
-            "LeetCode session 已失效：接口返回空用户名 / 0 道通过题。\n"
-            "在 Chrome 里重新登录 leetcode.com，把 LEETCODE_SESSION 更新到 .env 再跑。"
+            "LeetCode session expired: the API returned an empty username / 0 accepted problems.\n"
+            "Log back in to leetcode.com in Chrome, update LEETCODE_SESSION in .env, and rerun."
         )
     return user, solved
 
@@ -60,9 +60,9 @@ def missing_questions() -> list[dict]:
 
 
 def register_in_notion(entries: list[dict], dry_run: bool = True) -> int:
-    """Create a 「LC 旧题回顾」row for each newly downloaded problem.
+    """Create a review-tracker row for each newly downloaded problem.
 
-    Rows are keyed on 题号. Anything already present is left alone rather than
+    Rows are keyed on the problem-number column. Anything already present is left alone rather than
     duplicated — the table is the thing echo reviews from, and a double row
     would quietly split a problem's history in two.
     """
@@ -83,7 +83,7 @@ def register_in_notion(entries: list[dict], dry_run: bool = True) -> int:
         if read_number(row, "题号") is not None
     }
     todo = [e for e in entries if int(e["question_id"]) not in existing]
-    print(f"Notion 建行 {len(todo)} 条{'（试运行）' if dry_run else ''}")
+    print(f"Notion rows to create: {len(todo)}{' (dry run)' if dry_run else ''}")
     if dry_run:
         return len(todo)
 
@@ -107,14 +107,14 @@ def register_in_notion(entries: list[dict], dry_run: bool = True) -> int:
 def run(dry_run: bool = True, limit: int | None = None) -> list[dict]:
     """Download what is missing, write the markdown, then register the rows."""
     user, solved = require_session()
-    print(f"👤 {user} | 力扣已通过 {solved} 道 | 本地 {len(local_slugs())} 道")
+    print(f"👤 {user} | {solved} accepted on LeetCode | {len(local_slugs())} local")
 
     from . import leetcode_api as fetcher
 
     pending = missing_questions()
     if limit:
         pending = pending[:limit]
-    print(f"待下载 {len(pending)} 道{'（试运行，不下载）' if dry_run else ''}")
+    print(f"{len(pending)} to download{' (dry run, not downloading)' if dry_run else ''}")
     if dry_run or not pending:
         return []
 
@@ -124,7 +124,7 @@ def run(dry_run: bool = True, limit: int | None = None) -> list[dict]:
         try:
             q_id, difficulty, tags, prob_cn = fetcher.get_problem_details(slug)
             if q_id is None:
-                print(f"  跳过 {slug}: 拿不到元数据")
+                print(f"  skipping {slug}: no metadata available")
                 continue
             title = (prob_cn.get("translatedTitle") if prob_cn else slug) or slug
             folder = PROBLEMS / f"{q_id}_{slug}"
@@ -148,7 +148,7 @@ def run(dry_run: bool = True, limit: int | None = None) -> list[dict]:
                 (folder / f"solution_{index + 1}.{ext}").write_text(code, encoding="utf-8")
                 codes[f"{sub['id']}_{sub['lang']}"] = code
             if not codes:
-                print(f"  跳过 {slug}: 没有取到代码")
+                print(f"  skipping {slug}: no code retrieved")
                 continue
 
             analysis = fetcher.ai_analyze_all_versions(title, codes)
@@ -168,6 +168,6 @@ def run(dry_run: bool = True, limit: int | None = None) -> list[dict]:
         except Exception as error:
             print(f"  ✗ {slug}: {error}")
 
-    print(f"下载完成 {len(downloaded)} 道")
+    print(f"Downloaded {len(downloaded)}")
     register_in_notion(downloaded, dry_run=False)
     return downloaded

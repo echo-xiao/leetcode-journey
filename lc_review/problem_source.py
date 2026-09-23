@@ -20,7 +20,7 @@ TAG_RE = re.compile(r"<[^>]+>")
 BLOCK_END_RE = re.compile(r"</(p|pre|div|li|ul|ol|h[1-6]|blockquote)>|<br\s*/?>", re.I)
 # Only the constraints block is dropped. The worked examples stay: several
 # statements are one clause long because the real definition sits behind a
-# link on the site ("判断它是否是平衡二叉树"), and without the examples the card
+# link on the site, and without the examples the card
 # gives you nothing to recall from.
 TRIM_RE = re.compile(r"(提示[：:]|进阶[：:]|Constraints[：:])")
 
@@ -79,7 +79,7 @@ def title_of(folder: Path) -> str:
 
 
 def elements_of(folder: Path) -> list[str]:
-    """The answered slots, as ``槽位：答案`` lines."""
+    """The answered slots, as ``<slot>：<answer>`` lines."""
     path = folder / "elements.md"
     if not path.exists():
         return []

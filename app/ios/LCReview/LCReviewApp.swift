@@ -74,10 +74,10 @@ struct LCReviewApp: App {
 struct DataStoreFailedView: View {
     var body: some View {
         VStack(spacing: 14) {
-            Text("数据打不开了")
+            Text("Couldn't open your data")
                 .font(Theme.titleFont)
                 .foregroundColor(Theme.primaryText)
-            Text("删除并重装 App 可以解决，但会丢掉复习进度。")
+            Text("Deleting and reinstalling the app fixes this, but loses your review progress.")
                 .font(Theme.bodyFont)
                 .foregroundColor(Theme.secondaryText)
                 .multilineTextAlignment(.center)
@@ -146,13 +146,13 @@ struct RootView: View {
 
     private var retry: some View {
         VStack(spacing: 14) {
-            Text("内容下载失败")
+            Text("Content download failed")
                 .font(Theme.titleFont)
                 .foregroundColor(Theme.primaryText)
-            Text("检查网络后重试。")
+            Text("Check your connection and try again.")
                 .font(Theme.bodyFont)
                 .foregroundColor(Theme.secondaryText)
-            Button("重试") {
+            Button("Retry") {
                 Task { await state.loadContent() }
             }
             .font(Theme.bodyFont)

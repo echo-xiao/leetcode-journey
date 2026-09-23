@@ -113,15 +113,15 @@ struct HomeView: View {
         case .fresh:
             return nil
         case .stale(let asOf):
-            return "数据截至 \(Self.noteFormatter.string(from: asOf))"
+            return "Data as of \(Self.noteFormatter.string(from: asOf))"
         case .unavailable:
-            return "暂时拿不到 LeetCode 数据"
+            return "LeetCode data unavailable right now"
         }
     }
 
     private static let noteFormatter: DateFormatter = {
         let formatter = DateFormatter()
-        formatter.dateFormat = "M月d日"
+        formatter.dateFormat = "MMM d"
         return formatter
     }()
 
@@ -145,10 +145,10 @@ struct HomeView: View {
 
     private var counters: some View {
         HStack(spacing: 0) {
-            counter(problemCount, "题目")
-            counter(newlySolvedToday, "今日新刷")
-            counter(reviewsToday, "今日复习")
-            counter(streak, "连续天")
+            counter(problemCount, "Problems")
+            counter(newlySolvedToday, "New today")
+            counter(reviewsToday, "Reviews today")
+            counter(streak, "Day streak")
         }
     }
 

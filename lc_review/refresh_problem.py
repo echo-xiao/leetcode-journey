@@ -44,19 +44,19 @@ def run(slug: str, dry_run: bool = True) -> bool:
     """Returns True when something was refreshed."""
     folder = folder_for(slug)
     if folder is None:
-        print(f"仓库里没有 {slug}，先跑 sync-new")
+        print(f"{slug} is not in the repository; run sync-new first")
         return False
 
     from . import leetcode_api as fetcher
 
     submissions = fetcher.get_all_ac_submissions(slug)
     if not submissions:
-        print(f"{slug}: 力扣没有返回 AC 提交")
+        print(f"{slug}: LeetCode returned no accepted submissions")
         return False
 
     local = local_solution_count(folder)
-    print(f"{folder.name}: 力扣 {len(submissions)} 版，本地 {local} 版"
-          f"{'（试运行，不写入）' if dry_run else ''}")
+    print(f"{folder.name}: {len(submissions)} versions on LeetCode, {local} local"
+          f"{' (dry run, not writing)' if dry_run else ''}")
     if dry_run:
         return len(submissions) != local
 
@@ -70,7 +70,7 @@ def run(slug: str, dry_run: bool = True) -> bool:
         fetched.append((ext, code))
         codes[f"{submission['id']}_{submission['lang']}"] = code
     if not codes:
-        print(f"{slug}: 一份代码都没取到，保留原样")
+        print(f"{slug}: no code retrieved at all, keeping everything as is")
         return False
 
     # Old files are removed only once new ones are in hand, so a failed fetch
@@ -94,7 +94,7 @@ def run(slug: str, dry_run: bool = True) -> bool:
         ac_times.record_first(folder.name, first_at)
 
     _rebuild_elements(folder.name)
-    print(f"{folder.name}: 已刷新 {len(fetched)} 版代码、伪代码、要素")
+    print(f"{folder.name}: refreshed {len(fetched)} code versions, pseudocode and elements")
     return True
 
 

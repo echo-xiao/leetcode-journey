@@ -75,7 +75,7 @@ def run(dry_run: bool = True, limit: int | None = None) -> list[str]:
     slugs = candidate_slugs(submissions)
     if limit:
         slugs = slugs[:limit]
-    print(f"最近碰过 {len(slugs)} 道题，逐道比对代码结构")
+    print(f"{len(slugs)} problems touched recently, comparing code structure one by one")
 
     changed: list[str] = []
     for slug in slugs:
@@ -87,17 +87,17 @@ def run(dry_run: bool = True, limit: int | None = None) -> list[str]:
             if code:
                 remote.append(code)
         if not remote:
-            print(f"  {slug}: 没取到代码，跳过")
+            print(f"  {slug}: no code retrieved, skipping")
             continue
         if not needs_refresh(slug, remote):
             continue
         changed.append(slug)
-        print(f"  {slug}: 出现了新的写法")
+        print(f"  {slug}: a new solution shape appeared")
         if not dry_run:
             refresh_problem.run(slug, dry_run=False)
 
     if not changed:
-        print("没有题目需要刷新")
+        print("no problems need a refresh")
     elif dry_run:
-        print(f"待刷新 {len(changed)} 道（试运行，不写入）")
+        print(f"{len(changed)} to refresh (dry run, not writing)")
     return changed

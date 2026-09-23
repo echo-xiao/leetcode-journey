@@ -120,7 +120,7 @@ final class AppState: ObservableObject {
     var newlySolvedToday: Int { summary.newlySolvedToday(problems: problems, now: .now) }
     /// The rows above the tree: what you start without choosing a lens.
     ///
-    /// 错题 only appears when there is something in it. A row that is always
+    /// Mistakes only appears when there is something in it. A row that is always
     /// there and usually says zero trains you to stop reading the screen.
     var homeEntries: [HomeEntry] {
         let states = allStates
@@ -132,10 +132,10 @@ final class AppState: ObservableObject {
         )
         if !mistakes.isEmpty {
             entries.append(
-                entry(id: "mistakes", label: "错题", scope: .mistakes, states: states)
+                entry(id: "mistakes", label: "Mistakes", scope: .mistakes, states: states)
             )
         }
-        entries.append(entry(id: "all", label: "全部", scope: .all, states: states))
+        entries.append(entry(id: "all", label: "All", scope: .all, states: states))
         return entries
     }
 
@@ -185,14 +185,14 @@ final class AppState: ObservableObject {
             )
         }
         return HomeSection(
-            id: "technique", label: "按类别刷",
+            id: "technique", label: "By category",
             total: problems.count, children: children, unavailable: nil
         )
     }
 
     private var recentSection: HomeSection {
         let windows: [(String, Int?)] = [
-            ("这周过的", 7), ("最近 30 天", 30), ("最近 90 天", 90), ("从最新往回刷", nil),
+            ("Solved this week", 7), ("Last 30 days", 30), ("Last 90 days", 90), ("Newest first", nil),
         ]
         let states = allStates
         let children = windows.compactMap { label, days -> HomeEntry? in
@@ -209,7 +209,7 @@ final class AppState: ObservableObject {
             return row.total == 0 ? nil : row
         }
         return HomeSection(
-            id: "recent", label: "按最近刷",
+            id: "recent", label: "By recency",
             total: problems.filter { $0.solvedAt != nil }.count,
             children: children, unavailable: nil
         )
@@ -217,15 +217,15 @@ final class AppState: ObservableObject {
 
     private var companySection: HomeSection {
         HomeSection(
-            id: "company", label: "按公司刷", total: nil, children: [],
-            unavailable: "力扣的公司标签是会员专属，仓库里没有这份数据。"
+            id: "company", label: "By company", total: nil, children: [],
+            unavailable: "LeetCode's company tags are Premium-only; the repository doesn't have this data."
         )
     }
 
     private var problemSetSection: HomeSection {
         HomeSection(
-            id: "problemset", label: "按题库刷", total: nil, children: [],
-            unavailable: "题目只按题型分组，还没有题单归属（LC75、热题 100）。"
+            id: "problemset", label: "By problem list", total: nil, children: [],
+            unavailable: "Problems are only grouped by pattern; no list membership yet (LC75, Top 100)."
         )
     }
 

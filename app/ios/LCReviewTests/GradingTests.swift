@@ -42,7 +42,7 @@ final class GradingTests: XCTestCase {
             grade: .good, to: state, problemID: "15_3sum",
             isRepeat: false, now: now.addingTimeInterval(86_400)
         )
-        XCTAssertTrue(after.inMistakeBank, "one 会 usually just means the answer was on screen minutes ago")
+        XCTAssertTrue(after.inMistakeBank, "one Good usually just means the answer was on screen minutes ago")
         XCTAssertEqual(after.consecutiveGood, 1)
     }
 

@@ -33,7 +33,7 @@ struct Summary {
     ///
     /// LeetCode buckets by UTC and this counts in the device's day, so the two
     /// disagree for a few hours around midnight. Deliberate: this number sits
-    /// beside 今日复习, which is local by nature, and one row of counters
+    /// beside the reviews-today counter, which is local by nature, and one row of counters
     /// should not mix two definitions of "today".
     func newlySolvedToday(
         problems: [Problem], now: Date, calendar: Calendar = .current

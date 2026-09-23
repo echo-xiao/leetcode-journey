@@ -96,7 +96,7 @@ def earliest_ac_timestamp(submissions: list[dict]) -> int | None:
     """The first accepted submission's unix time, or None.
 
     The counterpart to `latest_ac_timestamp`: this is the day a problem stopped
-    being unsolved, which is what separates新刷 from 复习 in a daily count.
+    being unsolved, which is what separates first-solves from reviews in a daily count.
     """
     stamps: list[int] = []
     for submission in submissions:

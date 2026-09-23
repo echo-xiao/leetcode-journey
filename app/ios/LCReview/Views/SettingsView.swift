@@ -16,15 +16,15 @@ struct SettingsView: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: Theme.sectionSpacing) {
-            Text("设置")
+            Text("Settings")
                 .font(Theme.titleFont)
                 .foregroundColor(Theme.primaryText)
 
             VStack(alignment: .leading, spacing: 10) {
-                Text("每节题数")
+                Text("Problems per session")
                     .font(Theme.bodyFont)
                     .foregroundColor(Theme.primaryText)
-                Picker("每节题数", selection: Binding(
+                Picker("Problems per session", selection: Binding(
                     get: { sessionLength },
                     set: { onChange($0) }
                 )) {
@@ -33,7 +33,7 @@ struct SettingsView: View {
                     }
                 }
                 .pickerStyle(.segmented)
-                Text("下一节生效，进行中的这一节不受影响。")
+                Text("Takes effect next session; the one in progress is unaffected.")
                     .font(Theme.metaFont)
                     .foregroundColor(Theme.secondaryText)
             }
@@ -44,7 +44,7 @@ struct SettingsView: View {
         .background(Theme.pageBackground)
         .presentationDetents([.fraction(0.35)])
         .overlay(alignment: .topTrailing) {
-            Button("完成", action: onDone)
+            Button("Done", action: onDone)
                 .font(Theme.bodyFont)
                 .foregroundColor(Theme.accent)
                 .padding(Theme.cardPadding)
