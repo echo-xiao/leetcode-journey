@@ -8,6 +8,7 @@ __pycache__/
 docs/*
 !docs/design/
 !docs/brand/
+!docs/*.md
 .DS_Store
 /data/
 logs/
