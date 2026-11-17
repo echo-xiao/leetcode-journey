@@ -1,0 +1,1348 @@
+<meta charset="utf-8">
+<title>Leet Journey · 视觉设定稿</title>
+
+<style>
+/* ============================================================
+   视觉设定稿 · v1
+   强调色对齐 flomo #30CF79；中性色按该色相重新偏移。
+   手册自身用这套 token 构建 —— 页面即样张。
+   ============================================================ */
+
+:root {
+  /* —— 中性：色相 ~148°，饱和度 3–6%，不是纯灰 —— */
+  --ground:   #F0F5F2;
+  --card:     #FFFFFF;
+  --inset:    #F6FAF8;
+  --ink-1:    #1B231F;
+  --ink-2:    #6A7670;
+  --ink-3:    #A0AAA5;
+  --ink-4:    #C3CCC7;
+  --hair:     #E3EAE6;
+
+  /* —— 强调：一屏一次 —— */
+  --accent:       #30CF79;
+  --accent-press: #2CBE6F;
+  /* 压在绿上的前景色。白字只有 2.03:1 —— 见 §9 的例外记录 */
+  --accent-ink:   #FFFFFF;
+  --accent-soft:  rgba(48, 207, 121, .14);
+
+  /* —— 功能色 —— */
+  --link:     #6082EF;
+  --link-bg:  #F0F3FC;
+  --gold:     #BFA47A;
+  --gold-bg:  #FAF0E1;
+  --warn:     #D97757;
+  --dot:      #FF3B30;
+
+  /* —— 热力图 4 档 —— */
+  --heat-0: #E5EBE8;
+  --heat-1: rgba(48, 207, 121, .24);
+  --heat-2: rgba(48, 207, 121, .52);
+  --heat-3: #30CF79;
+
+  --shadow: 0 6px 20px rgba(27, 35, 31, .07);
+  --lift:   0 1px 3px rgba(27, 35, 31, .11);
+
+  /* —— 两种声音 —— */
+  --voice-manual: "Iowan Old Style", Charter, "Palatino Linotype", Palatino, Georgia, "Songti SC", serif;
+  --voice-product: -apple-system, BlinkMacSystemFont, "SF Pro Text", "PingFang SC", "Helvetica Neue", sans-serif;
+  --voice-value: ui-monospace, "SF Mono", SFMono-Regular, Menlo, monospace;
+
+  --ease: cubic-bezier(.22, .61, .36, 1);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --ground: #0E1310; --card: #181E1B; --inset: #141916;
+    --ink-1: #E6EEEA; --ink-2: #9AA59F; --ink-3: #717A75; --ink-4: #4B534F;
+    --hair: #262D29;
+    --accent-soft: rgba(48, 207, 121, .18);
+    --link: #8FA6F0; --link-bg: #1E2535;
+    --gold: #C9B288; --gold-bg: #2A2318;
+    --heat-0: #232926;
+    --shadow: 0 6px 20px rgba(0, 0, 0, .45);
+    --lift:   0 1px 3px rgba(0, 0, 0, .55);
+  }
+}
+:root[data-theme="dark"] {
+  --ground: #0E1310; --card: #181E1B; --inset: #141916;
+  --ink-1: #E6EEEA; --ink-2: #9AA59F; --ink-3: #717A75; --ink-4: #4B534F;
+  --hair: #262D29;
+  --accent-soft: rgba(48, 207, 121, .18);
+  --link: #8FA6F0; --link-bg: #1E2535;
+  --gold: #C9B288; --gold-bg: #2A2318;
+  --heat-0: #232926;
+  --shadow: 0 6px 20px rgba(0, 0, 0, .45);
+  --lift:   0 1px 3px rgba(0, 0, 0, .55);
+}
+:root[data-theme="light"] {
+  --ground: #F0F5F2; --card: #FFFFFF; --inset: #F6FAF8;
+  --ink-1: #1B231F; --ink-2: #6A7670; --ink-3: #A0AAA5; --ink-4: #C3CCC7;
+  --hair: #E3EAE6;
+  --accent-soft: rgba(48, 207, 121, .14);
+  --link: #6082EF; --link-bg: #F0F3FC;
+  --gold: #BFA47A; --gold-bg: #FAF0E1;
+  --heat-0: #E5EBE8;
+  --shadow: 0 6px 20px rgba(27, 35, 31, .07);
+  --lift:   0 1px 3px rgba(27, 35, 31, .11);
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  background: var(--ground);
+  color: var(--ink-1);
+  font-family: var(--voice-manual);
+  font-size: 17px;
+  line-height: 1.72;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ───────── 骨架 ───────── */
+
+.shell {
+  max-width: 1120px;
+  margin: 0 auto;
+  padding: 0 24px 120px;
+  display: grid;
+  grid-template-columns: 216px minmax(0, 1fr);
+  gap: 56px;
+  align-items: start;
+}
+
+/* 左栏本身就是 §5「行」的实物样张 */
+.rail {
+  position: sticky;
+  top: 0;
+  padding: 40px 0;
+  font-family: var(--voice-product);
+}
+.rail-brand {
+  font-family: var(--voice-manual);
+  font-size: 19px;
+  font-weight: 600;
+  letter-spacing: -.01em;
+  padding: 0 16px 4px;
+}
+.rail-sub {
+  font-family: var(--voice-product);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: .09em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+  padding: 0 16px 20px;
+}
+.rail a {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  height: 44px;
+  padding: 0 16px;
+  border-radius: 14px;
+  color: var(--ink-1);
+  text-decoration: none;
+  font-size: 15px;
+  font-weight: 500;
+  transition: background-color .14s var(--ease);
+}
+.rail a .num {
+  font-family: var(--voice-value);
+  font-size: 11px;
+  color: var(--ink-3);
+  width: 14px;
+  transition: color .14s var(--ease);
+}
+.rail a:hover { background: var(--accent-soft); }
+.rail a.on { background: var(--accent); color: var(--accent-ink); }
+.rail a.on .num { color: color-mix(in srgb, var(--accent-ink) 70%, transparent); }
+
+.main { padding: 40px 0 0; min-width: 0; }
+
+/* ───────── 版头 ───────── */
+
+.masthead { padding: 24px 0 8px; }
+.eyebrow {
+  font-family: var(--voice-product);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+}
+h1 {
+  font-size: clamp(34px, 5vw, 46px);
+  line-height: 1.12;
+  font-weight: 600;
+  letter-spacing: -.02em;
+  margin: 14px 0 18px;
+  text-wrap: balance;
+}
+.lede {
+  font-size: 19px;
+  color: var(--ink-2);
+  max-width: 62ch;
+  margin: 0 0 28px;
+}
+.standfirst {
+  background: var(--gold-bg);
+  color: var(--ink-1);
+  border-radius: 14px;
+  padding: 18px 22px;
+  font-size: 15.5px;
+  max-width: 68ch;
+}
+.standfirst b { color: var(--gold); font-weight: 600; }
+
+/* ───────── 章节 ───────── */
+
+section { padding-top: 76px; scroll-margin-top: 24px; }
+h2 {
+  font-size: 30px;
+  font-weight: 600;
+  letter-spacing: -.015em;
+  margin: 0 0 6px;
+  text-wrap: balance;
+}
+h2 .sec {
+  font-family: var(--voice-value);
+  font-size: 14px;
+  font-weight: 400;
+  color: var(--accent);
+  margin-right: 12px;
+  letter-spacing: 0;
+}
+h3 {
+  font-family: var(--voice-product);
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: .09em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+  margin: 40px 0 14px;
+}
+p { max-width: 66ch; margin: 0 0 16px; color: var(--ink-2); }
+p strong { color: var(--ink-1); font-weight: 600; }
+.dek { font-size: 18px; color: var(--ink-2); max-width: 64ch; margin: 0 0 30px; }
+
+code {
+  font-family: var(--voice-value);
+  font-size: .88em;
+  background: var(--inset);
+  color: var(--ink-1);
+  padding: .12em .42em;
+  border-radius: 5px;
+}
+
+/* ───────── 卡片与样张 ───────── */
+
+.card {
+  background: var(--card);
+  border-radius: 18px;
+  padding: 26px;
+  box-shadow: var(--shadow);
+}
+.specimen { margin: 0 0 20px; }
+
+/* 公理 */
+.axioms { display: grid; gap: 14px; margin: 30px 0 0; }
+.axiom {
+  background: var(--card);
+  border-radius: 18px;
+  padding: 24px 26px;
+  box-shadow: var(--shadow);
+  display: grid;
+  grid-template-columns: 38px minmax(0, 1fr);
+  gap: 10px;
+  align-items: start;
+}
+.axiom .mark {
+  font-family: var(--voice-value);
+  font-size: 13px;
+  color: var(--accent);
+  padding-top: 7px;
+}
+.axiom h4 {
+  font-size: 21px;
+  font-weight: 600;
+  margin: 0 0 6px;
+  letter-spacing: -.01em;
+  text-wrap: balance;
+}
+.axiom p { margin: 0; font-size: 16px; }
+
+/* 色板 */
+.swatches {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(168px, 1fr));
+  gap: 12px;
+}
+.sw {
+  background: var(--card);
+  border-radius: 14px;
+  padding: 12px;
+  box-shadow: var(--shadow);
+  font-family: var(--voice-product);
+}
+.sw .chip {
+  height: 62px;
+  border-radius: 10px;
+  margin-bottom: 11px;
+}
+.sw .nm { font-size: 13px; font-weight: 600; letter-spacing: -.005em; }
+.sw .hx {
+  font-family: var(--voice-value);
+  font-size: 10.5px;
+  color: var(--ink-3);
+  margin-top: 3px;
+  line-height: 1.5;
+}
+.sw .use { font-size: 11.5px; color: var(--ink-2); margin-top: 7px; line-height: 1.45; }
+
+/* 层级演示 */
+.elev {
+  background: var(--ground);
+  border-radius: 18px;
+  padding: 26px;
+  box-shadow: inset 0 0 0 1px var(--hair);
+}
+.elev .l2 {
+  background: var(--card);
+  border-radius: 16px;
+  padding: 22px;
+  box-shadow: var(--shadow);
+}
+.elev .l3 {
+  background: var(--inset);
+  border-radius: 12px;
+  padding: 16px;
+}
+.elev span {
+  font-family: var(--voice-product);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+  display: block;
+  margin-bottom: 10px;
+}
+
+/* 字阶 */
+.typetable { display: grid; gap: 0; }
+.typerow {
+  display: grid;
+  grid-template-columns: 112px minmax(0, 1fr) 128px;
+  gap: 20px;
+  align-items: baseline;
+  padding: 17px 0;
+  border-bottom: 1px solid var(--hair);
+}
+.typerow:last-child { border-bottom: 0; }
+.typerow .tk {
+  font-family: var(--voice-value);
+  font-size: 11.5px;
+  color: var(--accent);
+}
+.typerow .sample { font-family: var(--voice-product); color: var(--ink-1); min-width: 0; }
+.typerow .meta {
+  font-family: var(--voice-value);
+  font-size: 11px;
+  color: var(--ink-3);
+  text-align: right;
+  line-height: 1.6;
+}
+
+/* 统计区样张 */
+.stats {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  font-family: var(--voice-product);
+  gap: 8px;
+}
+.stat .n {
+  font-size: 28px;
+  font-weight: 600;
+  color: var(--ink-2);
+  letter-spacing: -.03em;
+  font-variant-numeric: tabular-nums;
+  line-height: 1.1;
+}
+.stat .n small {
+  font-size: 15px;
+  font-weight: 500;
+  color: var(--ink-3);
+  letter-spacing: 0;
+}
+.stat .l {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: .09em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+  margin-top: 4px;
+}
+
+/* 间距尺 */
+.ruler { display: grid; gap: 9px; font-family: var(--voice-product); }
+.ruler .r { display: grid; grid-template-columns: 54px minmax(0,1fr); gap: 14px; align-items: center; }
+.ruler .r b {
+  font-family: var(--voice-value);
+  font-size: 11.5px;
+  font-weight: 400;
+  color: var(--ink-3);
+  text-align: right;
+}
+.ruler .bar { height: 15px; border-radius: 4px; background: var(--accent-soft); }
+.ruler .r.key .bar { background: var(--accent); }
+.ruler .r.key b { color: var(--accent); }
+.ruler .cap { font-size: 11.5px; color: var(--ink-3); margin-left: 10px; white-space: nowrap; }
+.ruler .r > div { display: flex; align-items: center; min-width: 0; }
+
+/* 圆角 */
+.radii { display: flex; flex-wrap: wrap; gap: 12px; font-family: var(--voice-product); }
+.radii figure { margin: 0; text-align: center; }
+.radii .box {
+  width: 84px; height: 72px;
+  background: var(--accent-soft);
+  box-shadow: inset 0 0 0 1.5px var(--accent);
+}
+.radii figcaption { font-family: var(--voice-value); font-size: 11px; color: var(--ink-3); margin-top: 8px; }
+
+/* 行 —— 核心构件 */
+.rows { font-family: var(--voice-product); max-width: 420px; }
+.row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  height: 40px;
+  padding: 0 16px;
+  border-radius: 12px;
+  font-size: 16px;
+  font-weight: 500;
+  color: var(--ink-1);
+  cursor: pointer;
+  user-select: none;
+  transition: background-color .12s var(--ease);
+}
+.row .ic {
+  width: 24px; height: 24px;
+  display: grid; place-items: center;
+  flex: none;
+  color: var(--ink-1);
+}
+.row .ic svg { width: 21px; height: 21px; display: block; }
+.row .lbl { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.row .tr {
+  color: var(--ink-3); font-size: 13px;
+  flex: 0 0 16px; height: 16px;
+  display: grid; place-items: center;
+  transition: transform .18s var(--ease);
+}
+.row .tr svg { width: 15px; height: 15px; display: block; }
+.row .tr.open { transform: rotate(90deg); }
+/* 行尾计数。叶子节点的 .tr 留空占位，两级才能对齐在同一条右轴上 */
+.row .ct {
+  font-family: var(--voice-value); font-size: 12px;
+  color: var(--ink-3); flex: none;
+  font-variant-numeric: tabular-nums;
+}
+/* 子项容器：线的 x = 行内距 + 图标槽的一半，对齐父行 # 的中心 */
+.kids {
+  margin-left: calc(16px + 24px / 2);
+  padding-left: 16px;
+  border-left: 1px solid var(--hair);
+}
+.row:active { background: var(--accent-soft); }
+.row.on { background: var(--accent); color: var(--accent-ink); }
+.row.on .ic { color: var(--accent-ink); }
+.row.on .tr { color: color-mix(in srgb, var(--accent-ink) 68%, transparent); }
+.row.on:active { background: var(--accent-press); }
+.row.off { opacity: .34; cursor: default; }
+.row.off:active { background: transparent; }
+
+.anatomy {
+  font-family: var(--voice-value);
+  font-size: 11.5px;
+  color: var(--ink-3);
+  line-height: 2;
+  overflow-x: auto;
+  white-space: pre;
+  margin-top: 18px;
+  padding-bottom: 4px;
+}
+
+/* 对照 */
+.compare { display: grid; grid-template-columns: repeat(auto-fit, minmax(270px, 1fr)); gap: 14px; }
+.vs { background: var(--card); border-radius: 18px; padding: 20px; box-shadow: var(--shadow); }
+.vs .tag {
+  font-family: var(--voice-product);
+  font-size: 11px; font-weight: 700;
+  letter-spacing: .08em; text-transform: uppercase;
+  margin-bottom: 16px;
+}
+.vs.no .tag { color: var(--warn); }
+.vs.yes .tag { color: var(--accent); }
+.vs .why { font-size: 14px; color: var(--ink-2); margin: 16px 0 0; line-height: 1.6; }
+
+/* 旧的 tab 反面样张 */
+.tabs { display: flex; gap: 26px; font-family: var(--voice-product); font-size: 16px; padding: 0 4px; }
+.tabs span { padding-bottom: 10px; color: var(--ink-3); }
+.tabs span.on { color: var(--ink-1); font-weight: 600; box-shadow: inset 0 -2px 0 var(--accent); }
+
+/* 维度切换器 —— 凹槽 + 浮片 */
+.seg {
+  display: inline-flex;
+  background: var(--inset);
+  border-radius: 12px;
+  padding: 3px;
+  gap: 2px;
+  font-family: var(--voice-product);
+  max-width: 100%;
+}
+.seg button {
+  appearance: none;
+  border: 0;
+  background: transparent;
+  font: 500 15px/1 var(--voice-product);
+  color: var(--ink-3);
+  height: 34px;
+  padding: 0 16px;
+  border-radius: 9px;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background-color .16s var(--ease), color .16s var(--ease);
+}
+.seg button:hover { color: var(--ink-2); }
+.seg button.on {
+  background: var(--card);
+  color: var(--ink-1);
+  font-weight: 600;
+  box-shadow: var(--lift);
+}
+.seg.wide { display: flex; width: 100%; }
+.seg.wide button { flex: 1; padding: 0 8px; }
+
+/* 判据表 */
+.ladder { width: 100%; border-collapse: collapse; font-family: var(--voice-product); font-size: 14px; }
+.ladder th {
+  text-align: left; font-size: 11px; font-weight: 600;
+  letter-spacing: .08em; text-transform: uppercase; color: var(--ink-3);
+  padding: 0 18px 12px 0; border-bottom: 1px solid var(--hair);
+}
+.ladder td { padding: 14px 18px 14px 0; border-bottom: 1px solid var(--hair); color: var(--ink-2); vertical-align: top; }
+.ladder tr:last-child td { border-bottom: 0; }
+.ladder td:first-child { color: var(--ink-1); font-weight: 600; white-space: nowrap; }
+
+/* 热力图 */
+.heat { display: grid; grid-auto-flow: column; grid-template-rows: repeat(7, 1fr); gap: 4px; width: fit-content; }
+.heat i { width: 15px; height: 15px; border-radius: 4px; display: block; background: var(--heat-0); }
+.heat i.h1 { background: var(--heat-1); }
+.heat i.h2 { background: var(--heat-2); }
+.heat i.h3 { background: var(--heat-3); }
+.heat i.today { background: transparent; box-shadow: inset 0 0 0 1.5px var(--accent); }
+.months {
+  display: flex; justify-content: space-between;
+  font-family: var(--voice-product); font-size: 11px; color: var(--ink-3);
+  margin-top: 10px; max-width: 265px;
+}
+
+/* 交互表 */
+.states { width: 100%; border-collapse: collapse; font-family: var(--voice-product); font-size: 14px; }
+.states th {
+  text-align: left; font-size: 11px; font-weight: 600;
+  letter-spacing: .08em; text-transform: uppercase; color: var(--ink-3);
+  padding: 0 16px 12px 0; border-bottom: 1px solid var(--hair);
+}
+.states td { padding: 13px 16px 13px 0; border-bottom: 1px solid var(--hair); color: var(--ink-2); vertical-align: top; }
+.states td:first-child { color: var(--ink-1); font-weight: 500; white-space: nowrap; }
+.states tr:last-child td { border-bottom: 0; }
+.states code { font-size: 12px; }
+.scroll-x { overflow-x: auto; }
+
+/* 禁止 */
+.nope { display: grid; gap: 1px; background: var(--hair); border-radius: 18px; overflow: hidden; box-shadow: var(--shadow); }
+.nope div {
+  background: var(--card);
+  padding: 17px 22px;
+  font-size: 15.5px;
+  color: var(--ink-2);
+  display: grid;
+  grid-template-columns: 26px minmax(0,1fr);
+  gap: 10px;
+  align-items: baseline;
+}
+.nope div b { color: var(--warn); font-family: var(--voice-value); font-size: 13px; font-weight: 400; }
+.nope div strong { color: var(--ink-1); font-weight: 600; }
+
+/* 结尾 */
+.coda {
+  margin-top: 76px;
+  padding: 30px;
+  background: var(--card);
+  border-radius: 18px;
+  box-shadow: var(--shadow);
+}
+.coda h3 { margin-top: 0; }
+.coda ol { margin: 0; padding-left: 22px; color: var(--ink-2); max-width: 64ch; }
+.coda li { margin-bottom: 9px; }
+.coda strong { color: var(--ink-1); font-weight: 600; }
+
+a { color: var(--link); }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; border-radius: 6px; }
+
+@media (prefers-reduced-motion: reduce) {
+  * { transition-duration: .01ms !important; animation-duration: .01ms !important; }
+}
+
+@media (max-width: 860px) {
+  .shell { grid-template-columns: minmax(0, 1fr); gap: 0; padding: 0 20px 80px; }
+  .rail { position: static; padding: 32px 0 0; }
+  .rail nav { display: flex; flex-wrap: wrap; gap: 6px; }
+  .rail a { height: 38px; padding: 0 14px; }
+  .typerow { grid-template-columns: 92px minmax(0,1fr); }
+  .typerow .meta { grid-column: 1 / -1; text-align: left; }
+}
+</style>
+
+<div class="shell">
+
+  <aside class="rail">
+    <div class="rail-brand">视觉设定稿</div>
+    <div class="rail-sub">Leet Journey · v1</div>
+    <nav>
+      <a href="#axioms"><span class="num">00</span>公理</a>
+      <a href="#ground"><span class="num">01</span>底色</a>
+      <a href="#color"><span class="num">02</span>色板</a>
+      <a href="#type"><span class="num">03</span>字阶</a>
+      <a href="#space"><span class="num">04</span>间距</a>
+      <a href="#row"><span class="num">05</span>行</a>
+      <a href="#seg"><span class="num">06</span>切换器</a>
+      <a href="#heat"><span class="num">07</span>热力图</a>
+      <a href="#motion"><span class="num">08</span>交互</a>
+      <a href="#never"><span class="num">09</span>禁止</a>
+    </nav>
+  </aside>
+
+  <main class="main">
+
+    <header class="masthead">
+      <div class="eyebrow">Visual Direction · 待确认</div>
+      <h1>借 flomo 的语法，说自己的话</h1>
+      <p class="lede">
+        这不是规则文档，是一张样张。页面上每一块颜色、每一个字号、每一次按下的反馈，
+        都是即将写进 <code>Theme.swift</code> 的那个值本身 —— 看到的就是会得到的。
+      </p>
+      <div class="standfirst">
+        <b>本稿只定视觉。</b>
+        确认之后再转成带 SwiftUI 常量的规则手册，并逐条比对现有代码。
+        所以现在只需要回答一件事：<b>这套东西，看着对不对。</b>
+      </div>
+    </header>
+
+    <!-- ══════════ 00 ══════════ -->
+    <section id="axioms">
+      <h2><span class="sec">00</span>三条公理</h2>
+      <p class="dek">后面所有具体数值都是这三句话的推论。如果某个值和它们冲突，错的是值。</p>
+
+      <div class="axioms">
+        <div class="axiom">
+          <div class="mark">01</div>
+          <div>
+            <h4>底色是浅灰，白是浮起来的东西</h4>
+            <p>这是整套语言能在浅色模式下成立的根本。页面不是白的，卡片才是白的。一旦把底色做成纯白，所有层级会同时塌掉 —— 因为这套系统没有边框可以兜底。</p>
+          </div>
+        </div>
+        <div class="axiom">
+          <div class="mark">02</div>
+          <div>
+            <h4>一屏只有一个主角</h4>
+            <p>实心绿块只出现一次，含义恒定：<strong>你在这里</strong>。它不做按钮、不做链接、不做强调文字。绿色一旦出现第二次，第一次就不再是指示，而变成了装饰。</p>
+          </div>
+        </div>
+        <div class="axiom">
+          <div class="mark">03</div>
+          <div>
+            <h4>没有线</h4>
+            <p>全局零描边、零分割线。层级只由两件事表达：底色的明度台阶，和一条极柔的阴影。想画一条线的时候，真正需要的通常是 8pt 留白。</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ══════════ 01 ══════════ -->
+    <section id="ground">
+      <h2><span class="sec">01</span>底色与层级</h2>
+      <p class="dek">只有三层。没有第四层 —— 需要第四层时，说明这一屏的信息该拆了。</p>
+
+      <div class="elev specimen">
+        <span>L1 · Ground &nbsp;#F0F5F2</span>
+        <div class="l2">
+          <span>L2 · Card &nbsp;#FFFFFF &nbsp;+ shadow</span>
+          <div class="l3">
+            <span>L3 · Inset &nbsp;#F6FAF8</span>
+            <div class="stats">
+              <div class="stat"><div class="n">72<small>/104</small></div><div class="l">Easy</div></div>
+              <div class="stat"><div class="n">158<small>/201</small></div><div class="l">Medium</div></div>
+              <div class="stat"><div class="n">50<small>/109</small></div><div class="l">Hard</div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <p>
+        <strong>L1 底板</strong>承载一切，永不放文字。
+        <strong>L2 卡片</strong>是内容的单位，圆角 12，唯一一条阴影。
+        <strong>L3 内嵌</strong>用于卡片内部的次级分区（代码块、统计槽、输入框），比卡片<em>暗</em>一点而不是亮一点 —— 它是挖进去的，不是叠上去的。
+      </p>
+      <p>
+        深色模式下三层依次是 <code>#0E1310</code> / <code>#181E1B</code> / <code>#141916</code>。
+        注意 L3 仍然比 L2 暗：明暗关系在两个模式里是<strong>同向</strong>的，不做简单反转。
+      </p>
+
+      <h3>唯一的阴影</h3>
+      <p>
+        <code>0 6px 20px rgba(27,35,31,.07)</code> —— 浅色；深色换成 <code>rgba(0,0,0,.45)</code>。
+        只用在 L2 和浮层（药丸、FAB）。<strong>选中的绿块不加阴影</strong>，它靠颜色已经足够重。
+      </p>
+    </section>
+
+    <!-- ══════════ 02 ══════════ -->
+    <section id="color">
+      <h2><span class="sec">02</span>色板</h2>
+      <p class="dek">
+        中性色不是灰的 —— 它们统一偏向强调色的色相（约 148°），饱和度压在 3–6%。
+        这一点肉眼几乎读不出，但它让整屏颜色像是同一个家族，而不是拼来的。
+      </p>
+
+      <h3>中性 · 七档</h3>
+      <div class="swatches specimen">
+        <div class="sw">
+          <div class="chip" style="background:var(--ground);box-shadow:inset 0 0 0 1px var(--hair)"></div>
+          <div class="nm">Ground</div><div class="hx">#F0F5F2 / #0E1310</div>
+          <div class="use">页面底板。永不放文字。</div>
+        </div>
+        <div class="sw">
+          <div class="chip" style="background:var(--card);box-shadow:inset 0 0 0 1px var(--hair)"></div>
+          <div class="nm">Card</div><div class="hx">#FFFFFF / #181E1B</div>
+          <div class="use">卡片、药丸、浮层。</div>
+        </div>
+        <div class="sw">
+          <div class="chip" style="background:var(--inset)"></div>
+          <div class="nm">Inset</div><div class="hx">#F6FAF8 / #141916</div>
+          <div class="use">卡片内的凹槽、代码块。</div>
+        </div>
+        <div class="sw">
+          <div class="chip" style="background:var(--ink-1)"></div>
+          <div class="nm">Ink 1</div><div class="hx">#1B231F / #E6EEEA</div>
+          <div class="use">标题、行文字、图标。注意不是纯黑。</div>
+        </div>
+        <div class="sw">
+          <div class="chip" style="background:var(--ink-2)"></div>
+          <div class="nm">Ink 2</div><div class="hx">#6A7670 / #9AA59F</div>
+          <div class="use">正文、<strong>统计大数字</strong>。</div>
+        </div>
+        <div class="sw">
+          <div class="chip" style="background:var(--ink-3)"></div>
+          <div class="nm">Ink 3</div><div class="hx">#A0AAA5 / #717A75</div>
+          <div class="use">大写小标签、月份、chevron。</div>
+        </div>
+        <div class="sw">
+          <div class="chip" style="background:var(--ink-4)"></div>
+          <div class="nm">Ink 4</div><div class="hx">#C3CCC7 / #4B534F</div>
+          <div class="use">更多菜单、占位、渐隐项。</div>
+        </div>
+      </div>
+
+      <h3>强调与功能色</h3>
+      <div class="swatches specimen">
+        <div class="sw">
+          <div class="chip" style="background:var(--accent)"></div>
+          <div class="nm">Accent</div><div class="hx">#30CF79</div>
+          <div class="use">「你在这里」。一屏一次。两模式同值。</div>
+        </div>
+        <div class="sw">
+          <div class="chip" style="background:var(--accent-press)"></div>
+          <div class="nm">Accent Press</div><div class="hx">#2CBE6F</div>
+          <div class="use">绿块被按下时。亮度 −8%。</div>
+        </div>
+        <div class="sw">
+          <div class="chip" style="background:var(--accent-soft)"></div>
+          <div class="nm">Accent Soft</div><div class="hx">accent @ 14%</div>
+          <div class="use">普通行按下时的瞬态底色。</div>
+        </div>
+        <div class="sw">
+          <div class="chip" style="background:var(--link-bg);display:grid;place-items:center;color:var(--link);font:600 14px/1 var(--voice-product)">#滑动窗口</div>
+          <div class="nm">Link</div><div class="hx">#6082EF on #F0F3FC</div>
+          <div class="use">标签 chip、内联可点文本。绿不做链接。</div>
+        </div>
+        <div class="sw">
+          <div class="chip" style="background:var(--warn)"></div>
+          <div class="nm">Overdue</div><div class="hx">#D97757</div>
+          <div class="use">过期、危险、破坏性操作。</div>
+        </div>
+        <div class="sw">
+          <div class="chip" style="background:var(--gold-bg);display:grid;place-items:center;color:var(--gold);font:600 12px/1 var(--voice-product);letter-spacing:.08em">ALL TAGS</div>
+          <div class="nm">Gold</div><div class="hx">#BFA47A on #FAF0E1</div>
+          <div class="use">分区标题。可选 —— 不用就退回 Ink 3。</div>
+        </div>
+      </div>
+
+      <h3>四条用色铁律</h3>
+      <div class="nope specimen">
+        <div><b>1</b><span><strong>绿只表示位置。</strong>不做按钮底色，不做链接，不做强调文字，不做成功提示。</span></div>
+        <div><b>2</b><span><strong>热力图的绿必须更淡。</strong>它是氛围不是信息，最深一档才允许等于强调绿本身。</span></div>
+        <div><b>3</b><span><strong>蓝只做内联可点。</strong>标签 chip、「展开全文」。蓝绝不用于选中态。</span></div>
+        <div><b>4</b><span><strong>其余一切都是灰阶。</strong>没有第五个色相。需要区分难度 / 状态时，用灰度和位置，不用颜色。</span></div>
+      </div>
+    </section>
+
+    <!-- ══════════ 03 ══════════ -->
+    <section id="type">
+      <h2><span class="sec">03</span>字阶</h2>
+      <p class="dek">
+        六档，全部落在 Apple HIG 的既有 token 上。层级只靠<strong>字号 + 灰度</strong>拉开 ——
+        不靠粗细叠加，不靠颜色。字重只有 Regular / Medium / Semibold 三级。
+      </p>
+
+      <div class="card specimen">
+        <div class="typetable">
+          <div class="typerow">
+            <div class="tk">display</div>
+            <div class="sample" style="font-size:28px;font-weight:600;color:var(--ink-2);letter-spacing:-.03em;font-variant-numeric:tabular-nums">1210</div>
+            <div class="meta">28 / Semibold<br>Ink 2 · tabular</div>
+          </div>
+          <div class="typerow">
+            <div class="tk">title</div>
+            <div class="sample" style="font-size:21px;font-weight:600;letter-spacing:-.01em">最大连续子数组和</div>
+            <div class="meta">21 / Semibold<br>Ink 1</div>
+          </div>
+          <div class="typerow">
+            <div class="tk">body &nbsp;/ row</div>
+            <div class="sample" style="font-size:16px;font-weight:500">滑动窗口 · 定长窗口的最值</div>
+            <div class="meta">16 / Regular · Medium<br>Ink 1 · 行距 +8</div>
+          </div>
+          <div class="typerow">
+            <div class="tk">meta</div>
+            <div class="sample" style="font-size:13px;color:var(--ink-3)">2026-11-17 · Medium · #53</div>
+            <div class="meta">13 / Regular<br>Ink 3</div>
+          </div>
+          <div class="typerow">
+            <div class="tk">caption</div>
+            <div class="sample" style="font-size:12px;font-weight:500;color:var(--link);background:var(--link-bg);padding:4px 10px;border-radius:999px;display:inline-block">#二叉树</div>
+            <div class="meta">12 / Medium<br>Link</div>
+          </div>
+          <div class="typerow">
+            <div class="tk">label</div>
+            <div class="sample" style="font-size:11px;font-weight:600;letter-spacing:.09em;text-transform:uppercase;color:var(--ink-3)">Medium</div>
+            <div class="meta">11 / Semibold<br>+.09em · 大写</div>
+          </div>
+        </div>
+      </div>
+
+      <h3>签名排版：大数字 + 小大写标签</h3>
+      <p>
+        这一组是整套语言最容易认出来的地方。两个比例必须守住：
+        字号比约 <strong>2.5 : 1</strong>（28 ↔ 11），灰度差 <strong>2 档</strong>（Ink 2 ↔ Ink 3）。
+        数字拿走全部注意力，标签退成脚注。
+      </p>
+      <div class="card specimen" style="max-width:420px">
+        <div class="stats">
+          <div class="stat"><div class="n">72<small>/104</small></div><div class="l">Easy</div></div>
+          <div class="stat"><div class="n">158<small>/201</small></div><div class="l">Medium</div></div>
+          <div class="stat"><div class="n">50<small>/109</small></div><div class="l">Hard</div></div>
+        </div>
+      </div>
+      <p>
+        分母是你比 flomo 多出来的信息，处理方式是<strong>让它读作标签的一部分而不是第三档</strong>：
+        15pt / Medium / Ink 3，紧贴数字不留空格。这样「大数字 — 小字组」仍然只有两档，节奏不碎。
+      </p>
+
+      <h3>两种声音</h3>
+      <p>
+        产品内只有系统字族一种声音（SF Pro / PingFang SC）。
+        衬线体<span style="font-family:var(--voice-manual)">（也就是你现在读的这行）</span>只属于文档，
+        永远不进 App。代码与数值用 SF Mono。
+      </p>
+    </section>
+
+    <!-- ══════════ 04 ══════════ -->
+    <section id="space">
+      <h2><span class="sec">04</span>间距与圆角</h2>
+      <p class="dek">4 的倍数，八档，到此为止。<code>10</code> <code>14</code> <code>22</code> <code>26</code> 这类数字不存在 —— 出现即是 bug。</p>
+
+      <div class="card specimen">
+        <div class="ruler">
+          <div class="r"><b>4</b><div><div class="bar" style="width:4px"></div><span class="cap">热力格间隙、徽章内距</span></div></div>
+          <div class="r"><b>8</b><div><div class="bar" style="width:8px"></div><span class="cap">紧邻元素、正文额外行距</span></div></div>
+          <div class="r"><b>12</b><div><div class="bar" style="width:12px"></div><span class="cap">卡片之间</span></div></div>
+          <div class="r key"><b>16</b><div><div class="bar" style="width:16px"></div><span class="cap">屏幕左右边距 · 卡片内距</span></div></div>
+          <div class="r key"><b>20</b><div><div class="bar" style="width:20px"></div><span class="cap">卡片内边距、行左右内距</span></div></div>
+          <div class="r"><b>24</b><div><div class="bar" style="width:24px"></div><span class="cap">卡片内的区块间隔</span></div></div>
+          <div class="r"><b>32</b><div><div class="bar" style="width:32px"></div><span class="cap">大区块之间（热力图 → 导航）</span></div></div>
+          <div class="r"><b>40</b><div><div class="bar" style="width:40px"></div><span class="cap">屏首留白</span></div></div>
+        </div>
+      </div>
+      <p>
+        卡片内距取 <strong>16</strong>，实测 15.4。行节奏 <strong>40</strong>，实测 40.2 —— 这套东西
+        本来就长在 4 的倍数上，不用凑。
+      </p>
+
+      <h3>圆角 · 随尺寸放大，但不超过 height / 3</h3>
+      <div class="radii specimen">
+        <figure><div class="box" style="border-radius:4px"></div><figcaption>4 · 热力格</figcaption></figure>
+        <figure><div class="box" style="border-radius:8px"></div><figcaption>8 · 徽章</figcaption></figure>
+        <figure><div class="box" style="border-radius:12px"></div><figcaption>12 · 内嵌槽</figcaption></figure>
+        <figure><div class="box" style="border-radius:12px"></div><figcaption>12 · 行 · 卡片</figcaption></figure>
+        <figure><div class="box" style="border-radius:16px"></div><figcaption>16 · 大面板</figcaption></figure>
+        <figure><div class="box" style="border-radius:999px"></div><figcaption>∞ · 药丸 / FAB</figcaption></figure>
+      </div>
+      <p>全部使用<strong>连续圆角</strong>（SwiftUI 的 <code>style: .continuous</code>）。普通圆角在 16 以上会明显看出转折。</p>
+    </section>
+
+    <!-- ══════════ 05 ══════════ -->
+    <section id="row">
+      <h2><span class="sec">05</span>行</h2>
+      <p class="dek">
+        整个抽屉只有这一个构件。导航项、标签项、设置项共用同一副骨架 ——
+        所以所有行的文字起点落在同一条 x 轴上，包括选中的那一行。这条轴线就是抽屉的结构。
+      </p>
+
+      <div class="card specimen">
+        <div class="rows">
+          <div class="row on">
+            <span class="ic"><svg viewBox="0 0 24 24" fill="currentColor"><rect x="3" y="3" width="8" height="8" rx="2.4"/><rect x="13" y="3" width="8" height="8" rx="2.4"/><rect x="3" y="13" width="8" height="8" rx="2.4"/><rect x="13" y="13" width="8" height="8" rx="2.4"/></svg></span>
+            <span class="lbl">今日复习</span>
+            <span class="tr"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M9 5l7 7-7 7"/></svg></span>
+          </div>
+          <div class="row">
+            <span class="ic"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2.6l2.7 6.2 6.7.6-5.1 4.4 1.6 6.6L12 16.9l-5.9 3.5 1.6-6.6L2.6 9.4l6.7-.6z"/></svg></span>
+            <span class="lbl">错题本</span>
+          </div>
+          <div class="row">
+            <span class="ic"><svg viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="12" r="9.2"/><circle cx="12" cy="12" r="3.4" fill="var(--card)"/></svg></span>
+            <span class="lbl">AI 讲解</span>
+          </div>
+          <div class="row off">
+            <span class="ic"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M4 5.5h16v3H4zM4 11h16v3H4zM4 16.5h10v3H4z"/></svg></span>
+            <span class="lbl">模拟面试</span>
+          </div>
+          <div class="row">
+            <span class="ic" style="font:700 19px/1 var(--voice-product)">#</span>
+            <span class="lbl">二叉树</span>
+            <span class="tr"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M9 5l7 7-7 7"/></svg></span>
+          </div>
+          <div class="row">
+            <span class="ic" style="font:700 19px/1 var(--voice-product)">#</span>
+            <span class="lbl">滑动窗口</span>
+            <span class="tr"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M9 5l7 7-7 7"/></svg></span>
+          </div>
+        </div>
+
+        <div class="anatomy">┌ 20 ─┬ 24 ─┬ 14 ─┬────────── flex ──────────┬── auto ──┬ 20 ─┐
+│     │ 图标 │     │ 标签 16/Medium · Ink 1   │ chevron  │     │   高 40 · 圆角 12
+└─────┴─────┴─────┴──────────────────────────┴──────────┴─────┘</div>
+      </div>
+
+      <p>
+        <strong>图标必须是实心填充式</strong>，颜色与文字同为 Ink 1。线性细描边图标会让左轴线变虚 ——
+        这是整个抽屉最先垮掉的地方。视觉尺寸统一 24，不同形状做重量补偿（圆形可略大，方形略小）。
+      </p>
+      <p>
+        <strong>行尾默认只放操作。</strong>有下一层才给 chevron，有菜单才给 <code>···</code>，否则留空。
+        行尾堆数据会让每一行都在喊，整屏就没法扫。
+        <strong>唯一的例外是标签列表的进度计数</strong>（<code>5/61</code>）—— 见本节末尾，
+        那是你的产品比 flomo 多出来的信息，且只出现在那一处。
+      </p>
+      <p>
+        上面第四行是<strong>禁用态</strong>：整行 34% 不透明度，没有按下反馈。
+        不要用变灰来表示禁用 —— 变灰会和 Ink 3 的次要文字混淆。
+      </p>
+
+      <h3>选中态只有一种形态</h3>
+      <p>
+        实心圆角块，含义恒定：你在这里。<strong>不是下划线，不是左侧竖条，不是加粗，不是变色文字。</strong>
+        这四种替代方案的共同问题是重量不足 —— 在一个没有边框、全靠色块说话的系统里，
+        2px 的线撑不起「当前位置」这么重的语义。
+      </p>
+
+      <h3>层级：就地缩进展开，用一条竖线串起来</h3>
+      <p class="dek" style="font-size:16px">
+        这一条推翻了本稿早先的写法。之前写的是「用 chevron 进下一屏，不用缩进」——
+        那是只看到收起态截图推出来的。flomo 的展开态是<strong>就地缩进</strong>，
+        而且有一条竖向引导线。
+      </p>
+
+      <div class="card specimen">
+        <div class="rows" style="max-width:360px">
+          <div class="row">
+            <span class="ic" style="font:700 17px/1 var(--voice-product)">#</span>
+            <span class="lbl">二叉树</span>
+            <span class="ct">5/61</span>
+            <span class="tr open"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M9 5l7 7-7 7"/></svg></span>
+          </div>
+          <div class="kids">
+            <div class="row">
+              <span class="ic" style="font:700 17px/1 var(--voice-product)">#</span>
+              <span class="lbl">遍历</span><span class="ct">2/28</span><span class="tr"></span>
+            </div>
+            <div class="row">
+              <span class="ic" style="font:700 17px/1 var(--voice-product)">#</span>
+              <span class="lbl">构造</span><span class="ct">3/19</span><span class="tr"></span>
+            </div>
+          </div>
+          <div class="row">
+            <span class="ic" style="font:700 17px/1 var(--voice-product)">#</span>
+            <span class="lbl">滑动窗口</span>
+            <span class="ct">8/42</span>
+            <span class="tr"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M9 5l7 7-7 7"/></svg></span>
+          </div>
+          <div class="row">
+            <span class="ic" style="font:700 17px/1 var(--voice-product)">#</span>
+            <span class="lbl">双指针</span><span class="ct">6/31</span><span class="tr"></span>
+          </div>
+        </div>
+      </div>
+
+      <p>
+        <strong>子项不降级。</strong>和父项同字号、同颜色 —— 层级只由缩进和那条线表达，
+        不靠把文字变灰。把子项降到 Ink 2 会让它和「次要文字」混淆。
+      </p>
+      <p>
+        <strong>chevron 只是旋转，不换图标。</strong>收起 <code>›</code>，展开转 90° 成 <code>⌄</code>，
+        180ms。叶子节点没有 chevron，但<strong>保留那个位置的占位</strong> ——
+        否则两级的行尾会错开半个字。
+      </p>
+      <p>
+        <strong>引导线的 x 由父行自己的内距推出来</strong>（<code>行内距 + 图标槽 / 2</code>），
+        对齐父行 <code>#</code> 的中心。这样改行内距的时候线会自己跟上，不用记得去改第二个地方。
+      </p>
+      <p>
+        行尾是「计数 + chevron」两件事。这是本稿唯一允许在行尾放数据的地方 ——
+        flomo 这里放的是 <code>···</code>，但进度计数是你的产品比它多出来的信息，
+        且只在标签列表这一处出现，不构成 §5 说的「每一行都在喊」。
+      </p>
+    </section>
+
+    <!-- ══════════ 06 ══════════ -->
+    <section id="seg">
+      <h2><span class="sec">06</span>维度切换器</h2>
+      <p class="dek">
+        flomo 没有这个构件，因为它不需要换个角度看同一批内容。你需要 ——
+        「题单 / 标签 / 公司 / 时间」是同一堆题的四种看法。所以这里要加一个 flomo 没有的东西，
+        前提是它得说这套语言。
+      </p>
+
+      <h3>判据：导航用颜色，维度用高度</h3>
+      <p>
+        这是整份设定稿里唯一需要记住的分类法。两个构件长得完全不同，因为它们回答的是两个问题。
+      </p>
+      <div class="card specimen scroll-x">
+        <table class="ladder">
+          <thead><tr><th>构件</th><th>回答的问题</th><th>做了什么</th><th>形态</th></tr></thead>
+          <tbody>
+            <tr>
+              <td>行 · §5</td>
+              <td>我在哪里？</td>
+              <td>换掉整屏的内容来源</td>
+              <td>实心<strong style="color:var(--accent)">绿块</strong></td>
+            </tr>
+            <tr>
+              <td>切换器 · §6</td>
+              <td>我怎么看它？</td>
+              <td>同一批内容，换一种组织方式</td>
+              <td>凹槽里的<strong style="color:var(--ink-1)">白浮片</strong></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <p>
+        把颜色留给导航，意味着公理 02 不受威胁 —— 一屏仍然只有一块绿。
+        切换器改用<strong>高度</strong>说话：L3 的凹槽 + L2 的浮片，正好是 §1 那套层级的复用，
+        一个新颜色都不用引入。而且它天然像个控件，有「可以拨」的手感。
+      </p>
+
+      <h3>规格</h3>
+      <div class="card specimen">
+        <div class="seg" role="tablist">
+          <button type="button" role="tab">题单</button>
+          <button type="button" role="tab" class="on" aria-selected="true">标签</button>
+          <button type="button" role="tab">公司</button>
+          <button type="button" role="tab">时间</button>
+        </div>
+        <p class="why" style="margin-top:18px;font-family:var(--voice-manual);font-size:15px">点一下换挡 —— 浮片是淡入淡出的，不滑动。</p>
+      </div>
+
+      <div class="card specimen">
+        <div class="scroll-x">
+          <table class="states">
+            <thead><tr><th>属性</th><th>值</th></tr></thead>
+            <tbody>
+              <tr><td>轨道</td><td><code>Inset</code> 底色 · 圆角 12 · 内距 3</td></tr>
+              <tr><td>浮片</td><td><code>Card</code> 底色 · 圆角 9 · <code>0 1px 3px rgba(27,35,31,.11)</code></td></tr>
+              <tr><td>高度</td><td>轨道 40 · 浮片 34</td></tr>
+              <tr><td>选中文字</td><td>15 / Semibold / Ink 1</td></tr>
+              <tr><td>未选文字</td><td>15 / Medium / Ink 3</td></tr>
+              <tr><td>段内距</td><td>左右 16，或等分铺满（≥4 段时）</td></tr>
+              <tr><td>切换</td><td>160ms 交叉淡入，<strong>浮片不滑动</strong></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <p>
+        浮片<strong>不做滑动动画</strong>。滑动是 iOS 原生 segmented control 的签名动作，
+        在一个连滚动入场动效都没有的系统里会显得过分活泼。直接淡入淡出，160ms。
+      </p>
+
+      <h3>等分铺满</h3>
+      <p>四段及以上、且文字长度接近时，让每段等宽铺满容器 —— 比左对齐更稳，也更像一个整体。</p>
+      <div class="card specimen" style="max-width:420px">
+        <div class="seg wide" role="tablist">
+          <button type="button" role="tab" class="on" aria-selected="true">题单</button>
+          <button type="button" role="tab">标签</button>
+          <button type="button" role="tab">公司</button>
+          <button type="button" role="tab">时间</button>
+        </div>
+      </div>
+
+      <h3>对照</h3>
+      <div class="compare specimen">
+        <div class="vs no">
+          <div class="tag">✗ 下划线 tab</div>
+          <div class="tabs">
+            <span>题单</span><span class="on">标签</span><span>公司</span><span>时间</span>
+          </div>
+          <p class="why">Material / Web 的语汇。选中态压成一条 2px 的线，重量不足；而且它凭空引入了一条「线」—— 违反公理 03。另外这里的绿是全屏第二块绿，会削弱抽屉里那块真正的绿。</p>
+        </div>
+        <div class="vs yes">
+          <div class="tag">✓ 凹槽切换器</div>
+          <div class="seg wide" role="tablist">
+            <button type="button" role="tab">题单</button>
+            <button type="button" role="tab" class="on" aria-selected="true">标签</button>
+            <button type="button" role="tab">公司</button>
+            <button type="button" role="tab">时间</button>
+          </div>
+          <p class="why">零新颜色、零线条，全部由已有的 L2 / L3 层级和 Ink 灰阶构成。重量足够读作主控件，又明显比绿块轻 —— 层次关系正确：先定位置，再选看法。</p>
+        </div>
+      </div>
+
+      <h3>什么时候不要用它</h3>
+      <p>
+        超过 <strong>5 段</strong>、或者段数会随数据变化，就不该用切换器 ——
+        换成 §5 的行列表，或者一个下拉。切换器的前提是<strong>选项固定且一眼能数完</strong>。
+      </p>
+    </section>
+
+    <!-- ══════════ 07 ══════════ -->
+    <section id="heat">
+      <h2><span class="sec">07</span>热力图</h2>
+      <p class="dek">它是统计区的延伸，不是独立模块 —— 所以没有标题，直接贴着数字下方。宁可欠曝，不要过曝。</p>
+
+      <div class="card specimen" style="width:fit-content">
+        <div class="heat" id="heat"></div>
+        <div class="months"><span>9 月</span><span>10 月</span><span>11 月</span></div>
+      </div>
+
+      <div class="swatches specimen" style="max-width:720px">
+        <div class="sw"><div class="chip" style="background:var(--heat-0);height:44px"></div><div class="nm">0 题</div><div class="hx">#E5EBE8 / #232926</div></div>
+        <div class="sw"><div class="chip" style="background:var(--heat-1);height:44px"></div><div class="nm">1–4 题</div><div class="hx">accent @ 24%</div></div>
+        <div class="sw"><div class="chip" style="background:var(--heat-2);height:44px"></div><div class="nm">5–14 题</div><div class="hx">accent @ 52%</div></div>
+        <div class="sw"><div class="chip" style="background:var(--heat-3);height:44px"></div><div class="nm">15+ 题</div><div class="hx">#30CF79</div></div>
+      </div>
+
+      <p>
+        格子 <strong>15 × 15</strong>，间隙 <strong>5</strong>，圆角 <strong>4</strong>，节奏 20pt。
+        七行一列代表一周，列从左到右推进。
+      </p>
+      <p>
+        <strong>今天</strong>是全图唯一一处纯色绿线条：底色透明 + 1.5pt 绿描边，<em>不是</em>实心。
+        这样「今天」永远可辨，哪怕今天还没做题。
+      </p>
+      <p>
+        最淡的两档必须在真机上校一次。按白底调出来的淡绿，在黑底上会直接消失 ——
+        所以 1 档和 2 档用<strong>强调色的不透明度</strong>而不是固定色值，让它自动压在当前底色上。
+      </p>
+    </section>
+
+    <!-- ══════════ 08 ══════════ -->
+    <section id="motion">
+      <h2><span class="sec">08</span>交互</h2>
+      <p class="dek">
+        动效的职责只有一个：让状态变化可追踪。不负责表演。
+        没有一个转场超过 320ms，没有一个元素会弹。
+      </p>
+
+      <h3>状态</h3>
+      <div class="card specimen scroll-x">
+        <table class="states">
+          <thead><tr><th>状态</th><th>表现</th><th>时长</th></tr></thead>
+          <tbody>
+            <tr><td>默认</td><td>透明底，Ink 1 文字与图标</td><td>—</td></tr>
+            <tr><td>按下 · 普通行</td><td>底色淡入 <code>Accent Soft</code>，无位移、无缩放</td><td>120ms</td></tr>
+            <tr><td>按下 · 选中行</td><td>绿块变暗到 <code>#2CBE6F</code></td><td>120ms</td></tr>
+            <tr><td>选中</td><td>实心绿块 + 白字白图标 + 白 chevron @68%</td><td>180ms 交叉淡入</td></tr>
+            <tr><td>禁用</td><td>整行不透明度 34%，不响应按下</td><td>—</td></tr>
+            <tr><td>键盘 / VoiceOver 焦点</td><td>2pt 强调色描边，外扩 3pt</td><td>即时</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p>上面 §5 的每一行都是可按的 —— 直接点一下看反馈。</p>
+
+      <h3>转场</h3>
+      <div class="card specimen scroll-x">
+        <table class="states">
+          <thead><tr><th>动作</th><th>曲线</th><th>时长</th></tr></thead>
+          <tbody>
+            <tr><td>抽屉开 / 合</td><td>spring · response .38 · damping .86</td><td>≈320ms</td></tr>
+            <tr><td>展开 / 折叠</td><td>ease-out，chevron 同步旋转 90°</td><td>180ms</td></tr>
+            <tr><td>卡片翻面 / 揭示答案</td><td>ease-out 淡入 + 上移 6pt</td><td>200ms</td></tr>
+            <tr><td>列表滚动入场</td><td><strong>无</strong>。滚动不加动效</td><td>—</td></tr>
+            <tr><td>数值变化（统计、连续天数）</td><td>直接替换，不滚动计数</td><td>—</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3>触觉</h3>
+      <p>
+        克制使用，只在三处：切换选中项 <code>.selection</code>、
+        提交评分 <code>.impact(.light)</code>、
+        破坏性操作确认 <code>.warning</code>。
+        滚动、展开、翻页<strong>不给触觉</strong> —— 滥用会让反馈完全失去意义。
+      </p>
+
+      <h3>无障碍</h3>
+      <p>
+        行高 40 低于 <strong>44 × 44</strong> 的触控下限 —— 用 <code>contentShape</code> 把可点区域外扩到 44，不要把行撑高。
+        支持动态字体，字阶按比例缩放，<strong>行高随之变化而不是裁切</strong>。
+        开启「减弱动态效果」时，全部转场降为即时切换。
+        选中态除了颜色还有 chevron 和 VoiceOver 的 <code>.isSelected</code> 标记 ——
+        不能只靠颜色区分状态。
+      </p>
+
+      <h3>一条明知故犯的例外</h3>
+      <div class="card specimen">
+        <div class="rows" style="max-width:360px">
+          <div class="row on">
+            <span class="ic"><svg viewBox="0 0 24 24" fill="currentColor"><rect x="3" y="3" width="8" height="8" rx="2.4"/><rect x="13" y="3" width="8" height="8" rx="2.4"/><rect x="3" y="13" width="8" height="8" rx="2.4"/><rect x="13" y="13" width="8" height="8" rx="2.4"/></svg></span>
+            <span class="lbl">白字压在 #30CF79 上</span>
+            <span class="tr"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M9 5l7 7-7 7"/></svg></span>
+          </div>
+        </div>
+        <div class="scroll-x" style="margin-top:18px">
+          <table class="states">
+            <thead><tr><th>组合</th><th>对比度</th><th>WCAG AA（正文 4.5）</th></tr></thead>
+            <tbody>
+              <tr><td>白 <code>#FFFFFF</code></td><td><strong style="color:var(--warn)">2.03 : 1</strong></td><td style="color:var(--warn)">不通过</td></tr>
+              <tr><td>近黑 <code>#04220E</code></td><td><strong style="color:var(--accent)">8.33 : 1</strong></td><td>通过</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <p>
+        <strong>我们选了白字，明知它不通过。</strong>理由是视觉上和 flomo 一致 ——
+        flomo 自己在这一处也不通过。这是记录在案的取舍，<strong>不是遗漏</strong>：
+        看到它的人请不要当 bug 改成深色。
+      </p>
+      <p>
+        两点缓解。其一，失效的只是 <strong>1.4.3 对比度</strong>；
+        <strong>1.4.1「不以颜色为唯一手段」仍然成立</strong> ——
+        选中态同时由实心块、chevron 和 VoiceOver 的 <code>.isSelected</code> 表达，
+        色觉障碍用户不依赖那抹绿也能判断自己在哪。
+        其二，整个应用里压着白字的绿<strong>只有选中行这一处</strong>（公理 02 的副产品），
+        所以影响面是一个构件，不是一套文字系统。
+      </p>
+      <p>
+        要反悔只需改一个 token：<code>--accent-ink</code> 从 <code>#FFFFFF</code>
+        换成 <code>#04220E</code>，全局即刻生效。
+      </p>
+    </section>
+
+    <!-- ══════════ 09 ══════════ -->
+    <section id="never">
+      <h2><span class="sec">09</span>禁止事项</h2>
+      <p class="dek">每一条都对应一个已经发生过、或者极容易发生的具体错误。</p>
+
+      <div class="nope">
+        <div><b>01</b><span><strong>纯白页面底色。</strong>会让三层结构同时塌掉。底色永远是 Ground。</span></div>
+        <div><b>02</b><span><strong>分割线与描边。</strong>包括列表分隔线、卡片边框、输入框边框。用留白和底色台阶。</span></div>
+        <div><b>03</b><span><strong>第二块绿。</strong>绿色在一屏里出现两次，第一次就失效了。</span></div>
+        <div><b>04</b><span><strong>下划线表示选中。</strong>以及左侧竖条、加粗、变色文字。导航选中只有实心绿块，维度选中只有凹槽浮片。</span></div>
+        <div><b>05</b><span><strong>线性细描边图标。</strong>和实心图标混用会让左轴线散掉。</span></div>
+        <div><b>06</b><span><strong>行尾堆数据。</strong>百分比、时间、状态都不行。唯一获准的是标签列表的进度计数（§5 末）。</span></div>
+        <div><b>07</b><span><strong>栅格外的数字。</strong>10、14、22、26 —— 一个破例会繁殖出十个。</span></div>
+        <div><b>08</b><span><strong>渐变、彩色阴影、毛玻璃。</strong>这套语言里不存在这三样东西。</span></div>
+        <div><b>09</b><span><strong>弹跳动效与超过 320ms 的转场。</strong>包括滚动计数器和入场交错动画。</span></div>
+        <div><b>10</b><span><strong>深色模式用反转得到。</strong>L3 在两个模式里都比 L2 暗；中性色要重新定，不是取补。</span></div>
+      </div>
+    </section>
+
+    <div class="coda">
+      <h3>确认这稿之后</h3>
+      <ol>
+        <li><strong>把 token 写进 <code>Theme.swift</code></strong> —— 新的中性色七档、强调色改 <code>#30CF79</code>、间距与圆角两套标尺。</li>
+        <li><strong>抽出 <code>Row</code> 构件</strong> —— §5 那副骨架做成一个 SwiftUI View，抽屉里所有列表项都走它。</li>
+        <li><strong>清掉散落的硬编码</strong> —— <code>HomeView.swift</code> 现在有 <code>11 / 14 / 15 / 17 / 24 / 26</code> 这些没进 Theme 的数字，逐个映射到新字阶和间距档。</li>
+        <li><strong>tab 换成凹槽切换器</strong> —— 「题单 / 标签 / 公司 / 时间」保留横向控件，但从下划线改成 §6 的凹槽 + 白浮片。</li>
+        <li><strong>标签列表改成就地展开</strong> —— 缩进 + 竖向引导线 + chevron 旋转，子项不降级，计数保留（§5 末）。</li>
+        <li><strong>真机校淡色</strong> —— 热力图 1、2 档在深色模式的 OLED 上确认可见。</li>
+      </ol>
+    </div>
+
+  </main>
+</div>
+
+<script>
+(function () {
+  // 热力图样张：确定性伪随机，保证每次渲染一致
+  var heat = document.getElementById('heat');
+  if (heat) {
+    var TOTAL = 91, TODAY = 88, seed = 20261117;
+    function rnd() { seed = (seed * 1103515245 + 12345) % 2147483648; return seed / 2147483648; }
+    for (var i = 0; i < TOTAL; i++) {
+      var cell = document.createElement('i');
+      if (i === TODAY) {
+        cell.className = 'today';
+      } else {
+        var r = rnd();
+        if (r > 0.86) cell.className = 'h3';
+        else if (r > 0.62) cell.className = 'h2';
+        else if (r > 0.34) cell.className = 'h1';
+      }
+      heat.appendChild(cell);
+    }
+  }
+
+  // §6 切换器：可拨，好让手感也能被确认
+  Array.prototype.forEach.call(document.querySelectorAll('.seg'), function (seg) {
+    seg.addEventListener('click', function (e) {
+      var btn = e.target.closest('button');
+      if (!btn || !seg.contains(btn)) return;
+      Array.prototype.forEach.call(seg.querySelectorAll('button'), function (b) {
+        b.classList.toggle('on', b === btn);
+        b.setAttribute('aria-selected', b === btn ? 'true' : 'false');
+      });
+    });
+  });
+
+  // 左栏选中态：它本身就是 §5 的实物样张
+  var links = Array.prototype.slice.call(document.querySelectorAll('.rail a'));
+  var sections = links.map(function (a) { return document.querySelector(a.getAttribute('href')); });
+
+  function sync() {
+    var best = 0, line = window.scrollY + window.innerHeight * 0.28;
+    sections.forEach(function (s, i) { if (s && s.offsetTop <= line) best = i; });
+    links.forEach(function (a, i) { a.classList.toggle('on', i === best); });
+  }
+
+  var ticking = false;
+  window.addEventListener('scroll', function () {
+    if (ticking) return;
+    ticking = true;
+    requestAnimationFrame(function () { sync(); ticking = false; });
+  }, { passive: true });
+  sync();
+})();
+</script>

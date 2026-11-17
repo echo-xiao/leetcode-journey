@@ -3,7 +3,11 @@ __pycache__/
 *.pyc
 .pytest_cache/
 .idea/
-docs/
+# 排除 docs/ 的内容而不是目录本身 —— 写成 docs/ 的话 git 不再往里看，
+# 下面的 ! 规则会失效。设计稿和品牌资产要留在版本控制里。
+docs/*
+!docs/design/
+!docs/brand/
 .DS_Store
 /data/
 logs/
@@ -15,3 +19,6 @@ anki/
 app/ios/**/xcuserdata/
 app/ios/**/*.xcuserstate
 app/ios/DerivedData/
+
+# 本机 IDE 的 MCP 配置（写死 localhost 端口），不进版本控制
+.codex/

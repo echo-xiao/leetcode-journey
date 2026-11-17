@@ -1,0 +1,2256 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1"><style>:root{color-scheme:light}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#F0F5F2;color:#1B231F}img{max-width:100%}@media(prefers-color-scheme:dark){body{background:#0E1310;color:#E6EEEA}}
+</style></head><body>
+<title>Kerno 果核 · UI 设计稿</title>
+
+<style>
+  /* ============================================================
+     tokens — 视觉设定稿 v1 · docs/design/flomo-visual-spec.html
+
+     一套调色板，两次指派，零硬编码。强调色对齐 flomo #30CF79；
+     中性色按该色相（~148°）重新偏移，饱和度压在 3–6%。
+
+     --light-* / --dark-* 是唯一的颜色出处。后面所有规则——包括样
+     稿里的明暗切换——都只能 var() 引用，不准再写 hex。
+     ============================================================ */
+
+  :root {
+    /* —— 调色板：浅 —— */
+    --light-ground: #F0F5F2;  --light-card: #FFFFFF;  --light-inset: #F6FAF8;
+    --light-ink-1: #1B231F;   --light-ink-2: #6A7670;
+    --light-ink-3: #A0AAA5;   --light-ink-4: #C3CCC7;
+    --light-hair: #E3EAE6;    --light-heat-0: #E5EBE8;
+    --light-tag-bg: #F0F3FC;  --light-tag-ink: #6082EF;
+    --light-shadow: 0 6px 20px rgba(27, 35, 31, .07);
+    --light-lift: 0 1px 3px rgba(27, 35, 31, .11);
+    --light-hl: rgba(255, 178, 46, .36);
+    --light-veil: rgba(27, 35, 31, .38);
+
+    /* —— 调色板：深。L3 仍比 L2 暗 —— 明暗关系同向，不做反转 —— */
+    --dark-ground: #0E1310;   --dark-card: #181E1B;   --dark-inset: #141916;
+    --dark-ink-1: #E6EEEA;    --dark-ink-2: #9AA59F;
+    --dark-ink-3: #717A75;    --dark-ink-4: #4B534F;
+    --dark-hair: #262D29;     --dark-heat-0: #232926;
+    --dark-tag-bg: #1E2535;   --dark-tag-ink: #8FA6F0;
+    --dark-shadow: 0 6px 20px rgba(0, 0, 0, .45);
+    --dark-lift: 0 1px 3px rgba(0, 0, 0, .55);
+    --dark-hl: rgba(255, 178, 46, .26);
+    --dark-veil: rgba(0, 0, 0, .52);
+
+    /* —— 强调：两个主题同值。一屏一次 —— */
+    --accent: #30CF79;
+    --accent-press: #2CBE6F;
+    /* 压在强调色上的前景色。白字对 #30CF79 只有 2.03:1，低于 WCAG AA
+       正文要求的 4.5 —— 这是为了和 flomo 视觉一致而「明知故犯」的例外，
+       已记录在设定稿 §9，不要当 bug 改回深色。
+       要反悔就改这一行：近黑 #04220E 可得 8.33:1。 */
+    --accent-ink: #FFFFFF;
+    --overdue: #D97757;
+    --gold: #BFA47A;
+
+    /* —— 热力图：1/2 档用不透明度，自动压在当前底色上 —— */
+    --heat-1: rgba(48, 207, 121, .24);
+    --heat-2: rgba(48, 207, 121, .52);
+    --heat-3: var(--accent);
+
+    /* —— 间距：4 的倍数，八档，到此为止 —— */
+    --s1: 4px;  --s2: 8px;  --s3: 12px; --s4: 16px;
+    --s5: 20px; --s6: 24px; --s7: 32px; --s8: 40px;
+
+    /* —— 圆角：随尺寸放大，但不超过 height/3 —— */
+    --r1: 4px;  --r2: 8px;  --r3: 12px;
+    --r4: 16px; --r5: 18px; --rp: 999px;
+
+    --sans: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Helvetica Neue",
+            "PingFang SC", "Hiragino Sans GB", sans-serif;
+    --serif: "Iowan Old Style", Charter, Palatino, Georgia, "Songti SC", serif;
+    --mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, monospace;
+
+    /* 品牌资产内联成 token：每个 URI 只出现一次，引用点再多也不重复。
+       --kmark 用的是 k-mark-transparent（纯 K，无底），不是 app-icon ——
+       后者自带薄荷圆角底，那是给桌面图标用的，放进标题栏会多出一个色块。
+       SVG 不是 base64 而是百分号编码 —— 体积更小，而且在源码里还能读。 */
+    --kmark: url("data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 1254 1254%22 width=%221024%22 height=%221024%22 role=%22img%22 aria-labelledby=%22title desc%22> <title id=%22title%22>Kerno K mark</title> <desc id=%22desc%22>Transparent-background K symbol in Kerno green.</desc> <path id=%22K%22 d=%22M 1004 344 L 991 346 L 990 347 L 983 347 L 982 348 L 958 348 L 957 347 L 945 346 L 933 342 L 930 342 L 927 340 L 919 338 L 908 332 L 906 332 L 892 324 L 873 311 L 856 297 L 846 287 L 844 287 L 816 327 L 737 447 L 600 639 L 599 638 L 599 429 L 600 428 L 600 424 L 605 412 L 610 405 L 625 392 L 656 361 L 677 335 L 698 302 L 707 283 L 708 278 L 711 272 L 711 269 L 709 269 L 688 286 L 666 298 L 649 304 L 632 308 L 625 308 L 624 309 L 588 309 L 587 308 L 573 307 L 553 302 L 549 302 L 536 298 L 532 298 L 523 295 L 503 292 L 502 291 L 497 291 L 496 290 L 491 290 L 490 289 L 482 289 L 481 288 L 439 287 L 438 288 L 430 288 L 429 289 L 417 290 L 393 296 L 367 306 L 343 319 L 317 338 L 294 361 L 280 380 L 269 401 L 261 425 L 261 429 L 259 435 L 259 444 L 258 445 L 259 469 L 265 493 L 274 511 L 275 511 L 274 493 L 275 492 L 276 481 L 281 467 L 288 455 L 305 437 L 313 431 L 332 421 L 337 420 L 343 417 L 360 413 L 376 412 L 377 411 L 406 411 L 407 412 L 430 413 L 431 414 L 450 415 L 451 416 L 479 418 L 480 419 L 491 419 L 492 420 L 508 420 L 509 421 L 548 420 L 549 421 L 527 434 L 494 456 L 463 481 L 447 498 L 438 511 L 430 531 L 429 544 L 428 545 L 428 813 L 402 821 L 375 834 L 353 849 L 327 873 L 311 892 L 294 918 L 281 946 L 276 963 L 274 978 L 275 979 L 291 964 L 307 953 L 333 941 L 351 936 L 367 934 L 368 933 L 406 932 L 407 933 L 418 933 L 419 934 L 427 934 L 434 936 L 446 937 L 482 946 L 512 956 L 539 968 L 541 968 L 574 984 L 587 992 L 589 992 L 685 872 L 684 870 L 668 868 L 650 862 L 647 862 L 612 848 L 572 835 L 529 824 L 519 823 L 507 820 L 508 818 L 510 818 L 536 804 L 558 789 L 577 771 L 586 759 L 593 745 L 598 726 L 598 719 L 599 718 L 599 672 L 600 671 L 609 674 L 627 684 L 640 695 L 654 711 L 667 730 L 678 749 L 705 801 L 738 859 L 758 891 L 761 894 L 764 900 L 796 943 L 819 968 L 840 986 L 854 995 L 861 998 L 869 984 L 904 935 L 956 871 L 997 823 L 1004 813 L 1002 812 L 992 816 L 971 821 L 943 822 L 942 821 L 931 820 L 911 813 L 897 804 L 880 788 L 869 774 L 851 746 L 825 699 L 804 664 L 793 648 L 774 626 L 757 612 L 743 603 L 726 595 L 706 589 L 695 588 L 694 586 L 795 451 L 798 451 L 816 457 L 831 459 L 832 460 L 866 461 L 867 460 L 873 460 L 874 459 L 887 457 L 899 453 L 917 444 L 942 426 L 970 397 L 995 362 L 1002 350 Z%22 fill=%22%2330CF79%22 fill-rule=%22evenodd%22/> </svg>");
+    --wordmark: url("data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 1198 474%22 width=%221198%22 height=%22474%22 role=%22img%22 aria-labelledby=%22title desc%22> <title id=%22title%22>Kerno wordmark</title> <desc id=%22desc%22>Outlined lettering, custom blackletter-inspired K and classic serif erno, in Kerno green.</desc> <path id=%22letter-K%22 d=%22M 453 75 L 440 79 L 424 79 L 423 78 L 415 77 L 403 73 L 387 65 L 367 52 L 246 230 L 243 228 L 239 222 L 235 209 L 235 119 L 236 118 L 236 113 L 241 101 L 259 84 L 270 71 L 282 54 L 292 36 L 269 54 L 257 60 L 244 64 L 218 65 L 217 64 L 198 62 L 183 58 L 161 55 L 160 54 L 129 53 L 128 54 L 121 54 L 116 56 L 112 56 L 96 61 L 77 70 L 64 79 L 52 91 L 46 99 L 39 113 L 36 125 L 36 139 L 39 150 L 45 161 L 60 175 L 62 175 L 62 173 L 56 167 L 51 155 L 52 140 L 58 129 L 64 123 L 78 115 L 88 112 L 101 111 L 102 110 L 124 111 L 125 112 L 138 113 L 139 114 L 165 117 L 166 118 L 195 118 L 211 114 L 214 115 L 180 138 L 161 157 L 155 168 L 152 177 L 152 183 L 151 184 L 151 207 L 150 208 L 144 208 L 143 209 L 135 210 L 116 218 L 107 224 L 95 236 L 91 242 L 86 252 L 83 264 L 83 282 L 84 285 L 85 285 L 92 273 L 102 263 L 113 256 L 129 251 L 143 251 L 147 253 L 151 258 L 152 261 L 152 337 L 149 345 L 142 352 L 130 356 L 116 363 L 92 380 L 70 403 L 51 430 L 51 432 L 64 421 L 82 411 L 99 405 L 115 403 L 116 402 L 142 402 L 143 403 L 163 406 L 184 413 L 194 418 L 196 418 L 233 437 L 274 386 L 290 368 L 288 367 L 285 369 L 281 369 L 280 370 L 265 369 L 218 353 L 210 352 L 200 349 L 195 349 L 194 348 L 185 348 L 184 347 L 175 347 L 174 346 L 192 337 L 204 329 L 214 321 L 224 310 L 228 304 L 234 290 L 236 260 L 240 250 L 245 244 L 248 244 L 258 248 L 276 266 L 286 282 L 295 300 L 295 302 L 299 309 L 299 311 L 302 316 L 314 346 L 329 377 L 339 393 L 349 406 L 366 423 L 369 424 L 380 406 L 392 390 L 436 338 L 435 337 L 432 338 L 420 337 L 410 331 L 402 323 L 384 297 L 355 250 L 346 238 L 329 221 L 317 213 L 306 208 L 289 204 L 281 204 L 280 202 L 335 122 L 337 122 L 348 128 L 367 133 L 387 133 L 399 130 L 416 121 L 432 106 L 445 89 L 453 77 Z%22 fill=%22%2330CF79%22 fill-rule=%22evenodd%22/> <path id=%22letter-e%22 d=%22M 528 190 L 527 191 L 520 191 L 508 194 L 494 200 L 482 208 L 466 224 L 459 235 L 450 256 L 447 269 L 447 277 L 446 278 L 446 296 L 447 297 L 447 304 L 448 305 L 449 314 L 455 331 L 465 348 L 476 360 L 487 368 L 504 376 L 517 379 L 523 379 L 524 380 L 542 380 L 543 379 L 553 378 L 565 374 L 576 368 L 584 362 L 591 355 L 601 342 L 608 328 L 610 321 L 607 320 L 598 333 L 587 344 L 572 353 L 558 357 L 537 357 L 523 353 L 515 349 L 505 341 L 496 331 L 489 319 L 484 306 L 481 294 L 480 267 L 481 266 L 607 266 L 607 251 L 606 250 L 606 245 L 604 237 L 598 223 L 591 213 L 581 204 L 575 200 L 559 193 L 551 192 L 550 191 L 544 191 L 543 190 Z M 480 256 L 481 255 L 481 249 L 482 248 L 483 240 L 486 231 L 492 220 L 505 207 L 515 202 L 522 200 L 539 201 L 550 206 L 554 209 L 565 222 L 568 228 L 572 243 L 572 257 L 571 258 L 482 258 Z%22 fill=%22%2330CF79%22 fill-rule=%22evenodd%22/> <path id=%22letter-r%22 d=%22M 745 193 L 736 190 L 726 190 L 718 192 L 708 197 L 700 203 L 689 214 L 679 227 L 678 226 L 678 191 L 673 191 L 646 202 L 622 210 L 619 210 L 619 214 L 632 214 L 637 216 L 642 221 L 645 229 L 645 352 L 644 353 L 644 357 L 641 363 L 636 368 L 627 371 L 619 371 L 619 375 L 705 375 L 705 371 L 698 371 L 690 369 L 685 366 L 682 362 L 678 352 L 678 243 L 686 230 L 696 220 L 704 216 L 714 216 L 717 217 L 729 226 L 734 228 L 741 228 L 746 226 L 751 221 L 753 217 L 754 207 L 751 199 Z%22 fill=%22%2330CF79%22 fill-rule=%22evenodd%22/> <path id=%22letter-n%22 d=%22M 767 211 L 767 214 L 779 214 L 786 217 L 790 221 L 793 229 L 793 353 L 789 363 L 785 367 L 774 371 L 768 371 L 767 375 L 851 375 L 851 371 L 844 371 L 833 367 L 830 364 L 826 354 L 826 237 L 832 230 L 846 219 L 854 215 L 870 211 L 885 212 L 893 215 L 899 219 L 905 225 L 910 234 L 913 245 L 913 252 L 914 253 L 914 350 L 913 351 L 913 355 L 910 362 L 904 368 L 894 371 L 888 371 L 888 375 L 971 375 L 971 371 L 965 371 L 956 368 L 950 362 L 948 357 L 948 352 L 947 351 L 947 245 L 946 244 L 945 233 L 942 224 L 934 210 L 926 202 L 912 194 L 905 192 L 900 192 L 899 191 L 876 192 L 864 196 L 851 203 L 842 210 L 827 225 L 826 224 L 826 191 L 822 191 L 805 198 Z%22 fill=%22%2330CF79%22 fill-rule=%22evenodd%22/> <path id=%22letter-o%22 d=%22M 1049 191 L 1032 196 L 1015 205 L 1007 211 L 997 221 L 989 232 L 981 248 L 976 265 L 976 270 L 975 271 L 975 298 L 976 299 L 976 304 L 981 321 L 989 337 L 996 347 L 1007 358 L 1015 364 L 1032 373 L 1053 379 L 1075 380 L 1076 379 L 1091 378 L 1111 371 L 1123 364 L 1140 348 L 1148 336 L 1154 324 L 1161 298 L 1161 273 L 1160 272 L 1159 262 L 1154 246 L 1145 229 L 1131 213 L 1119 204 L 1101 195 L 1085 191 L 1079 191 L 1078 190 L 1056 190 L 1055 191 Z M 1058 199 L 1070 199 L 1078 201 L 1091 208 L 1102 219 L 1114 240 L 1119 255 L 1121 268 L 1122 269 L 1123 287 L 1124 288 L 1124 301 L 1123 302 L 1122 321 L 1118 336 L 1113 347 L 1102 361 L 1097 365 L 1082 371 L 1065 371 L 1058 369 L 1048 364 L 1038 355 L 1028 341 L 1024 333 L 1017 313 L 1015 305 L 1015 300 L 1014 299 L 1014 294 L 1013 293 L 1012 262 L 1013 261 L 1013 254 L 1014 253 L 1014 248 L 1016 240 L 1021 227 L 1027 217 L 1036 208 L 1046 202 Z%22 fill=%22%2330CF79%22 fill-rule=%22evenodd%22/> </svg>");
+
+    --measure: 66ch;
+    --ease: cubic-bezier(.22, .61, .36, 1);
+  }
+
+  /* ------------------------------------------------------------
+     指派。每个主题只有这一处，列表完全对称 —— 加一个 token 必须
+     同时出现在两个 @mixin 里，缺一个就会在另一个主题下露馅。
+     ------------------------------------------------------------ */
+
+  :root,
+  :root[data-theme="light"] {
+    --ground: var(--light-ground); --card: var(--light-card); --panel: var(--light-inset);
+    --inset: var(--light-inset);
+    --ink: var(--light-ink-1);  --ink-2: var(--light-ink-2);
+    --ink-3: var(--light-ink-3); --ink-4: var(--light-ink-4);
+    --rule: var(--light-hair);  --chrome: var(--light-inset);
+    --tag-bg: var(--light-tag-bg); --tag-ink: var(--light-tag-ink);
+    --shadow: var(--light-shadow); --lift: var(--light-lift);
+    --hl: var(--light-hl); --veil: var(--light-veil);
+    --heat-0: var(--light-heat-0);
+    --accent-soft: rgba(48, 207, 121, .14);
+
+    /* 样稿内的 iOS 画布 = 同一套三层结构，不是第二套颜色 */
+    --ios-ground: var(--light-ground); --ios-card: var(--light-card);
+    --ios-inset: var(--light-inset);
+    --ios-ink: var(--light-ink-1); --ios-ink-2: var(--light-ink-2);
+    --ios-ink-3: var(--light-ink-3); --ios-fill: var(--light-heat-0);
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --ground: var(--dark-ground); --card: var(--dark-card); --panel: var(--dark-inset);
+      --inset: var(--dark-inset);
+      --ink: var(--dark-ink-1);  --ink-2: var(--dark-ink-2);
+      --ink-3: var(--dark-ink-3); --ink-4: var(--dark-ink-4);
+      --rule: var(--dark-hair);  --chrome: var(--dark-inset);
+      --tag-bg: var(--dark-tag-bg); --tag-ink: var(--dark-tag-ink);
+      --shadow: var(--dark-shadow); --lift: var(--dark-lift);
+      --hl: var(--dark-hl); --veil: var(--dark-veil);
+      --heat-0: var(--dark-heat-0);
+      --accent-soft: rgba(48, 207, 121, .18);
+
+      --ios-ground: var(--dark-ground); --ios-card: var(--dark-card);
+      --ios-inset: var(--dark-inset);
+      --ios-ink: var(--dark-ink-1); --ios-ink-2: var(--dark-ink-2);
+      --ios-ink-3: var(--dark-ink-3); --ios-fill: var(--dark-heat-0);
+    }
+  }
+
+  :root[data-theme="dark"] {
+    --ground: var(--dark-ground); --card: var(--dark-card); --panel: var(--dark-inset);
+    --inset: var(--dark-inset);
+    --ink: var(--dark-ink-1);  --ink-2: var(--dark-ink-2);
+    --ink-3: var(--dark-ink-3); --ink-4: var(--dark-ink-4);
+    --rule: var(--dark-hair);  --chrome: var(--dark-inset);
+    --tag-bg: var(--dark-tag-bg); --tag-ink: var(--dark-tag-ink);
+    --shadow: var(--dark-shadow); --lift: var(--dark-lift);
+    --hl: var(--dark-hl); --veil: var(--dark-veil);
+    --heat-0: var(--dark-heat-0);
+    --accent-soft: rgba(48, 207, 121, .18);
+
+    --ios-ground: var(--dark-ground); --ios-card: var(--dark-card);
+    --ios-inset: var(--dark-inset);
+    --ios-ink: var(--dark-ink-1); --ios-ink-2: var(--dark-ink-2);
+    --ios-ink-3: var(--dark-ink-3); --ios-fill: var(--dark-heat-0);
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    background: var(--ground);
+    color: var(--ink);
+    font-family: var(--serif);
+    font-size: 17px;
+    line-height: 1.75;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .wrap {
+    max-width: 1120px;
+    margin: 0 auto;
+    padding: 72px 28px 110px;
+    display: flex;
+    flex-direction: column;
+    gap: 76px;
+  }
+
+  /* ---------- document chrome ---------- */
+
+  .masthead { display: flex; flex-direction: column; gap: 20px; }
+
+  .eyebrow {
+    font-family: var(--mono);
+    font-size: 12px;
+    letter-spacing: .14em;
+    text-transform: uppercase;
+    color: var(--accent);
+  }
+
+  h1 {
+    font-family: var(--serif);
+    font-size: clamp(32px, 5vw, 46px);
+    line-height: 1.18;
+    font-weight: 600;
+    margin: 0;
+    text-wrap: balance;
+    letter-spacing: -.01em;
+  }
+
+  .standfirst { max-width: var(--measure); color: var(--ink-2); font-size: 18px; margin: 0; }
+
+  .tokens { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 6px; }
+  .token {
+    display: inline-flex; align-items: center; gap: 8px;
+    padding: 6px 12px 6px 7px;
+    border-radius: 999px;
+    background: var(--card);
+    border: 1px solid var(--rule);
+    font-family: var(--mono);
+    font-size: 11.5px;
+    color: var(--ink-2);
+  }
+  .swatch { width: 15px; height: 15px; border-radius: 5px; flex: none; }
+
+  section { display: flex; flex-direction: column; gap: 26px; }
+  .sec-head { display: flex; flex-direction: column; gap: 10px; }
+
+  h2 {
+    font-family: var(--serif);
+    font-size: 27px; font-weight: 600; margin: 0;
+    letter-spacing: -.005em; text-wrap: balance;
+  }
+  h2 .kicker {
+    font-family: var(--mono); font-size: 13px; color: var(--accent);
+    letter-spacing: .1em; margin-right: 12px; vertical-align: 2px;
+  }
+
+  .sec-head p, .note { margin: 0; max-width: var(--measure); color: var(--ink-2); }
+  .note strong, .sec-head p strong { color: var(--ink); font-weight: 600; }
+
+  code {
+    font-family: var(--mono); font-size: .86em;
+    background: var(--accent-soft); color: var(--ink);
+    padding: 1px 5px; border-radius: 4px;
+  }
+
+  .rail {
+    display: flex; align-items: flex-start; flex-wrap: wrap;
+    gap: 22px 16px; padding: 4px 2px 4px;
+  }
+  .unit { display: flex; flex-direction: column; gap: 12px; flex: none; }
+  .cap {
+    font-family: var(--mono); font-size: 11.5px;
+    letter-spacing: .1em; text-transform: uppercase; color: var(--ink-3);
+    display: flex; align-items: baseline; gap: 8px;
+  }
+  .cap b { color: var(--accent); font-weight: 600; }
+  .cap em { font-style: normal; color: var(--accent); }
+
+  .grid {
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(248px, 1fr));
+    gap: 1px; background: var(--rule);
+    border: 1px solid var(--rule); border-radius: 12px; overflow: hidden;
+  }
+  .grid > div { background: var(--card); padding: 19px 21px; display: flex; flex-direction: column; gap: 7px; }
+  .grid h4 { margin: 0; font-family: var(--sans); font-size: 13px; font-weight: 650; color: var(--ink); }
+  .grid p { margin: 0; font-size: 15px; line-height: 1.7; color: var(--ink-2); }
+
+  .tablewrap { overflow-x: auto; border: 1px solid var(--rule); border-radius: 12px; background: var(--card); }
+  table { border-collapse: collapse; width: 100%; min-width: 560px; font-family: var(--sans); font-size: 14px; }
+  th, td { text-align: left; padding: 12px 18px; border-bottom: 1px solid var(--rule); vertical-align: top; }
+  tbody tr:last-child td { border-bottom: none; }
+  th {
+    font-family: var(--mono); font-size: 11px; letter-spacing: .1em;
+    text-transform: uppercase; color: var(--ink-3); font-weight: 500;
+  }
+  td.k { font-family: var(--mono); font-size: 12.5px; color: var(--ink); white-space: nowrap; }
+  td.v { font-family: var(--mono); font-size: 12.5px; color: var(--ink-2); font-variant-numeric: tabular-nums; white-space: nowrap; }
+  td.w { color: var(--ink-2); }
+  tr.gone td.k { text-decoration: line-through; text-decoration-color: var(--overdue); color: var(--ink-3); }
+
+  footer { border-top: 1px solid var(--rule); padding-top: 26px; color: var(--ink-3); font-size: 14.5px; max-width: var(--measure); }
+
+  /* ============================================================
+     Chrome side panel
+     ============================================================ */
+
+  .panel {
+    width: 330px; flex: none;
+    background: var(--panel);
+    border: 1px solid var(--rule);
+    border-radius: 12px; overflow: hidden;
+    font-family: var(--sans); font-size: 13.5px; line-height: 1.55;
+    box-shadow: 0 1px 2px rgba(0,0,0,.04), 0 10px 26px rgba(0,0,0,.055);
+  }
+
+  /* 导航用绝对定位居中，不靠网格。
+     网格居中要求两侧栏宽度相等，而「相等」会被一串变量影响：列的最小尺寸
+     （1fr = minmax(auto,1fr)）、左右两端元素宽度不同（logo 16px vs ··· 24px）、
+     选中项字重改变内容宽度。绝对定位只认一件事：栏的中线。
+     代价是导航不再参与流式布局，所以必须自己保证不会和两端重叠 ——
+     导航 114px，栏内可用约 296px，余量充足。 */
+  .pbar { position: relative;
+    display: flex; align-items: center; gap: 8px;
+    padding: 9px 12px; background: var(--chrome);
+    border-bottom: 1px solid var(--rule);
+  }
+  .pbar .pnav { position:absolute; left:50%; transform:translateX(-50%); }
+  .pbar .pcheck, .pbar .recap-menu-wrap { margin-left:auto; }
+  .pbar .mark { width: 17px; height: 17px; border-radius: 5px; background: var(--accent); flex: none; }
+  .pbar .nm { font-size: 13px; font-weight: 600; color: var(--ink); }
+  .state {
+    display: inline-flex; align-items: center; gap: 5px;
+    font-size: 11px; color: var(--ink-2);
+  }
+  .state::before { content: ""; width: 7px; height: 7px; border-radius: 50%; background: var(--accent); }
+  .state.bad { color: var(--overdue); }
+  .state.bad::before { background: var(--overdue); }
+  /* 标题栏从「品牌条」改成「导航条」：产品名在侧边栏里是废话 —— Chrome 自己
+     的面板头已经写着扩展名了。那块位置让给今天/本题/设置，零新增高度换回了
+     底部整条标签栏（33px）。品牌绿点一并撤掉：名字没了它就没有归属。 */
+  /* logo 槽位。现在是一个纯色方块占位，将来换成真 logo（<img> 或内联 svg）
+     时尺寸不变，导航不会被推位 —— 所以这里写死 14×14 而不是让内容撑开。
+     留它的理由是构图不是识别：Chrome 的侧边栏头部本来就显示扩展图标和名字，
+     这个 logo 严格说是重复的。但一条机壳条需要一个起点，否则直接从「今天」
+     开始会显得没有左边界。 */
+  /* 真 logo 已就位。尺寸仍写死在槽位上，换图不会把导航推位。
+     图本身带浅绿圆角底，所以这里不再给背景色和圆角 —— 给了会在图外面再套一圈。
+     用 32px 的那档内联成 data URI：设计稿是单文件，外链相对路径一换位置就断。 */
+  .plogo { flex:none; width:16px; height:16px;
+    background:var(--kmark) center/contain no-repeat; }
+  /* 纯文字导航，当前项只靠字重 + 灰度区分 —— 不给底色、不做药丸。
+     标题栏是机壳，药丸那套（底色 + 圆角 + 容器内距）属于内容区的选择控件；
+     搬到机壳上会把一条本该安静的栏做得很闹。而且设置页已经有三组实心绿的
+     分段控件，再添一处带色块的，整屏的强调就散了。 */
+  .pnav { display:flex; gap:var(--s3); }
+  /* 每项预留固定宽度：选中项是 600 字重、比 400 宽，不留的话「哪一项被选中」
+     会改变整条导航的宽度，三个字在每个面板的落点就都不一样。 */
+  .pnav b { min-width:30px; text-align:center;
+    font-size:12px; font-weight:400; color:var(--ink-3); cursor:pointer;
+    transition:color .15s var(--ease); }
+  .pnav b:hover { color:var(--ink-2); }
+  .pnav b.here { color:var(--ink); font-weight:600; }
+  /* ··· 放标题栏：它不滚，入口永远可达。队列有 13 行，挂在队列上的话，
+     「做完想打卡」那一刻入口正好滚出了视野。
+     右槽跟着 tab 变：「今天」只有打卡一件事，就直接给按钮 —— 一个菜单项
+     藏在 ··· 后面等于白加一次点击；「本题」有三件（分享/编辑/复制），才配
+     得上菜单；「设置」留空。
+     「立即同步」整个去掉：AC 后自动同步是这个产品的前提，常驻一个手动按钮
+     等于不相信自己的前提。同步失败时该做的是把失败显示出来（设置里的
+     同步状态有 .bad 态），重试按钮应该长在那条失败信息旁边，不是藏在全局菜单里。 */
+  .pcheck { display:inline-flex; border:0; background:none; padding:2px; color:var(--ink-3); cursor:pointer; }
+  .pcheck:hover { color:var(--ink); }
+  .pcheck svg { width:15px; height:15px; fill:none; stroke:currentColor; stroke-width:1.7; stroke-linecap:round; stroke-linejoin:round; }
+
+
+  /* 内距存成 --pbody-pad：.qlist 要靠负边距出血到面板边缘，出血量必须
+     等于这个内距。两处取值不一样（这里 14px，样稿块里 s4=16px），写死
+     任何一个都会在另一种状态下露出或盖过一条缝。 */
+  /* 正文区走 --card（白），不走 --panel（= --inset，下陷色）。三层体系里
+     inset 是「陷下去的次级面」，内容面该是 card —— 题解的白卡拆掉之后，
+     正文直接落在下陷色上，层级就反了。
+     面板因此变成：pbar 下陷色（chrome）→ pbody 白（内容）。标签栏已移除。 */
+  .pbody { --pbody-pad: 14px; background: var(--card); padding: var(--pbody-pad); display: flex; flex-direction: column; gap: 13px; }
+
+  .phead { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; }
+  .phead h3 { margin: 0; font-family: var(--sans); font-size: 15px; font-weight: 600; color: var(--ink); }
+  .phead .n { font-family: var(--mono); font-size: 12px; color: var(--ink-3); font-variant-numeric: tabular-nums; }
+
+  /* 列表是一张表，不是一摞卡：行与行贴合、无间隙、不描圆角、不开滚动窗口，
+     整列直接铺在面板里，靠行间细线分隔。
+     注意和分享卡的 .daily-submissions 不同 —— 那张表用 nth-child 斑马纹，
+     因为它是固定行数的静态图；这里行数每天变，不能依赖计数。 */
+  .qlist { display: flex; flex-direction: column; gap: 0;
+    margin-left: calc(-1 * var(--pbody-pad)); margin-right: calc(-1 * var(--pbody-pad)); }
+  /* 行格式对齐分享卡的 .daily-question（:946-949）：旗标一栏，然后
+     「编号. 标题」粗体占一行，难度和到期退成下面一行小字。原先是
+     14/44/1fr/auto 四栏网格，编号和标题分家、到期甩在最右 —— 同一个
+     产品里同一条题目记录，两处排法不该不一样。 */
+  .q {
+    display: grid; grid-template-columns: 14px 1fr;
+    align-items: center; gap: 9px;
+    /* 左右用 --pbody-pad：行底色和细线通栏到面板边缘，文字却仍和面板里
+       其他内容对齐在同一条左缘上 —— 分享卡 td{padding:13px 16px} 同理。 */
+    padding: 10px var(--pbody-pad);
+    cursor: pointer; transition: background-color .15s var(--ease);
+  }
+  /* 斑马纹由 restripeQueue() 打 .alt 类，不用 :nth-child。原因：复习和新题
+     在两个独立的 .qlist 里（JS 要分别显隐），nth-child 在第二组会从 1 重新
+     数 —— 复习条数是奇数那天，交界处就会连着两行同色。真实数据里这个数
+     天天变，所以那是必然会发生的 bug，不是理论风险。 */
+  .q { background: var(--card); }
+  .q.alt { background: var(--inset); }
+  .q:hover, .q:focus-visible { background: var(--accent-soft); outline: none; }
+  .q .flag { font-size: 12px; color: var(--ink-3); text-align: center; }
+  /* 一行：标题吃掉剩余宽度并省略，难度+到期贴右。min-width:0 不能省 ——
+     flex 子项默认 min-width:auto，不给 0 的话省略号永远不会触发，标题会把
+     右边的元信息顶出行外。 */
+  .qmain { min-width: 0; display: flex; align-items: baseline; gap: 8px; }
+  .qmain > b { flex: 1; min-width: 0; font-size: 12px; line-height: 1.55; font-weight: 600; color: var(--ink); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .qsub { flex: none; font-size: 11px; line-height: 1.4; color: var(--ink-3); white-space: nowrap; }
+  /* 复习 / 新题靠左侧色条区分：复习无条，新题走强调色。两组本来就是
+     两个独立的 .qlist，这里只是让它们一眼能分开。 */
+  .q .due { font-variant-numeric: tabular-nums; }
+  .q.late .flag, .q.late .due { color: var(--overdue); }
+  .q.fresh .due { color: var(--ink-2); }
+  /* 三个旗标是现在唯一区分逾期/今天/新题的东西，颜色必须拉开 */
+  .q.fresh .flag { color: var(--accent); font-weight: 700; }
+
+  /* 去掉左右横线，改左对齐小标签：5 个分区就是 5 条横线，噪音大且压不下去。
+     大写字距 + Ink 3 同样能把它读成分区标题，还能再紧一档。
+     负的下边距：.pbody 的 gap 让标题上下各 8px，等距浮在两组中间，既浪费
+     又读不出它属于谁。拉近下方内容，归属才清楚。 */
+  .ruleline {
+    display: flex; align-items: center; gap: 9px;
+    font-family: var(--mono); font-size: 11px; letter-spacing: .06em;
+    color: var(--ink-3); margin: 0 0 -4px;
+  }
+  .ruleline > button { margin-left: auto; }
+
+  .hr { height: 1px; background: var(--rule); }
+
+  .cta {
+    display: block; width: 100%; padding: 11px; border: none; border-radius: 9px;
+    background: var(--accent); color: var(--accent-ink);
+    font-family: var(--sans); font-size: 13.5px; font-weight: 600; cursor: pointer;
+    transition: filter .15s var(--ease);
+  }
+  /* §7 按下态：绿块变暗 8%，不用 filter —— 亮度滤镜会连带影响文字 */
+  .cta:hover, .cta:active { background: var(--accent-press); }
+  .cta:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
+
+  .chip {
+    display: inline-block; padding: 2.5px 9px; border-radius: 999px;
+    background: var(--tag-bg); color: var(--tag-ink);
+    font-family: var(--sans); font-size: 12px; font-weight: 500;
+  }
+
+
+  /* 做题中只放一块内容：上次的题解。原先是「第 1 层伪代码 / 第 2 层题解」两级
+     折叠（details.peel），连同 .peelbody / .depth 一起删了 —— 整个文件只有那
+     一处用它们。橙色高亮走全局的 mark，和手机端卡片同一套。 */
+  /* 不套卡片：面板里只剩题解这一样东西，再描一层底色+圆角就是盒中盒。
+     内距交给 .pbody，这里只管纵向排布。 */
+  .recap { display: flex; flex-direction: column; gap: 8px; }
+  .recap-head { display: flex; align-items: center; gap: 8px; }
+  /* 默认只露 3 行，剩下的交给 Show More —— 对着 flomo 的 memo 卡。
+     -webkit-line-clamp 要求整段文字在同一个盒子里，所以三段合成一段；
+     拆成多个 <p> 的话 clamp 只会裁最后那一段。 */
+  .recap-body { margin: 0; font-size: 13px; line-height: 1.75; color: var(--ink-2);
+    display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 3; overflow: hidden; }
+  .recap-body.open { -webkit-line-clamp: unset; overflow: visible; }
+  .recap > .text-button { align-self: flex-start; }
+  /* 编辑态和阅读态在同一张卡里切换，不另开页面 —— 题解是这张卡的内容，
+     改它不该把人带走。chip 和 ··· 保持可见，位置不跳。 */
+  /* 对着 flomo 手机版：正文占满上方、无边框、行距和阅读态一致；工具栏沉到底部，
+     保存是一枚绿色圆形对勾。工具栏在下而不是在上 —— 打字时手和视线都在底部，
+     格式按钮放上面每次都要往回够。 */
+  .recap-editor { display:flex; flex-direction:column; gap:var(--s2); }
+  /* 按类不按 id：演示屏那个 textarea 没有 id，用 #recap-draft 的话它完全不被覆盖，
+     浏览器就会给它默认的边框和默认字体（多数浏览器是等宽）。 */
+  /* overflow:hidden 去掉滚动条，高度由 autosize() 设成内容高度 —— 题解要全文可见，
+     规格 §6.3：「正文完整呈现，不使用固定高度裁切」。min-height 只兜空题解。 */
+  .recap-editor textarea { width:100%; box-sizing:border-box; resize:none;
+    min-height:72px; overflow:hidden;
+    padding:0; border:0; background:none; color:var(--ink-2);
+    font:13px/1.75 var(--sans); }
+  .recap-editor textarea:focus { outline:none; }
+  .recap-editor textarea::placeholder { color:var(--ink-4); }
+  /* 不画分隔线：工具栏和正文之间已经有 8px 间距和「一排图标 vs 一段文字」的
+     形态差异，再加一条线是替没有歧义的地方做区分。 */
+  .editor-foot { display:flex; align-items:center; gap:var(--s2); padding-top:var(--s2); }
+  .editor-tools { display:flex; gap:1px; }
+  .editor-tools button { width:22px; height:22px; display:grid; place-items:center;
+    border:0; background:none; border-radius:var(--r1); color:var(--ink-3);
+    font:600 11px/1 var(--sans); cursor:pointer; }
+  .editor-tools button:hover { background:var(--inset); color:var(--ink); }
+  /* 高亮按钮穿它自己的颜色：背景就是 --hl，和正文里 <mark> 渲染出来的完全同一个值。
+     这样它既是按钮也是色样 —— 不用标签就知道按下去会得到什么。
+     之前用实心 Ink 1 是为了「一排灰图标里要有主角」，但那是靠对比度硬抢注意力，
+     在一条安静的工具栏里太吵。36% 的橙本来就够显眼，不需要再加黑。 */
+  .editor-tools button.is-hl { background:var(--hl); color:var(--ink); }
+  .editor-tools button.is-hl:hover { background:var(--hl); box-shadow:inset 0 0 0 1px var(--rule); }
+  .draft-state { margin-left:var(--s2); font-size:10px; color:var(--ink-3); }
+  .draft-count { font-size:10px; color:var(--ink-3); font-variant-numeric:tabular-nums; }
+  /* 绿色圆形对勾，对着 flomo 手机版的主按钮 */
+  .save-dot { margin-left:auto; flex:none; width:30px; height:30px; display:grid; place-items:center;
+    border:0; border-radius:50%; background:var(--accent); color:var(--accent-ink); cursor:pointer; }
+  .save-dot:hover { background:var(--accent-press); }
+  .save-dot svg { width:15px; height:15px; fill:none; stroke:currentColor;
+    stroke-width:2.6; stroke-linecap:round; stroke-linejoin:round; }
+  /* 本地已存 ≠ 已同步。两个状态必须分开显示，否则用户以为数据已经在 GitHub 上了。 */
+  /* 降级条。四种状态必须能分辨，不能都画成一句「保存失败」：
+     待同步 = 正在推，等一下就好      → 灰，会自己消失
+     离线   = 推不出去，但数据没丢    → 橙，常驻
+     冲突   = 远端被改过，要你决定    → 橙 + 操作
+     授权   = 要重新连 GitHub        → 橙 + 操作
+     后三种都常驻，因为它们需要人去做事；只有第一种可以自己走。 */
+  .sync-note { display:flex; align-items:center; gap:var(--s2); margin:0; font-size:10px; color:var(--ink-3); }
+  .sync-note.warn { color:var(--overdue); }
+  .sn-act { margin-left:auto; border:0; background:none; color:var(--tag-ink);
+    font-size:10px; font-weight:600; cursor:pointer; padding:0; white-space:nowrap; }
+  /* 空题解：这是新用户的默认状态，不是异常。规格 §7.4 的待开始池里全是这种题。 */
+  .recap-empty { display:flex; flex-direction:column; gap:var(--s1);
+    padding:var(--s3); border:1px dashed var(--rule); border-radius:var(--r2);
+    font-size:12px; color:var(--ink-3); cursor:pointer; }
+  .recap-empty b { color:var(--ink-2); font-weight:600; font-size:13px; }
+  .recap-empty:hover { border-color:var(--accent); }
+  /* 边界状态演示开关，只属于设计稿，不是产品的一部分 */
+  .state-demo { display:flex; flex-wrap:wrap; gap:4px; margin-top:var(--s2); }
+  .state-demo button { border:1px solid var(--rule); background:var(--card); color:var(--ink-3);
+    border-radius:var(--rp); padding:2px 8px; font-size:10px; cursor:pointer; }
+  .state-demo button:hover { border-color:var(--accent); color:var(--ink); }
+
+
+  .foot { font-family: var(--mono); font-size: 11.5px; color: var(--ink-3); text-align: center; margin: 0; }
+  .foot b { color: var(--ink); font-weight: 600; }
+
+  .alert {
+    display: flex; align-items: center; gap: 8px;
+    margin: 0 14px 13px; padding: 9px 11px; border-radius: 8px;
+    background: rgba(217,119,87,.11); border: 1px solid rgba(217,119,87,.3);
+    font-size: 12px; color: var(--ink);
+  }
+  .alert .sign { color: var(--overdue); flex: none; }
+  .alert .fix { margin-left: auto; color: var(--overdue); font-weight: 600; cursor: pointer; white-space: nowrap; }
+
+
+  /* problem-list rows inside the panel */
+  /* 组内贴合不画线，组与组之间靠 .pbody 的 gap + 底色反差区分 —— flomo 设置页
+     的做法。整组切圆角，首尾两行自动被裁圆。 */
+  .lists { display: flex; flex-direction: column; gap: 0;
+    background: var(--card); border-radius: var(--r2); overflow: hidden; }
+  .lists .row { border-radius: 0; }
+  /* 只有设置面板需要这层下陷底色当画布，好让白色的组浮出来。做题中是单块
+     内容，正文直接落在白底上，不能跟着改。 */
+  /* 上内距给 0：别的面板正文是白的、紧贴灰条，白色从标题栏下边缘就开始；
+     设置是灰底白卡，留任何上内距都会让白卡比别处晚开始。归零之后，三个面板
+     「白色从哪里开始」这条线才真正对齐。 */
+  #scope-panel { background: var(--panel); padding-top: 0; }
+  .row {
+    display: flex; align-items: center; gap: 9px;
+    /* 上下 9 → 6px：每行只有一行字，38px 太肥。侧边栏是鼠标操作不是手指，
+       32px 的命中区够用。 */
+    padding: 6px 10px; border-radius: 8px; background: var(--card);
+    border: 1px solid transparent; cursor: pointer;
+    transition: border-color .14s var(--ease);
+  }
+  .row:hover, .row:focus-visible { background: var(--accent-soft); outline: none; }
+  .row.track { background: var(--accent-soft); }
+  /* flex 的第三个值要 auto 而不是 0%：原来写 flex:1（= 1 1 0%）时基准宽是 0，
+     右边标签一多就把它挤到一个字宽，中文于是逐字竖排。配 nowrap + shrink:0
+     锁死，让右边的内容去收缩。 */
+  .row .ttl { flex: 1 0 auto; min-width: 0; white-space: nowrap; font-size: 13px; color: var(--ink); }
+  .row .ttl i { font-style: normal; font-family: var(--mono); font-size: 10.5px; color: var(--ink-3); margin-left: 5px; }
+  .row .pg { font-family: var(--mono); font-size: 11.5px; color: var(--ink-3); font-variant-numeric: tabular-nums; }
+  .row .pg b { color: var(--ink); font-weight: 600; font-size: 13px; }
+  .dot { width: 13px; height: 13px; border-radius: 50%; border: 1.5px solid var(--ink-3); flex: none; }
+  .dot.on { border-color: var(--accent); border-width: 4px; }
+
+  .aside { margin: 0; font-size: 11.5px; line-height: 1.6; color: var(--ink-3); }
+  .aside b { color: var(--ink-2); font-weight: 600; }
+
+  .kv { display: flex; flex-direction: column; gap: 2px; }
+  .kv > div { display: flex; align-items: baseline; gap: 10px; padding: 6px 10px; background: var(--card); border-radius: 7px; font-size: 12.5px; }
+  .kv .t { flex: 1; color: var(--ink-2); }
+  .kv .d { font-family: var(--mono); font-size: 11.5px; color: var(--ink-3); font-variant-numeric: tabular-nums; }
+  .kv .d.yes { color: var(--ink-2); }
+
+  .snippet {
+    background: var(--card); border: 1px solid var(--rule); border-radius: 8px;
+    padding: 11px 12px; font-family: var(--mono); font-size: 10.5px; line-height: 1.7;
+    color: var(--ink-2); white-space: pre; overflow: hidden;
+  }
+
+
+  /* ============================================================
+     share cards — one layout engine, two canvases
+     ============================================================ */
+
+  .promo {
+    min-width: 0;
+    background: var(--dark-ground);
+    color: var(--dark-ink-1);
+    border-radius: 14px;
+    border: 1px solid var(--dark-hair);
+    font-family: var(--sans);
+    overflow: hidden;
+    flex: none;
+    display: flex; flex-direction: column;
+    box-shadow: 0 10px 30px rgba(0,0,0,.18);
+  }
+  .promo.wide { width: 460px; padding: 26px 28px; gap: 16px; }
+  .promo.tall { width: 290px; padding: 24px 24px; gap: 14px; }
+
+  .promo .big {
+    font-size: 34px; font-weight: 700; letter-spacing: -.025em; line-height: 1.1;
+    font-variant-numeric: tabular-nums;
+  }
+  .promo.tall .big { font-size: 26px; }
+  .promo .sub { font-size: 14px; color: var(--dark-ink-2); margin: 0; line-height: 1.6; }
+
+  .wallgrid { display: grid; grid-auto-flow: column; grid-template-rows: repeat(5, 11px); gap: 4px; }
+  .promo.tall .wallgrid { grid-template-rows: repeat(5, 9px); gap: 3px; }
+  .wallgrid i { display: block; width: 11px; height: 11px; border-radius: 3px; background: var(--dark-heat-0); }
+  .promo.tall .wallgrid i { width: 9px; height: 9px; border-radius: 2.5px; }
+  .wallgrid i.a { background: var(--heat-1); }
+  .wallgrid i.b { background: var(--heat-2); }
+  .wallgrid i.c { background: var(--accent); }
+
+  .promo .split { display: flex; gap: 18px; font-size: 13px; color: var(--dark-ink-2); font-variant-numeric: tabular-nums; }
+  .promo .split b { color: var(--dark-ink-1); font-weight: 600; }
+
+  .promo .track { display: flex; flex-direction: column; gap: 7px; }
+  .promo .track .row2 { display: flex; justify-content: space-between; font-size: 13px; color: var(--dark-ink-2); }
+  .promo .track .row2 b { color: var(--dark-ink-1); font-weight: 600; font-variant-numeric: tabular-nums; }
+  .promo .track .rail2 { height: 5px; border-radius: 99px; background: var(--dark-heat-0); overflow: hidden; }
+  .promo .track .rail2 i { display: block; height: 100%; width: 27%; background: var(--accent); border-radius: 99px; }
+
+  .promo .sig {
+    border-top: 1px solid var(--dark-hair); padding-top: 13px;
+    display: flex; align-items: baseline; justify-content: space-between; gap: 12px;
+  }
+  .promo .sig .repo { font-family: var(--mono); font-size: 12px; color: var(--dark-ink-1); }
+  .promo .sig .by { font-size: 11px; color: var(--dark-ink-3); white-space: nowrap; }
+
+
+  .promo.square { width: 330px; padding: 26px 26px; gap: 15px; }
+  .promo .head2 {
+    display: flex; align-items: center; gap: 10px;
+    font-size: 12px; color: var(--dark-ink-2); font-family: var(--mono);
+  }
+  .promo .head2 .pill2 {
+    background: var(--dark-tag-bg); color: var(--dark-tag-ink);
+    padding: 3px 10px; border-radius: 999px;
+    font-family: var(--sans); font-size: 12px; font-weight: 500;
+  }
+  .promo .head2 .far2 { margin-left: auto; }
+  .promo .title2 { font-size: 22px; font-weight: 600; letter-spacing: -.015em; line-height: 1.25; }
+  .promo .body2 { font-size: 15px; line-height: 1.6; color: var(--dark-ink-1); margin: 0; }
+  .promo .snip {
+    background: var(--dark-inset); border: 1px solid var(--dark-hair); border-radius: var(--r3);
+    padding: 14px 15px;
+    font-family: var(--mono); font-size: 11.5px; line-height: 1.75;
+    color: var(--dark-ink-2); white-space: pre; overflow: hidden;
+    min-width: 0;
+  }
+  .promo .snip b { color: var(--accent); font-weight: 400; }
+
+  .ladder {
+    display: grid; grid-template-columns: repeat(3, 1fr);
+    gap: 12px 8px; margin: 4px 0 2px;
+  }
+  .ladder > div {
+    display: flex; align-items: baseline; gap: 3px;
+    padding: 9px 0; border-radius: 9px;
+    background: var(--dark-inset); justify-content: center;
+  }
+  .ladder b { font-size: 19px; font-weight: 700; color: var(--accent); font-variant-numeric: tabular-nums; }
+  .ladder span { font-size: 11px; color: var(--dark-ink-3); }
+
+  .size {
+    font-family: var(--mono); font-size: 10.5px; color: var(--ink-3);
+    letter-spacing: .06em; text-align: center;
+  }
+
+  /* ============================================================
+     iPhone — type scale follows Theme.swift, which was measured
+     off the flomo reference: body 16/+8, title 21, meta 13, tag 12
+     ============================================================ */
+
+  .phone {
+    width: 390px; flex: none; height: 680px; position: relative; overflow: hidden;
+    background: var(--ios-ground);
+    border-radius: 34px; padding: 12px 0 16px;
+    border: 1px solid var(--rule);
+    font-family: var(--sans);
+    color: var(--ios-ink);
+    box-shadow: 0 1px 2px rgba(0,0,0,.05), 0 14px 34px rgba(0,0,0,.07);
+  }
+  .phone.tall { height: 740px; }
+
+  .bar0 {
+    display: flex; justify-content: space-between;
+    padding: 2px 24px 16px;
+    font-size: 12.5px; font-weight: 600; font-variant-numeric: tabular-nums;
+  }
+
+  /* --- the reading page, which the drawer covers --- */
+
+  .read {
+    height: 100%;
+    transform-origin: right center;
+    will-change: transform;
+    transition: transform .42s var(--ease);
+  }
+  /* 三栏网格：汉堡 | 标题 | 空。两侧都是 1fr，所以中间那一栏天然落在
+     整条栏的正中 —— 不用知道汉堡到底多宽（它在下面几个块里被改过尺寸）。
+     minmax(0,auto) 让标题栏既收紧到内容宽度，又允许被压扁出省略号。 */
+  .readtop {
+    display: grid; grid-template-columns: 1fr minmax(0, auto) 1fr;
+    align-items: center; gap: 13px; padding: 0 22px 16px;
+  }
+  .hamb {
+    justify-self: start;
+    font-size: 17px; line-height: 1; cursor: pointer;
+    padding: 5px 7px; border-radius: 8px; user-select: none; color: var(--ios-ink);
+  }
+  .hamb:hover { background: var(--ios-fill); }
+  .hamb:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
+  /* 顶栏说的是「在读哪一类」（标签/二叉树），题名归卡片，两边不重复。
+     它是整屏唯一加粗、唯一 Ink 1 的字 —— 分量给足，因为这是「你在哪」。 */
+  .readtop .now {
+    font-size: 16px; font-weight: 600; color: var(--ios-ink);
+    overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+    cursor: pointer;
+  }
+  /* ⌄ 必须是伪元素，不能是真标签：:2016 的 JS 用 textContent 改这里的
+     文字，真元素会被整个冲掉，伪元素不受影响。
+     它也不是纯装饰 —— .now 是 <label for="drawer">，点标题和点汉堡一样
+     把抽屉拉出来，⌄ 许诺的交互是真的存在的。 */
+  .readtop .now::after {
+    content: "⌄"; margin-left: 6px; font-size: .8em; font-weight: 400;
+    color: var(--ios-ink-3); vertical-align: 2px;
+  }
+  .readtop .now:hover::after { color: var(--ios-ink-2); }
+  .readtop .now:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; border-radius: var(--r1); }
+
+  .chain { padding: 0 18px; }
+  .link { position: relative; }
+  .link + .link { margin-top: 18px; }
+  .link + .link::before {
+    content: ""; position: absolute; left: 50%; top: -18px; height: 18px;
+    border-left: 2px dashed var(--ios-fill);
+  }
+
+  .leaf { background: var(--ios-card); border-radius: 18px; padding: 22px; }
+  /* 卡片头部，对着 flomo 的 memo 卡：
+     卡片没有 meta 行。时间戳、出处（「Medium · 1004」「review.md」
+     「3 个版本」）全部拿掉 —— 它们是系统说给自己听的话，读卡片的人
+     不需要。层 chip 顶替了那一行的位置：一张卡是哪一层，就是这张卡
+     唯一需要的元信息。
+     chip 的排法跟着 flomo 的规则走：首行后面有内容就内联，没有就独占
+     一行。题意卡首行跟着题名，所以 chip 内联，像一个词一样参与行内排版；
+     伪代码 / 题解 / 我的代码三张卡首行就是内容本身，chip 独占一行。
+     两种排法下 chip 的左边缘都落在卡片 padding 边上，竖着扫一眼仍然知道
+     这条链走到了第几层。chip 后面不再挂任何东西。
+     chip 用 tag 蓝 —— 和 flomo 一致，也意味着它必须可点（§2 铁律 3：
+     蓝只做内联可点）。点它＝跳到该层 / 按该层筛选。 */
+  .layer {
+    /* 块级 + fit-content：自己占一行，但底色只包住文字，不拉通整行 */
+    display: block; width: fit-content;
+    margin: 0 0 var(--s2); padding: 2px 8px;
+    border-radius: var(--r2);
+    background: var(--tag-bg); color: var(--tag-ink);
+    /* 13px 是字阶（34/21/16/13/12/11）里 16px 正文的下一档 —— chip 是
+       标签不是正文，低一档；但和正文同在一张字阶上，不再是游离的 12px。
+       四张卡写死同一个字号，不跟着代码卡的 mono 字号缩水。 */
+    font: 500 13px/1.4 var(--sans); letter-spacing: 0;
+    white-space: nowrap;
+  }
+  /* 题意卡的 chip 回到内联。inline-block 的基线＝它内部文字的基线，所以
+     chip 里的字和题名严格对齐，padding 只向外长 —— 不要改成 flex 或
+     vertical-align:middle，那会按盒高对齐，字就错开了。
+     行盒算过：chip 药丸 13×1.4+2+2 = 22.2px，题名行盒 30px，基线对齐后
+     chip 落在行盒内 5.1→27.3px，上下各余约 3px —— 撑不开行距。改动 chip
+     字号或 padding 时要重算这笔账。 */
+  .leaf h3 .layer { display: inline-block; width: auto; margin: 0 var(--s2) 0 0; }
+  /* 卡片里的字全是正文，一种排法：同族、同字号、同字重、同行距、同字距、
+     同灰度（Ink 2 —— 设定稿 §调色板把「正文」指派给 Ink 2，flomo 的 memo
+     正文也是灰的）。h3 只是语义上的标题，视觉上不升一级：它的内容是
+     「1004. 最大连续1的个数 III」，一条 LeetCode 题目引用，不是一句标语。
+     两个选择器写在一起，不是图省事 —— 是让它们没法各改各的慢慢分叉。
+     整张卡唯一的视觉层级是 chip：蓝、小一档。
+     行距 1.7 —— iPhone 12 mini 满屏实测：正文 16pt、行距 27pt。原先写的
+     「flomo 约 1.85」是从不知道缩放比的裁图上量的，偏松了约 3px/行。 */
+  .leaf h3, .leaf p {
+    font-family: var(--sans); font-size: 16px; font-weight: 400;
+    line-height: 1.7; letter-spacing: normal; margin: 0;
+    color: var(--ios-ink-2);
+  }
+  /* 标题到正文之间给一个段距，和 p+p 同宽 */
+  .leaf h3 { margin-bottom: var(--s2); }
+  /* 题意卡的标题直通 LeetCode。去 LeetCode 不去 GitHub：仓库那份是自己的
+     记录，对看到分享的人没用；自己点它想去的也是题目页。
+     不改颜色不加下划线 —— 整张卡只有 chip 一处是蓝的，标题再变蓝就乱了；
+     悬停时才显出下划线，够了。 */
+  .leaf h3 .tlink { color:inherit; text-decoration:none; }
+  .leaf h3 .tlink:hover { text-decoration:underline; text-underline-offset:3px; }
+  .leaf h3 .tlink:focus-visible { outline:2px solid var(--accent); outline-offset:2px; border-radius:var(--r1); }
+  .leaf p + p { margin-top: var(--s2); }
+  .leaf p.code { font-family: var(--mono); font-size: 13px; line-height: 1.85; white-space: pre-wrap; }
+  mark { background: var(--hl); color: inherit; border-radius: 3px; padding: 0 2px; }
+  /* 四层全部展开；只有超长的正文收起来，而不是整张卡藏起来。
+     收的是「读不完」，不是「不给看」—— 所以收的单位是段落，不是卡片。 */
+  .leaf .clampable { display:-webkit-box; -webkit-box-orient:vertical; -webkit-line-clamp:2; overflow:hidden; }
+  .leaf .clampable.open { -webkit-line-clamp:unset; overflow:visible; }
+  .leaf-more { align-self:flex-start; padding:0; margin-top:var(--s1); }
+
+  .more { text-align: center; margin-top: 20px; font-size: 13px; color: var(--ios-ink-2); }
+  .more::before { content: "↓"; display: block; color: var(--ink-3); margin-bottom: 4px; }
+
+  /* --- the drawer --- */
+
+  .phone > input[type="checkbox"] { position: absolute; width: 1px; height: 1px; opacity: 0; margin: 0; }
+
+  .veil {
+    position: absolute; inset: 0; background: var(--veil);
+    opacity: 0; pointer-events: none; cursor: pointer;
+    transition: opacity .42s var(--ease);
+  }
+  .veil:hover { background: var(--veil); }
+
+  .drawer {
+    position: absolute; top: 46px; left: 0; bottom: 0;
+    width: 79%;
+    overflow-y: auto;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+    background: var(--ios-ground);
+    border-radius: 0 20px 20px 0;
+    padding-bottom: 16px;
+    box-shadow: 8px 0 28px rgba(0,0,0,.26);
+    transform: translateX(-103%);
+    will-change: transform;
+    transition: transform .42s var(--ease);
+  }
+
+  #drawer:checked ~ .read { transform: translateX(14px) scale(.955); }
+  #drawer:checked ~ .veil { opacity: 1; pointer-events: auto; }
+  #drawer:checked ~ .drawer { transform: none; }
+
+  @media (prefers-reduced-motion: reduce) {
+    .read, .veil, .drawer { transition: none; }
+  }
+
+  .drawer::-webkit-scrollbar { width: 0; height: 0; display: none; }
+
+  .dtop { display: flex; align-items: center; gap: 12px; padding: 4px 22px 20px; }
+  .dtop .me { font-size: 22px; font-weight: 700; letter-spacing: -.02em; }
+  .dtop .icons { margin-left: auto; display: flex; gap: 15px; font-size: 15px; opacity: .55; }
+
+  .counts { display: flex; justify-content: space-between; padding: 0 22px 32px; }
+  .counts > div { display: flex; flex-direction: column; }
+  .counts b {
+    /* 字距 -.03em：大数字要的是「一团」而不是「一排」，字号越大，默认
+       字距看着越松。这是重定过的规范值 —— flomo-visual-spec 的 §字阶
+       样张和 .stat .n 已经同步改成 -.03em，两份文件不能各走各的。
+       注意别靠关 tabular-nums 来换紧凑：那样 71→72 会让整行宽度跳动。 */
+    font-size: 28px; font-weight: 700; letter-spacing: -.03em; line-height: 1.05;
+    font-variant-numeric: tabular-nums; color: var(--ios-ink);
+    white-space: nowrap;
+  }
+  .counts b em {
+    font-style: normal; font-size: 13px; font-weight: 500;
+    color: var(--ios-ink-2); letter-spacing: 0;
+  }
+  /* 600 不能漏：设定稿 §字阶的 label 一档是「11 / Semibold / +.09em / 大写」。
+     小字号 + 大字距 + 全大写本来就稀，再用 400 会散成一排灰点。 */
+  .counts span { font-size: 11px; font-weight: 600; color: var(--ios-ink-2); letter-spacing: .1em; margin-top: 7px; }
+
+  /* 月份标签到下一个模块的留白：flomo 约占面板宽 15%，这里是模块分组
+     的唯一手段（不画分割线），所以宁可大 —— 不要再收回 22px */
+  .cal { padding: 0 22px 40px; }
+  .cells { display: grid; grid-auto-flow: column; grid-template-rows: repeat(7, 16px); gap: 5px; }
+  .cells i { display: block; width: 16px; height: 16px; border-radius: 5px; background: var(--ios-fill); }
+  .cells i.a { background: rgba(48,194,130,.28); }
+  .cells i.b { background: rgba(48,194,130,.58); }
+  .cells i.c { background: var(--accent); }
+  .cells i.now { background: none; border: 2px solid var(--accent); }
+  .mons { display: flex; gap: 72px; margin-top: 14px; font-size: 13px; color: var(--ios-ink-2); }
+
+
+  .dims { padding: 0 22px; }
+  .dims > input[type="radio"] { position: absolute; width: 1px; height: 1px; opacity: 0; margin: 0; }
+
+  /* 维度切换器 —— §6。导航用颜色，维度用高度：
+     这里不碰绿色，改用 L3 凹槽 + L2 浮片，所以一屏仍然只有一块绿。 */
+  .switch {
+    display: flex;
+    gap: 2px;
+    padding: 3px;
+    margin-bottom: var(--s4);
+    background: var(--ios-inset);
+    border-radius: var(--r3);
+  }
+  .switch label {
+    flex: 1;
+    display: flex; align-items: center; justify-content: center;
+    height: 34px; padding: 0 var(--s2);
+    font-size: 15px; font-weight: 500;
+    color: var(--ios-ink-3);
+    background: transparent;
+    border-radius: 9px;
+    cursor: pointer; user-select: none; white-space: nowrap;
+    transition: background-color .16s var(--ease), color .16s var(--ease);
+  }
+
+  .face { display: none; }
+  #d-list:checked  ~ .faces .f-list,
+  #d-cat:checked   ~ .faces .f-cat,
+  #d-time:checked  ~ .faces .f-time { display: block; }
+
+  /* 选中的那一档填强调色 + 白字。这是整个抽屉唯一一块实心绿 —— 守 :39 的
+     「强调色一屏一次」。白字压 #30CF79 是 2.03:1，设定稿 §9 记录在案的
+     「明知故犯」，不要改回深色。
+     四个 id 必须写在同一条里：d-company 原先在 :815 和 :1176 各有一份
+     一次性规则，漏掉它就会出现「三个绿、公司白」。 */
+  #d-list:checked    ~ .switch label[for="d-list"],
+  #d-cat:checked     ~ .switch label[for="d-cat"],
+  #d-company:checked ~ .switch label[for="d-company"],
+  #d-time:checked    ~ .switch label[for="d-time"] {
+    color: var(--accent-ink); font-weight: 600;
+    background: var(--accent); box-shadow: var(--lift);
+  }
+  #d-list:focus-visible    ~ .switch label[for="d-list"],
+  #d-cat:focus-visible     ~ .switch label[for="d-cat"],
+  #d-company:focus-visible ~ .switch label[for="d-company"],
+  #d-time:focus-visible    ~ .switch label[for="d-time"] {
+    outline: 2px solid var(--ios-ink); outline-offset: 2px;
+  }
+
+  /* 标签行。行尾两件事：计数（数据，你的产品比 flomo 多的）+ chevron（操作）。
+     叶子节点的 .cv 留空占位，这样两级的计数仍然对齐在同一条右轴上。 */
+  .hash {
+    --row-pad-x: var(--s1);          /* 行左右内距 —— 引导线靠它定位 */
+    --row-icon: var(--s4);           /* # 图标槽宽 —— 同上 */
+    display: flex; align-items: center; gap: var(--s3);
+    padding: var(--s3) var(--row-pad-x); border-radius: var(--r2);
+    font-size: 17px; color: var(--ios-ink); cursor: pointer;
+    transition: background .13s var(--ease);
+  }
+  .hash:hover, .hash:focus-visible { background: var(--accent-soft); outline: none; }
+  /* # 和标签名同色（Ink 1），对着 flomo —— 这样「#二叉树」读成一个词。
+     原来是 Ink 2，比标签名淡一档，读起来像「一个装饰前缀 + 二叉树」。
+     它占一个固定宽度的槽（--row-icon），所以不是真图标，是这行文字的一部分。 */
+  .hash .sg { color: var(--ios-ink); flex: 0 0 var(--row-icon); text-align: center; }
+  /* 设定稿 §字阶的 row 一档写的是「16 / Regular · Medium」—— 400 和 500 都在
+     规范之内，这里取 400：这一列有十来行，500 连成一片会显得发黑压人。
+     注意是「显式写 400」而不是「不写」—— 不写是继承，改了上层就会被带跑。 */
+  .hash .nm { flex: 1; min-width: 0; font-weight: 400; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .hash .ct { font-family: var(--mono); color: var(--ios-ink-2); font-variant-numeric: tabular-nums; }
+  .hash .cv {
+    flex: 0 0 var(--s4); height: var(--s4);
+    display: grid; place-items: center;
+    color: var(--ios-ink-3);
+    transition: transform .18s var(--ease);
+  }
+  .hash .cv svg { width: var(--s3); height: var(--s3); display: block; }
+  .hash.open .cv { transform: rotate(90deg); }
+
+  /* 子标签就地缩进展开，一条竖线把它们串起来 —— 对着 flomo 的展开态。
+     线的 x 由父行自己的内距和图标槽推出来，父行改了它自动跟着走。
+     子项不降级：和父项同字号同颜色，层级只由缩进和这条线表达。 */
+  .kids {
+    margin-left: calc(var(--s1) + var(--s4) / 2);
+    padding-left: var(--s4);
+    border-left: 1px solid var(--rule);
+  }
+
+  @media (max-width: 680px) {
+    .wrap { padding: 46px 18px 76px; gap: 56px; }
+  }
+
+  /* Revision: GitHub import, intersecting scope, quiet milestones. */
+  [hidden] { display: none !important; }
+  button, input, select { font: inherit; }
+  button { cursor: pointer; }
+  button:focus-visible, input:focus-visible, select:focus-visible, a:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+  .tagline { display:flex; flex-wrap:wrap; gap:6px; align-items:center; }
+  .company-tag { display:inline-flex; padding:2px 7px; border:1px solid var(--rule); border-radius:6px; color:var(--ink-2); font:11px var(--sans); }
+  .mode-control { display:flex; flex:none; padding:2px; gap:2px; background:var(--inset); border-radius:var(--r3); }
+  .mode-control button { flex:1; border:0; padding:9px 5px; border-radius:6px; color:var(--ink-2); background:transparent; font-size:13px; }
+  .mode-control button[aria-pressed="true"] { background:var(--accent); color:var(--accent-ink); box-shadow:none; font-weight:600; }
+  .row-link { color:inherit; text-decoration:none; }
+  .text-button { border:0; background:none; color:var(--tag-ink); padding:4px 0; font-size:12px; white-space:nowrap; }
+  .phead .text-button { margin-left:auto; }
+  fieldset { padding:0; border:0; margin:9px 0 0; min-width:0; }
+  legend { font-size:11px; color:var(--ink-3); margin-bottom:8px; }
+  .choices { display:flex; flex-wrap:wrap; gap:6px; }
+  .choices label { padding:6px 8px; border:1px solid var(--rule); border-radius:7px; display:flex; gap:4px; align-items:center; font-size:12px; cursor:pointer; }
+  .choices label:has(input:checked) { background:var(--accent-soft); border-color:var(--accent); }
+  input[type="checkbox"] { accent-color:var(--accent); }
+  .field-label { display:flex; justify-content:space-between; align-items:center; gap:8px; font-size:12px; color:var(--ink-2); margin-top:10px; }
+  select, input.cap { max-width:190px; padding:2px 6px; border:1px solid var(--rule); border-radius:var(--r1); background:var(--card); color:var(--ink); font-size:11px; }
+  /* 不给固定档位，直接输数字 —— 10/20/30/50 这种预设挡住了「我今天只想做 3 道」。
+     min/max 兜住范围，step 的上下箭头顺便给出小步微调。单位「道」放在框外，
+     不占输入宽度，也不用用户自己打。 */
+  .capfield { display:inline-flex; align-items:baseline; gap:4px; }
+  .capfield em { font-style:normal; font-size:11px; color:var(--ink-3); }
+  input.cap { width:52px; text-align:right; font-variant-numeric:tabular-nums; }
+  .scope-result { background:var(--accent-soft); border-radius:8px; padding:6px 10px; display:flex; flex-wrap:wrap; align-items:baseline; justify-content:center; text-align:center; gap:6px; font-size:11px; color:var(--ink-2); }
+  .scope-result strong { font-size:14px; color:var(--ink); }
+  .url-input { width:100%; min-width:0; border:1px solid var(--rule); background:var(--card); color:var(--ink); border-radius:8px; padding:10px; font:11px/1.7 var(--mono); }
+  .import-error { color:var(--overdue); font-size:12px; }
+  #import-preview .cta { margin-top:14px; width:100%; }
+  /* 切换器的尺寸归 §6 的规格所有，这里不再二次覆盖 */
+  #d-company:checked ~ .faces .f-company { display:block; }
+  .dtop .icons { border:1px solid var(--rule); border-radius:999px; padding:7px 12px; gap:12px; }
+  .hamb { border:1px solid var(--rule); border-radius:50%; width:33px; height:33px; display:inline-flex; align-items:center; justify-content:center; }
+  /* 不要 flex:1 —— 等宽列 + 左对齐会让最后一列的富余空间变成右外边距，
+     整条于是左 16 右 34，看着就是歪的。space-between + 内容宽度，两端齐。 */
+  .counts { gap:var(--s3); }
+  .quiet-button { display:block; width:100%; border:0; background:none; color:var(--ink-2); font-size:12px; padding:10px; }
+  #milestone-actions .cta { width:100%; margin-top:14px; }
+  #milestone-actions .aside { margin-top:8px; }
+  @media(max-width:480px) { .wrap { padding-left:14px; padding-right:14px; }.unit { max-width:100%; }.panel,.phone { max-width:100%; }.rail { padding-left:0; padding-right:0; } }
+
+
+  /* Three share templates: milestone, solution and daily list. */
+  .share-daily { width:460px; max-width:100%; background:var(--card); color:var(--ink); border:0; border-radius:16px; padding:28px 30px 22px; font-family:var(--sans); box-shadow:var(--shadow); }
+  .difficulty { font-size:10px; font-style:normal; font-weight:500; }.difficulty.easy { color:var(--ink-2); }.difficulty.medium { color:var(--gold); }.difficulty.hard { color:var(--overdue); }
+  .daily-heading { display:flex; align-items:flex-end; gap:14px; margin-top:28px; }.daily-heading > div:first-child { flex:1; }.daily-heading h3 { font-size:21px; font-weight:500; letter-spacing:-.5px; margin:6px 0 0; line-height:1.5; }
+  .daily-total { display:flex; align-items:baseline; gap:5px; }.daily-total b { font-size:48px; line-height:1; font-weight:500; letter-spacing:-2px; }.daily-total > span { font-size:11px; color:var(--ink-3); }
+  .daily-summary { display:flex; gap:20px; padding:18px 0 22px; font-size:10px; color:var(--ink-3); }.daily-summary > span { display:flex; align-items:center; gap:5px; }.daily-summary b { font-weight:500; color:var(--ink-2); }.difficulty-dot { height:5px; width:5px; border-radius:50%; }.difficulty-dot.easy { background:var(--ink-3); }.difficulty-dot.medium { background:var(--gold); }.difficulty-dot.hard { background:var(--overdue); }
+  .daily-table-head { display:flex; justify-content:space-between; border-top:1px solid var(--rule); border-bottom:1px solid var(--rule); padding:9px 0 9px 23px; font-size:10px; color:var(--ink-3); }
+  .daily-questions { list-style:none; padding:0; margin:0; }.daily-questions li { display:flex; align-items:center; gap:9px; padding:13px 0; border-bottom:1px solid var(--rule); }.daily-questions li:last-child { border-bottom:0; }
+  .daily-check { color:var(--accent); font-size:12px; flex:0 0 14px; }.daily-question { flex:1; min-width:0; }.daily-question > b { display:block; font-size:11px; font-weight:600; line-height:1.6; overflow-wrap:anywhere; }.daily-question > span { display:flex; gap:9px; align-items:center; margin-top:3px; }.daily-result { font-size:9px; color:var(--ink-3); }.daily-questions time { flex:0 0 48px; font-size:9px; text-align:right; color:var(--ink-3); white-space:nowrap; }
+  @media(max-width:480px) { .share-daily { width:100%; padding:24px 20px; }.daily-heading h3 { font-size:18px; }.daily-summary { gap:14px; } }
+
+
+  /* ------------------------------------------------------------
+     样稿画布，归一到 390px 手机宽度。
+
+     这里原本压着第三套硬编码调色板，把所有样稿强制变暗，并且和
+     上面的 token 层、下面的 data-appearance 层互相打架。现在只保
+     留几何（那部分是从 flomo 截图量出来的，有价值），颜色一律走
+     token —— 样稿因此跟随主题，而不是自己另有一套。
+     间距吸附到 4 的倍数，字号吸附到字阶 34/21/16/13/12/11。
+     ------------------------------------------------------------ */
+  .panel, .phone, .share-daily {
+    color:var(--ink); font-family:var(--sans); -webkit-font-smoothing:antialiased;
+  }
+  .panel { border-radius:var(--r4); background:var(--ground); box-shadow:var(--shadow); border:0; }
+  /* 上下 s3(12) → s2(8)，标记块 17 → 14：这条只是机壳，高度从 41px 收到 30px */
+  /* 栏高钉死 36px。两件事缺一不可：
+     ① min-height 要算上内距 —— box-sizing 是 border-box，写 20px 的话 16px 内距
+        就把它吃满了，等于没写（实测四条栏仍是 32/35/36.9/32）。
+     ② 右端按钮要固定高 —— 否则 36 是下限不是定值，打卡按钮 19px、··· 21px，
+        后者会把栏顶到 37px。 */
+  .pbar { min-height:36px; padding:var(--s2) var(--s4); background:var(--chrome); border-bottom:0; }
+  .pbar .pcheck, .pbar .recap-menu, .pbar .recap-menu-wrap { height:20px; }
+  .pbar .mark { width:14px; height:14px; }
+  .pbar .mark { background:var(--accent); }
+  /* 块间距 s4(16) → s2(8)：.ruleline 的横线已经把组分开了，再叠 16px
+     等于分隔做两遍。这一屏有 8 个间隙，省 64px。 */
+  .pbody { --pbody-pad:var(--s4); padding:var(--pbody-pad); gap:var(--s2); }
+  .phead h3 { font-size:16px; font-weight:600; }
+  /* 13px/1.75 比正文行（13px/1.4）还松，而它只是注脚 */
+  .aside { font-size:12px; line-height:1.5; }
+  .foot { line-height:1.7; }
+  .cta { background:var(--accent); color:var(--accent-ink); border-radius:var(--r3); padding:var(--s3) var(--s4); box-shadow:none; }
+  /* 原先容器 12px + span 10px 上下各两层内距，合计 22px，白占一截。
+     容器纵向清零，只保留 span 自己的 8px —— 点击区仍有 33px，够手指。
+     标签栏不画分隔线。它的底色是 --chrome（= --inset），和斑马纹的深色行
+     同值，所以复习条数是偶数的日子，末行会和标签栏连成一片 —— 这是接受
+     的结果，不是疏漏。想彻底消除的话不是加线，而是把标签栏换成 --ground
+     （#F0F5F2，比白行和深色行都深一档），那样它和两种行色都不会撞。 */
+  .alert { background:var(--inset); color:var(--ink); border:0; }
+  .company-tag { color:var(--ink-2); border-color:var(--rule); }
+  .phone { background:var(--ios-ground); border:0; box-shadow:var(--shadow); }
+  .phone.tall { height:780px; }
+  .bar0 { padding:var(--s1) var(--s5) var(--s4); }
+  .readtop { padding:0 var(--s4) var(--s4); gap:var(--s3); }
+  /* 不再降到 13px —— 顶栏标题跟正文同档，见上面 .readtop .now 的注释 */
+  .hamb { width:44px; height:44px; font-size:20px; background:var(--ios-card); border:0; box-shadow:var(--lift); }
+  .chain { padding:0 var(--s3); }
+  .leaf { padding:var(--s4); border-radius:12px; background:var(--ios-card); box-shadow:var(--shadow); }
+  /* 27px = 16 × 1.7，iPhone 12 mini 满屏实测值。曾经是 28→30，依据是
+     「flomo 在 1.85–1.9 之间」—— 那个数来自裁图，站不住。
+     h3 和 p 一起写，和上面同一个道理：不给它们分叉的机会 */
+  .leaf h3, .leaf p { font-size:16px; line-height:27px; }
+  .leaf h3 { margin-bottom:var(--s2); }
+  /* 段间距＝行距 + 8，约 1/4 行 —— flomo 的比例。原来的 16 太像分块 */
+  .leaf p+p { margin-top:var(--s2); }
+  .leaf p.code { font-size:12px; line-height:24px; }
+  .link+.link { margin-top:var(--s4); }
+  .link+.link::before { height:var(--s3); top:calc(-1 * var(--s3)); }
+  .chip { background:var(--tag-bg); color:var(--tag-ink); border-radius:var(--r2); padding:var(--s1) var(--s2); }
+  .drawer { background:var(--ios-ground); box-shadow:var(--shadow); border-right:0; padding-top:var(--s1); }
+  .dtop { padding:var(--s1) var(--s5) var(--s6); gap:var(--s3); }
+  .dtop .me { font-size:21px; }
+  .dtop .icons { margin-left:auto; padding:var(--s2) var(--s3); opacity:1; }
+  .counts { padding:0 var(--s5) var(--s7); gap:var(--s2); }
+  /* 三列并排且带分母时 34 会横向溢出 390 画布 —— 见文末「字阶补丁」 */
+  .counts b { font-size:28px; color:var(--ios-ink-2); }
+  .counts b em { font-size:13px; color:var(--ios-ink-3); }
+  .counts span { font-size:11px; letter-spacing:.09em; margin-top:var(--s1); color:var(--ios-ink-3); }
+  .cal { padding:0 var(--s5) var(--s8); }
+  .cells { grid-template-rows:repeat(7,15px); gap:5px; }
+  .cells i { width:15px; height:15px; border-radius:var(--r1); background:var(--heat-0); }
+  .cells i.a { background:var(--heat-1); }
+  .cells i.b { background:var(--heat-2); }
+  .cells i.c { background:var(--heat-3); }
+  .cells i.now { border:0; background:transparent; box-shadow:inset 0 0 0 1.5px var(--accent); }
+  .mons { font-size:12px; gap:64px; margin-top:var(--s4); color:var(--ios-ink-3); }
+  .dims { padding:0 var(--s5); }
+  .hash { font-size:16px; padding:var(--s3) var(--row-pad-x); }
+  .share-daily { width:390px; max-width:100%; padding:var(--s5) var(--s4) var(--s4); border-radius:var(--r4); background:var(--ground); color:var(--ink); border:0; box-shadow:var(--shadow); }
+  .share-daily { background:var(--card); }.daily-heading { margin-top:var(--s6); }.daily-heading h3 { font-size:21px; color:var(--ink); }.daily-total b { font-size:34px; color:var(--ink-2); }.daily-total>span { color:var(--ink-3); }.daily-summary { padding:var(--s5) 0; color:var(--ink-3); }.daily-summary b { color:var(--ink-2); }
+  .daily-table-head { border-color:var(--rule); color:var(--ink-3); font-size:11px; }.daily-questions li { padding:var(--s4) 0; border-color:var(--rule); gap:var(--s2); }.daily-question>b { font-size:13px; line-height:1.6; font-weight:500; color:var(--ink); }.daily-question>span { margin-top:var(--s1); }.daily-questions time { color:var(--ink-3); flex-basis:44px; }.daily-result { color:var(--ink-3); }.daily-check { color:var(--accent); }.difficulty.easy { color:var(--ink-2); }.difficulty.medium { color:var(--gold); }.difficulty.hard { color:var(--overdue); }
+  @media(max-width:480px) { .share-daily { width:100%; padding:20px 17px 17px; } }
+
+
+  /* Daily card: submission-history layout with flomo spacing and surfaces. */
+  .share-daily { width:700px; padding:0; border-radius:16px; background:var(--card); overflow:hidden; }
+  .daily-card-head { display:flex; justify-content:space-between; align-items:center; padding:20px 17px; gap:16px; }
+  .daily-card-head>div { display:flex; align-items:baseline; gap:12px; }.daily-card-head b { font-size:18px; font-weight:600; color:var(--ink); }.daily-card-head div span { font-size:12px; color:var(--ink-3); }
+  .daily-table-scroll { overflow-x:auto; }.daily-submissions { width:100%; min-width:620px; border-collapse:collapse; table-layout:fixed; font-family:var(--sans); }
+  .daily-col-time { width:125px; }.daily-col-result { width:104px; }.daily-col-attempts { width:92px; }
+  .daily-submissions th { padding:10px 16px; color:var(--ink-3); font:11px/1.5 var(--sans); font-weight:400; text-transform:none; letter-spacing:0; border-top:1px solid var(--rule); border-bottom:1px solid var(--rule); white-space:nowrap; }
+  .daily-submissions td { border:0; vertical-align:middle; padding:13px 16px; font-size:12px; line-height:1.5; }
+  .daily-submissions tbody tr:nth-child(odd) { background:var(--card); }.daily-submissions tbody tr:nth-child(even) { background:var(--inset); }
+  .daily-submissions .daily-time { color:var(--ink-3); font-size:11px; white-space:nowrap; }
+  .daily-submissions .daily-problem-cell { position:relative; padding-left:34px; }
+  .daily-submissions .daily-check { position:absolute; left:14px; top:50%; transform:translateY(-50%); color:var(--accent); font-size:12px; }
+  .daily-submissions .daily-question { min-width:0; }.daily-submissions .daily-question>b { font-size:12px; line-height:1.55; font-weight:600; color:var(--ink); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .daily-submissions .difficulty { display:block; margin-top:2px; font-size:11px; font-weight:400; line-height:1.4; }
+  .daily-submissions .daily-accepted { color:var(--ink-3); font-size:11px; }.daily-submissions .daily-attempts { color:var(--ink-3); white-space:nowrap; font-size:11px; }
+  .daily-attempts svg { width:11px; height:11px; margin-left:12px; vertical-align:middle; fill:none; stroke:var(--ink-2); stroke-width:1.2; }
+  .daily-card-foot { display:flex; justify-content:space-between; gap:12px; padding:17px; color:var(--ink-3); font-size:11px; border-top:1px solid var(--rule); }
+  @media(max-width:480px) { .share-daily { width:100%; padding:0; }.daily-card-head { padding:17px; flex-wrap:wrap; }.daily-card-head>div { flex-wrap:wrap; gap:5px 10px; }.daily-card-foot { flex-wrap:wrap; } }
+
+
+  /* 9 → 5px：控件高 40 → 32px，和 .row 同一档 */
+  .mode-control button { padding:3px 4px; font-size:10px; border-radius:var(--r2); white-space:nowrap; }
+  #scope-overview { display:flex; flex-direction:column; gap:17px; }
+  #scope-overview .phead { margin:0; }
+  /* .scope-group / .scope-group-head 删了：维度从「标题行 + 标签行」两行
+     压成一行 .row，那两个类没人用了。
+     .selected-tags 跟着去掉 min-height:30px —— 那是给独占一行留的高度，
+     现在它挤在行里，留着会把每行撑高一截。 */
+  /* 单行：不换行、靠右、挤不下就裁掉。因为是 flex-end 对齐，溢出发生在左端，最新选中的那个始终可见。 */
+  /* 横向滚动：挤不下就滑，不再裁掉。滚动条两套引擎都藏（和复习队列同一做法）；
+     flex-end 让它默认停在最右，
+     也就是最新选的那个。 */
+  /* 不能用 justify-content:flex-end —— 配 overflow-x:auto 时内容会往起始侧溢出，
+     而 LTR 下 scrollLeft 不能为负，那段就永远滚不到。容器本身是 flex:0 1 auto，
+     内容少时会收缩到内容宽，所以不靠 flex-end 也贴着右边。 */
+  .selected-tags { display:flex; flex:0 1 auto; min-width:0; flex-wrap:nowrap;
+    align-items:center; gap:6px;
+    overflow-x:auto; overflow-y:hidden; scrollbar-width:none;
+    overscroll-behavior-x:contain; }
+  .selected-tags::-webkit-scrollbar { display:none; }
+  .selected-tags > * { flex:none; white-space:nowrap; }
+  .row > .picker-open { flex:none; }
+  /* 小药丸统一规格：2px 6px / 10px / r1。原来 6px 9px / 12px，是 .interval-preview
+     那档的三倍内距，公司·标签·题单三行因此比别的行整整高一截。 */
+  .selected-tag { display:inline-flex; align-items:center; gap:4px; max-width:100%; padding:2px 6px; background:var(--accent-soft); border:0; color:var(--ink); border-radius:var(--r1); font-size:10px; }
+  .selected-tag span { overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+  .selected-tag button { border:0; background:none; color:var(--ink-2); padding:0 1px; font-size:12px; line-height:1; }
+  .scope-unlimited { color:var(--ink-3); font-size:10px; }
+  #scope-picker { display:flex; flex-direction:column; gap:0; min-height:440px; }
+  .picker-head { display:flex; align-items:center; gap:15px; padding-bottom:18px; }
+  .picker-head h3 { font:600 16px var(--sans); color:var(--ink); margin:0; }
+  .picker-search { display:flex; align-items:center; gap:8px; border:0; border-radius:var(--r3); background:var(--inset); padding:9px 12px; color:var(--ink-3); }
+  .picker-search input { width:100%; border:0; outline:none; background:none; color:var(--ink); font-size:13px; min-width:0; }
+  .picker-search input::placeholder { color:var(--ink-3); }
+  .picker-hint { font-size:11px; color:var(--ink-3); margin:14px 0 8px; }
+  .picker-options { height:300px; overflow-y:auto; overscroll-behavior:contain; scrollbar-width:thin; scrollbar-color:var(--ink-4) transparent; }
+  .picker-option { display:flex; gap:10px; align-items:center; min-height:45px; padding:10px 7px; border-bottom:1px solid var(--rule); font-size:13px; cursor:pointer; color:var(--ink); }
+  .picker-option input { width:15px; height:15px; margin:0; accent-color:var(--accent); flex:none; }
+  .picker-option span { flex:1; }
+  .picker-option small { font-size:10px; color:var(--ink-3); }
+  .picker-footer { display:flex; align-items:center; justify-content:space-between; gap:16px; border-top:1px solid var(--rule); padding:14px 0 0; margin-top:auto; }
+  .picker-footer .cta { padding:10px 20px; font-size:13px; }
+  #picker-no-results { padding:18px 0; font-size:12px; }
+
+
+  .document-toolbar { display:flex; align-items:center; justify-content:space-between; gap:16px; flex-wrap:wrap; }
+  .theme-options { display:flex; gap:2px; padding:3px; border:0; background:var(--inset); border-radius:var(--r3); font:12px var(--sans); }
+  .theme-options button { border:0; border-radius:var(--r2); background:transparent; color:var(--ink-3); padding:6px 10px; }.theme-options button[aria-pressed="true"] { background:var(--card); box-shadow:var(--lift); color:var(--ink); font-weight:600; }
+  .auth-phone { height:auto; min-height:650px; padding-bottom:0; }.auth-content { padding:22px 30px 28px; }/* wordmark 代替文字品牌名。写死高度不写宽度 —— 图是 3:1，让宽度自己算，换一版比例不同的 logo 也不会被拉变形。 *//* 登录页中文走衬线（--serif 的中文落到 Songti SC），和文档标题同一套字 *//* 两端共用字族和文案，不共用字号。
+     一致的是品牌：同一句「Hi, Fellow.」、同一套衬线（中文落到 Songti SC）、同一个绿。
+     不一致的是度量，而且必须不一致 —— iOS 的 17pt 正文是给 390pt 宽、手持距离定的；
+     侧边栏 360px 在桌面上是另一个观看距离，17px 的条目标题跟这块面板自己的字阶
+     （16/13/12/11/10）也对不上，会显得像放大了的手机界面。
+     两套字阶：手机 26/17/14/11，面板 20/13/13/11。对应关系在下面成对写，别拆开。
+     （唯一真正要共用的是 font-family —— 之前手机端正文漏写，继承成无衬线，
+     那才是真的"两种字体"，和字号无关。） */.auth-hi, .auth-content h3 { font-family:var(--serif); line-height:1.3; letter-spacing:-.5px; }.auth-content h3 { font-size:26px; }.auth-hi { font-size:20px; }.auth-content h3 { margin:30px 0 22px; color:var(--ios-ink); }.auth-content h3 em { color:var(--accent); font-style:normal; }.auth-hi-line, .auth-content>p { font-family:var(--serif); line-height:1.9; }.auth-content>p { font-size:14px; }.auth-hi-line { font-size:13px; }.auth-content>p { color:var(--ios-ink-2); margin-bottom:35px; }
+  .auth-options { display:flex; flex-direction:column; gap:17px; }.auth-entry { display:flex; align-items:center; gap:13px; width:100%; padding:17px; border:1px solid var(--rule); border-radius:16px; background:var(--ios-card); color:var(--ios-ink); text-align:left; }.auth-entry>span:nth-child(2) { flex:1; display:flex; flex-direction:column; gap:5px; }.auth-entry b { font-size:17px; line-height:1.4; font-weight:500; }.auth-entry small { font-size:11px; line-height:1.4; color:var(--ios-ink-2); }.account-symbol { font:600 13px var(--mono); color:var(--accent); }.auth-github { border-color:var(--accent); }.auth-pbody .auth-options { gap:var(--s2); }.auth-pbody .auth-entry { padding:var(--s3); gap:var(--s3); border-radius:var(--r3); }.auth-pbody .auth-entry b { font-size:13px; font-weight:600; }.auth-pbody .auth-entry small { font-size:11px; }.auth-pbody .account-symbol { font-size:11px; }/* Chrome 的连接页。登录前标题栏只有 logo —— 还没连上账号，今天/本题/设置 都没有内容可去。 */.auth-pbody { gap:var(--s4); padding:var(--s6) var(--s5) var(--s5); }.auth-hi { margin:0; color:var(--ink); }.auth-hi em { color:var(--accent); font-style:normal; }.auth-hi-line { margin:0; color:var(--ink-2); }
+  #auth-device { padding:14px; border-radius:12px; border:1px solid var(--rule); background:var(--ios-card); }#auth-device strong { display:block; font:22px var(--mono); letter-spacing:2px; margin:12px 0; }#auth-device a { color:var(--accent); font-size:12px; }#auth-device small { display:block; color:var(--ios-ink-2); font-size:10px; margin-top:10px; }.auth-device-label { font-size:10px; color:var(--ios-ink-2); }
+  /* 队列面板的正文区直接去掉纵向内距，而不是给每个列表挂负边距 —— 两个列表
+     同时显示时（复习 + 新题），两份负边距会互相重叠 24px。零内距则两组都
+     自然贴到面板上下边，中间留 .pbody 的 gap 当分隔。 */
+  /* 队列面板：正文区既不要纵向内距，也不要块间距 —— 复习和新题要连成
+     一条不断的列表，区分交给新题行左边的绿色条，不靠留白。 */
+  .pbody:has(> .today-reviews) { padding-top:0; padding-bottom:0; gap:0; }
+  .today-reviews { display:flex; flex-direction:column; gap:9px; min-height:0; }.qlist .q { flex:none; text-decoration:none; }.schedule-badge { font-size:11px; color:var(--ink-3); }
+  .schedule-settings { display:flex; flex-direction:column; gap:var(--s2); }.schedule-control { display:flex; flex:none; gap:2px; padding:2px; border-radius:var(--r3); background:var(--inset); }/* 去掉那条 1px 透明边框：按下态也把它设成 transparent，它从不显形，
+     只是白白让这个控件比 .mode-control 高 2px。两者现在完全同规格。 */
+  .schedule-control button { flex:1; padding:3px 4px; border:0; border-radius:var(--r2); background:none; color:var(--ink-2); font-size:10px; white-space:nowrap; }.schedule-control button[aria-pressed="true"] { background:var(--accent); box-shadow:none; color:var(--accent-ink); font-weight:600; }.interval-preview { display:flex; flex-wrap:nowrap; gap:6px; margin:0; min-width:0; overflow-x:auto; overflow-y:hidden; scrollbar-width:none; overscroll-behavior-x:contain; }.interval-preview::-webkit-scrollbar { display:none; }.interval-preview > button { flex:none; }/* 阶梯是可拧的旋钮，不是展示：从 span 换成 button，点一下换一档。
+     「默认多少天复习」不是一个数字，是这条阶梯 —— 所以旋钮开在每一档上。 */
+  .interval-preview button { border:1px solid var(--rule); border-radius:var(--rp); padding:2px 8px; font-size:10px; color:var(--ink-2); background:var(--card); cursor:pointer; font-variant-numeric:tabular-nums; }
+  .interval-preview button:hover:not(:disabled) { border-color:var(--accent); color:var(--ink); }
+  /* 违反约束的档位禁用并压暗 —— 让人看出来不能点，而不是点了没反应 */
+  .interval-preview button:disabled { opacity:.3; cursor:not-allowed; }
+  /* 必须有预选项。渲染成一排没有选中项的按钮，这东西就从「告诉你结果」
+     变成「问你一个问题」—— 那就是我们不做的 Anki 打分条了。
+     实心绿 + 白字：描边版在一排描边药丸里对比太弱，得盯着看才知道选了哪个。
+     白字压 #30CF79 是 2.03:1，设定稿 §9 记录在案的「明知故犯」，别改回深色。 */
+  .interval-preview button[aria-pressed="true"] { background:var(--accent); border-color:var(--accent); color:var(--accent-ink); font-weight:600; }
+  .auto-completion { display:flex; align-items:center; gap:12px; padding:17px; background:var(--accent-soft); border-radius:12px; }.auto-completion>span { color:var(--accent); font-size:23px; }.auto-completion div { display:flex; flex-direction:column; gap:6px; }.auto-completion b { font-size:15px; }.auto-completion small { color:var(--ink-2); font-size:11px; }.completion-plan { display:flex; justify-content:space-between; font-size:12px; color:var(--ink-2); }.completion-plan b { color:var(--ink); font-weight:500; }
+  /* ------------------------------------------------------------
+     样稿的明暗开关。
+
+     原本这里有 27 条规则，逐个元素重新指定一遍浅色 hex —— 因为
+     上面那层把样稿硬写死成深色了。现在只需要在样稿容器上重新指
+     派一次 token，内部所有规则自动跟随，一条都不用再写。
+
+     注意作用域：data-appearance 只重新指派样稿容器，不动 :root。
+     文档本身的明暗仍然归 prefers-color-scheme / data-theme 管，
+     两个开关互不干扰。
+     ------------------------------------------------------------ */
+  [data-appearance="light"] .panel, [data-appearance="light"] .phone,
+  [data-appearance="light"] .share-daily {
+    --ground: var(--light-ground); --card: var(--light-card);
+    --panel: var(--light-inset);  --inset: var(--light-inset);
+    --ink: var(--light-ink-1);  --ink-2: var(--light-ink-2);
+    --ink-3: var(--light-ink-3); --ink-4: var(--light-ink-4);
+    --rule: var(--light-hair);  --chrome: var(--light-inset);
+    --tag-bg: var(--light-tag-bg); --tag-ink: var(--light-tag-ink);
+    --shadow: var(--light-shadow); --lift: var(--light-lift);
+    --hl: var(--light-hl); --veil: var(--light-veil);
+    --heat-0: var(--light-heat-0);
+    --accent-soft: rgba(48, 207, 121, .14);
+    --ios-ground: var(--light-ground); --ios-card: var(--light-card);
+    --ios-inset: var(--light-inset);
+    --ios-ink: var(--light-ink-1); --ios-ink-2: var(--light-ink-2);
+    --ios-ink-3: var(--light-ink-3); --ios-fill: var(--light-heat-0);
+    color: var(--ink);
+  }
+
+  [data-appearance="dark"] .panel, [data-appearance="dark"] .phone,
+  [data-appearance="dark"] .share-daily {
+    --ground: var(--dark-ground); --card: var(--dark-card);
+    --panel: var(--dark-inset);  --inset: var(--dark-inset);
+    --ink: var(--dark-ink-1);  --ink-2: var(--dark-ink-2);
+    --ink-3: var(--dark-ink-3); --ink-4: var(--dark-ink-4);
+    --rule: var(--dark-hair);  --chrome: var(--dark-inset);
+    --tag-bg: var(--dark-tag-bg); --tag-ink: var(--dark-tag-ink);
+    --shadow: var(--dark-shadow); --lift: var(--dark-lift);
+    --hl: var(--dark-hl); --veil: var(--dark-veil);
+    --heat-0: var(--dark-heat-0);
+    --accent-soft: rgba(48, 207, 121, .18);
+    --ios-ground: var(--dark-ground); --ios-card: var(--dark-card);
+    --ios-inset: var(--dark-inset);
+    --ios-ink: var(--dark-ink-1); --ios-ink-2: var(--dark-ink-2);
+    --ios-ink-3: var(--dark-ink-3); --ios-fill: var(--dark-heat-0);
+    color: var(--ink);
+  }
+
+
+
+  /* 分享/编辑/复制收进 ···：它们是偶尔才用的操作，不该占着头部最显眼的位置。
+     每次复习完真正要看一眼的是「下次多久」，所以阶梯上位、它们下沉一层。 */
+  /* 阶梯顶到右边、紧挨 ···：左边只留「题解」这个身份标签，右边是一组控件 */
+  .recap-head .interval-preview { flex:none; margin-left:auto; }
+  .recap-menu-wrap { position:relative; }
+  .recap-menu { border:0; background:none; color:var(--ink-3); font-size:15px; line-height:1; padding:2px 4px; cursor:pointer; letter-spacing:1px; }
+  .recap-menu:hover, .recap-menu[aria-expanded="true"] { color:var(--ink); }
+  /* width:max-content 不能省。这是绝对定位盒，它的可用宽度来自定位父元素
+     .recap-menu-wrap —— 而那个父元素只有 ··· 按钮那么宽（约 20px）。不写
+     max-content 的话 min-width 只保住一个下限，再长的文案就硬折成两行。 */
+  .recap-actions { position:absolute; right:0; top:calc(100% + 4px); z-index:5; display:flex; flex-direction:column;
+    width:max-content; min-width:92px; padding:4px; background:var(--card); border:1px solid var(--rule);
+    border-radius:var(--r2); box-shadow:var(--shadow); }
+  .recap-actions button { display:flex; align-items:center; gap:7px; border:0; background:none; text-align:left;
+    padding:5px 7px; border-radius:var(--r1); font-size:12px; color:var(--ink); cursor:pointer;
+    white-space:nowrap; }
+  .recap-actions button:hover { background:var(--accent-soft); }
+  /* 分享卡 = 阅读链本身 + 一条页脚。不再维护第二套 .share-problem 排版 ——
+     那套和阅读卡写的是同一段内容，已经分叉成了两种说法（题意、题解各一版）。
+     同一份内容有两个渲染路径，迟早会不一致。 */
+  .share-chain { width:390px; max-width:100%; background:var(--ground);
+    border-radius:var(--r4); padding:var(--s4) 0 0; box-shadow:var(--shadow); }
+  .share-pick { display:flex; flex-wrap:wrap; gap:var(--s3); padding:0 var(--s4) var(--s3); }
+  .share-pick label { display:inline-flex; align-items:center; gap:5px;
+    font-size:11px; color:var(--ios-ink-2); cursor:pointer; }
+  /* 自己画复选框，不用 accent-color —— 后者只能指定底色，勾的颜色由浏览器按
+     底色明度自动选，#30CF79 偏亮时它会给深色勾。要白勾只能自己画。 */
+  .share-pick input { appearance:none; -webkit-appearance:none; flex:none;
+    width:13px; height:13px; margin:0; border-radius:var(--r1);
+    border:1px solid var(--rule); background:var(--card); cursor:pointer; }
+  .share-pick input:checked { border-color:var(--accent);
+    background:var(--accent) url("data:image/svg+xml,<svg xmlns='http%3A//www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2523fff' stroke-width='3.6' stroke-linecap='round' stroke-linejoin='round'><path d='m5 13 4 4L19 7'/></svg>") center/9px no-repeat; }
+  .share-pick input:focus-visible { outline:2px solid var(--accent); outline-offset:2px; }
+  /* 题意锁成常勾：它是其余三块的上下文，单独分享「题解」别人看不懂在说什么。
+     用 disabled 而不是干脆不显示 —— 让人看见「这一块在里面，只是不能取消」，
+     比它凭空消失少一次疑惑。 */
+  .share-pick label.locked { cursor:default; color:var(--ios-ink-3); }
+  .share-pick input:disabled { opacity:.55; }
+  /* 没内容的那一块：比锁定态更淡，而且是「勾不上」不是「锁住了」—— 两种
+     不可点要能分辨，否则用户会以为题意和空伪代码是一回事。 */
+  .share-pick label.empty { opacity:.4; cursor:not-allowed; text-decoration:line-through;
+    text-decoration-color:var(--ios-ink-3); }
+  .share-chain .link[hidden] { display:none; }
+  /* 页脚是分享卡唯一的品牌位：卡片会被截图丢进群里，脱离 app 之后
+     只剩这一行能说明它从哪来 —— 所以这里必须是 logo，不是"Kerno"四个字母。
+     左署名右 wordmark，和截图里的社交卡一个路子。 */
+  .share-foot { display:flex; align-items:center; justify-content:space-between;
+    gap:var(--s4); padding:var(--s4); font-size:11px; color:var(--ios-ink-3); }
+  .share-foot-text { display:flex; flex-direction:column; gap:3px; min-width:0; }
+  .share-foot-text > span { overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+  /* 和状态栏的 .bar-mark 同一张图、同样按 3:1 固定宽高，只是不压透明度 ——
+     状态栏要让位给系统信息，分享卡上品牌就是要被看见。 */
+  .share-mark { flex:none; width:48px; height:18px;
+    background:var(--wordmark) center/contain no-repeat; }
+  .share-foot b { color:var(--ios-ink-2); font-weight:500; }
+  .recap-actions svg { width:14px; height:14px; fill:none; stroke:currentColor; stroke-width:1.6; stroke-linecap:round; stroke-linejoin:round; flex:none; }
+
+
+
+  /* Flomo-style navigation: an anchored sidebar and a pushed reading page. */
+  .drawer-demo > .bar0 { position:relative; z-index:4; }
+  .drawer-demo .read { position:relative; z-index:1; height:calc(100% - 34px); background:var(--ios-ground); overflow:hidden; border-radius:30px 0 0 30px; }
+  .drawer-demo #drawer:checked ~ .read { transform:translateX(79%); box-shadow:-1px 0 0 var(--ios-fill); }
+  .drawer-demo .veil { top:46px; left:79%; z-index:2; background:rgba(0,0,0,.12); }
+  .drawer-demo .drawer { top:58px; z-index:3; width:79%; background:var(--ios-ground); border:0; border-radius:0; box-shadow:none; padding:0 0 28px; }
+  .drawer-demo .dtop { padding:8px 24px 28px; gap:10px; }
+  .drawer-demo .dtop .icons { display:flex; align-items:center; gap:21px; border-radius:30px; padding:12px 17px; opacity:1; color:var(--ios-ink); }
+  .drawer-demo .icons svg { display:block; width:20px; height:20px; fill:none; stroke:currentColor; stroke-width:1.6; stroke-linecap:round; stroke-linejoin:round; }
+  /* s4(16) → s6(24)：抽屉里每个模块的左边缘都是 24px（.dtop 24、.cal 24、
+     .dims 20+.hash 内缩 4 = 24），只有这里是 16，Echo 和下面的大数字对不齐 */
+  .drawer-demo .counts { padding:0 var(--s6) var(--s7); gap:var(--s3); }
+  /* 28px：iPhone 12 mini 满屏实测（两张裁图各自标定、互相印证）。
+     曾经是 32，依据是设定稿里一行说明文字；34 的来源同样不可靠。 */
+  .drawer-demo .counts b { font-size:28px; }
+  .drawer-demo .counts b em { font-size:14px; }
+  .drawer-demo .counts span { font-size:11px; margin-top:var(--s2); }
+  .drawer-demo .cal { padding:0 24px 40px; }
+  .drawer-demo .cells { grid-template-columns:repeat(12,minmax(0,1fr)); grid-template-rows:repeat(7,16px); gap:5px; }
+  .drawer-demo .cells i { width:100%; height:16px; border-radius:4px; }
+  .drawer-demo .mons { justify-content:space-around; gap:0; margin-top:16px; font-size:12px; }
+  .drawer-demo .dims { padding:0 14px; }
+  .drawer-demo .hash .ct { font-size:12px; }
+
+
+  /* Reference spacing scaled from the supplied 375-point flomo screen. */
+  .drawer-demo { background:var(--ios-ground); }
+  /* .drawer-demo 的底色现在直接跟 --ios-ground，不再需要单独的变量 */
+  .drawer-demo > .bar0 { height:34px; box-sizing:border-box; padding:3px 24px 12px; background:var(--ios-ground); }/* 状态栏中间放 wordmark，对着 flomo 手机版 —— 那里本来就是刘海/灵动岛的位置，系统不画东西，正好让品牌露一次脸。阅读页不放 —— 那里是读自己的东西，不用被提醒用的是谁家的本子；分享卡要放，那是给别人看的。 */.bar0 { display:flex; align-items:center; justify-content:space-between; }/* data URI 写在 CSS 里只出现一次；写成 4 个 <img> 的话同一张图会被内联 4 遍，白白多出 40KB。宽高按原图 3:1 固定，换 logo 不会变形。 */.bar-mark { width:33px; height:13px; opacity:.75; background:var(--wordmark) center/contain no-repeat; }
+  .drawer-demo .drawer { top:60px; background:var(--ios-ground); }
+  /* 下边距 28 → s4(16)：flomo 这一段留白约是原来的 0.6 倍。量得不精
+     （两边缩放比不同），但方向明确是偏松。 */
+  .drawer-demo .dtop { min-height:46px; padding:0 24px var(--s4); }
+  /* 18px：flomo 实测 Echo ÷ 大数字 ≈ 0.64，28 × 0.64 ≈ 18。原来 23 几乎和
+     数字等重，在抢戏 —— 署名该是安静的。 */
+  .drawer-demo .dtop .me { font-size:18px; font-weight:600; letter-spacing:-.5px; }
+  /* 和 .hamb 同一套：实心卡色 + lift 投影、无描边。flomo 的铃铛/设置是一枚
+     浮起来的白药丸，描边透明那版在浅底上几乎看不见边界。 */
+  .drawer-demo .dtop .icons { padding:12px 15px; gap:22px; border:0; background:var(--ios-card); box-shadow:var(--lift); opacity:1; }
+  /* 红点角标：挂 .badge 才出现，不是所有状态都有未读。用 --overdue —— 调色板里
+     唯一的警示色，不另造一个红（§顶部「零硬编码」）。 */
+  .drawer-demo .dtop .icons > span { position:relative; }
+  .drawer-demo .dtop .icons > span.badge::after {
+    content:""; position:absolute; top:-1px; right:-2px;
+    width:6px; height:6px; border-radius:50%; background:var(--overdue);
+  }
+  .drawer-demo .counts b { line-height:1.1; font-weight:600; }
+  .drawer-demo .counts span { letter-spacing:.09em; }
+  .drawer-demo .cal { padding:0 24px 44px; }
+  .drawer-demo .cells { gap:6px; grid-template-rows:repeat(7,16px); }
+  .drawer-demo .mons { font-size:12px; margin-top:14px; }
+  .drawer-demo .dims { padding:0 20px; }
+  /* 切换器的几何归 §6 所有。这里原本是下划线 tab 的残留（flex:none +
+     18px 间距），会让浮片缩成文字宽度、右侧空出一截。 */
+  .drawer-demo .switch { margin:0 0 var(--s4); }
+  .drawer-demo .face { display:none; margin:0; padding:0; border:0; }
+  /* 量了 flomo 的标签行：行高约 41pt、字 16。这里原本是 18px 字 + 60px
+     行高 + 24px 的 #，比参考大了一圈半。
+     注意抽屉里有两种行密度，不是一个值：
+       导航行（MEMO / 每日回顾…）52  —— 有图标，是主入口
+       标签行（# 二叉树…）      40  —— 无图标，是列表 */
+  /* flomo 实测行节奏 40.2（iPhone 12 mini，923px/375pt = 2.461 缩放）——
+     正好落在 4 栅格上，不用凑。导航行和标签行是同一个值，不是两套。
+     注意它低于 44pt 触控下限：可点区域靠 contentShape 外扩，不要把行撑高。 */
+  /* 36px = 16 × 2.25，贴 flomo 实测的行距比 ≈2.2（原来 40px 是 2.5，偏松）。
+     行高不能从 line-height 要 —— 24px 是设定稿 row 档「行距 +8」写死的；
+     只能收上下内距 s2(8)→s1(4)，内容变 32px，由 min-height 36 接管。
+     左右回到 var(--row-pad-x)：.kids 那条引导竖线的 x 是按它算的，写死
+     var(--s1) 等于把耦合断掉，以后改行内距线就不跟着走了。 */
+  .drawer-demo .hash { min-height:36px; box-sizing:border-box; align-items:center; padding:var(--s1) var(--row-pad-x); font-size:16px; line-height:24px; gap:var(--s3); }
+  /* 不写 font-size，让 # 继承行的 16px：原来写死 17px，既比标签大 1px，
+     17 本身也不在字阶（34/21/16/13/12/11）上。继承还有个好处 —— 以后
+     改行字号时 # 自动跟着走，不会再分叉。 */
+  .drawer-demo .hash .sg { flex:0 0 var(--row-icon); line-height:24px; }
+  .drawer-demo .hash .ct { font-size:12px; }
+  .drawer-demo .read { position:absolute; inset:52px 0 0; height:auto; border-radius:0; background:var(--ios-ground); transition:transform .42s var(--ease); }
+  .drawer-demo #drawer:checked ~ .read { transform:translateX(79%); border-radius:26px 0 0 26px; box-shadow:-1px 0 0 var(--ios-fill); }
+  .drawer-demo .readtop { min-height:52px; padding:10px 20px 16px; }
+  .drawer-demo .veil { top:52px; border-radius:26px 0 0 26px; background:rgba(0,0,0,.08); }
+  .drawer-demo #d-list:checked ~ .faces .f-list,
+  .drawer-demo #d-cat:checked ~ .faces .f-cat,
+  .drawer-demo #d-company:checked ~ .faces .f-company,
+  .drawer-demo #d-time:checked ~ .faces .f-time { display:block; }
+  /* Metadata: topic and company share one treatment; reading stage is separate. */
+  /* 卡片 meta 里不再出现技术标签和公司标签 —— 那两样属于抽屉的筛选
+     维度，放进每张卡片只是重复，还把层级名挤到了右边。
+     .layer 的配色直接走 --tag-bg / --tag-ink，两个主题都已指派过，
+     这里不需要再写一条覆盖。 */
+  @media(prefers-reduced-motion:reduce) { .drawer-demo .read,.drawer-demo .drawer,.drawer-demo .veil { transition:none; } }
+</style>
+
+<div class="wrap">
+
+  <header class="masthead">
+    <div class="document-toolbar"><div class="eyebrow">LEET JOUNRY · UI 设计稿 · 修订版</div><div class="theme-options" role="group" aria-label="外观"><button data-theme-choice="system" aria-pressed="true">跟随系统</button><button data-theme-choice="light" aria-pressed="false">白天</button><button data-theme-choice="dark" aria-pressed="false">黑夜</button></div></div>
+    <h1>执行在浏览器里，阅读在手机上</h1>
+    <p class="standfirst">
+      Chrome 扩展负责练习与自动记录，默认不推荐新题；iOS app 只读，负责总览、阅读和提醒。题单直接从 GitHub 仓库读取。
+      整页保留原设计稿的展示方式；界面与三种分享卡统一参照 flomo 截图：深色底、低对比卡片、正文 16 / 行高 28、卡片内距 17、圆角 16。
+    </p>
+    <div class="tokens">
+      <span class="token"><span class="swatch" style="background:var(--accent)"></span>accent #30CF79</span>
+      <span class="token"><span class="swatch" style="background:var(--overdue)"></span>逾期 #D97757</span>
+      <span class="token"><span class="swatch" style="background:var(--tag-bg)"></span>tag #F0F3FC / #6082EF</span>
+      <span class="token"><span class="swatch" style="background:rgba(255,178,46,.36)"></span>复盘高亮</span>
+      <span class="token">圆角 16 · 内距 17 · 正文 16/28</span>
+    </div>
+  </header>
+
+  <section id="onboarding">
+    <div class="sec-head"><h2><span class="kicker">开始</span>连接你的练习与积累</h2><p>首次使用只提供 GitHub 和 LeetCode 两个入口。GitHub 授权访问自己的仓库；LeetCode 使用浏览器已有的登录状态。</p></div>
+    <div class="rail"><div class="unit"><div class="cap"><b>首页</b> flomo 风格 · 两个入口</div>
+      <div class="phone auth-phone"><div class="bar0"><span>9:41</span><span class="bar-mark" role="img" aria-label="Kerno"></span><span>●●● ⌁</span></div>
+        <div class="auth-content"><h3>Hi, <em>Fellow.</em></h3><p>把做过的题，<br>拆解透彻，<br>理解更深入。</p>
+          <div class="auth-options"><button class="auth-entry auth-github" id="auth-github"><span class="account-symbol">GH</span><span><b>GitHub</b><small>连接我的数据仓库</small></span><span>↗</span></button>
+          <button class="auth-entry" id="auth-leetcode"><span class="account-symbol">LC</span><span><b>LeetCode</b><small>使用浏览器登录状态</small></span><span>↗</span></button></div>
+          <div id="auth-device" hidden><span class="auth-device-label">GitHub Device Flow · 流程示意</span><strong>WDJB-MJHT</strong><a href="https://github.com/login/device" target="_blank" rel="noopener noreferrer">打开 GitHub 授权页 ↗</a><small>这是设计稿示例码，未发起真实授权。</small></div>
+        </div>
+      
+
+      </div></div>
+        <div class="unit">
+        <div class="cap"><b>Chrome</b> 第一次打开 <em>· 同一句话，两个端</em></div>
+        <div class="panel">
+          <div class="pbar"><span class="plogo" aria-hidden="true"></span></div>
+          <div class="pbody auth-pbody">
+            <h3 class="auth-hi">Hi, <em>Fellow.</em></h3>
+            <p class="auth-hi-line">把做过的题，<br>拆解透彻，<br>理解更深入。</p>
+            <div class="auth-options">
+              <button class="auth-entry auth-github" id="cauth-github"><span class="account-symbol">GH</span><span><b>GitHub</b><small>连接我的题库仓库</small></span><span>↗</span></button>
+              <button class="auth-entry" id="cauth-leetcode"><span class="account-symbol">LC</span><span><b>LeetCode</b><small>使用浏览器登录状态</small></span><span>↗</span></button>
+            </div>
+          </div>
+        </div>
+      </div>
+      </div>
+  </section>
+
+  <!-- ========================= CHROME ========================= -->
+  <section>
+    <div class="sec-head">
+      <h2><span class="kicker">CHROME</span>侧边栏 · 复习是主角</h2>
+      <p>
+        <strong>这不是三个页面，是同一块面板自己在变。</strong>
+        面板一直开着，不用去点——打开某道题的页面，它自动切到「这道题」；AC 被检测到，本次练习自动记录完成；
+        跳到下一题，内容跟着换。底部那三个 tab 只是手动兜底，正常流程里一次都不用点。
+      </p>
+    </div>
+
+    <div class="rail">
+
+      <div class="unit">
+        <div class="cap"><b>01</b> 打开浏览器时</div>
+        <div class="panel">
+          <div class="pbar"><span class="plogo" aria-hidden="true"></span><span class="pnav"><b class="here">今天</b><b>本题</b><b>设置</b></span><button class="pcheck" aria-label="今天打卡" title="今天打卡"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 8H6a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V10a2 2 0 0 0-2-2h-2M12 15V2m-4 4 4-4 4 4"/></svg></button></div>
+          <div class="pbody">
+            <div class="today-reviews"><div class="qlist"><a class="q late" href="https://leetcode.com/problems/max-consecutive-ones-iii/" target="_blank" rel="noopener noreferrer"><span class="flag" title="逾期" aria-label="逾期">!</span><div class="qmain"><b title="1004. 最大连续1的个数 III">1004. 最大连续1的个数 III</b><span class="qsub"><em class="difficulty medium">Med.</em> · <span class="due">3 天</span></span></div></a><a class="q late" href="https://leetcode.com/problems/sliding-window-maximum/" target="_blank" rel="noopener noreferrer"><span class="flag" title="逾期" aria-label="逾期">!</span><div class="qmain"><b title="239. 滑动窗口最大值">239. 滑动窗口最大值</b><span class="qsub"><em class="difficulty hard">Hard</em> · <span class="due">1 天</span></span></div></a><a class="q " href="https://leetcode.com/problems/maximum-depth-of-binary-tree/" target="_blank" rel="noopener noreferrer"><span class="flag" title="今天到期" aria-label="今天到期">·</span><div class="qmain"><b title="104. 二叉树的最大深度">104. 二叉树的最大深度</b><span class="qsub"><em class="difficulty easy">Easy</em></span></div></a><a class="q " href="https://leetcode.com/problems/course-schedule/" target="_blank" rel="noopener noreferrer"><span class="flag" title="今天到期" aria-label="今天到期">·</span><div class="qmain"><b title="207. 课程表">207. 课程表</b><span class="qsub"><em class="difficulty medium">Med.</em></span></div></a><a class="q " href="https://leetcode.com/problems/house-robber/" target="_blank" rel="noopener noreferrer"><span class="flag" title="今天到期" aria-label="今天到期">·</span><div class="qmain"><b title="198. 打家劫舍">198. 打家劫舍</b><span class="qsub"><em class="difficulty medium">Med.</em></span></div></a><a class="q " href="https://leetcode.com/problems/climbing-stairs/" target="_blank" rel="noopener noreferrer"><span class="flag" title="今天到期" aria-label="今天到期">·</span><div class="qmain"><b title="70. 爬楼梯">70. 爬楼梯</b><span class="qsub"><em class="difficulty easy">Easy</em></span></div></a><a class="q " href="https://leetcode.com/problems/coin-change/" target="_blank" rel="noopener noreferrer"><span class="flag" title="今天到期" aria-label="今天到期">·</span><div class="qmain"><b title="322. 零钱兑换">322. 零钱兑换</b><span class="qsub"><em class="difficulty medium">Med.</em></span></div></a><a class="q " href="https://leetcode.com/problems/trapping-rain-water/" target="_blank" rel="noopener noreferrer"><span class="flag" title="今天到期" aria-label="今天到期">·</span><div class="qmain"><b title="42. 接雨水">42. 接雨水</b><span class="qsub"><em class="difficulty hard">Hard</em></span></div></a><a class="q " href="https://leetcode.com/problems/product-of-array-except-self/" target="_blank" rel="noopener noreferrer"><span class="flag" title="今天到期" aria-label="今天到期">·</span><div class="qmain"><b title="238. 除自身以外数组的乘积">238. 除自身以外数组的乘积</b><span class="qsub"><em class="difficulty medium">Med.</em></span></div></a><a class="q " href="https://leetcode.com/problems/invert-binary-tree/" target="_blank" rel="noopener noreferrer"><span class="flag" title="今天到期" aria-label="今天到期">·</span><div class="qmain"><b title="226. 翻转二叉树">226. 翻转二叉树</b><span class="qsub"><em class="difficulty easy">Easy</em></span></div></a><a class="q " href="https://leetcode.com/problems/valid-parentheses/" target="_blank" rel="noopener noreferrer"><span class="flag" title="今天到期" aria-label="今天到期">·</span><div class="qmain"><b title="20. 有效的括号">20. 有效的括号</b><span class="qsub"><em class="difficulty easy">Easy</em></span></div></a><a class="q " href="https://leetcode.com/problems/best-time-to-buy-and-sell-stock-iii/" target="_blank" rel="noopener noreferrer"><span class="flag" title="今天到期" aria-label="今天到期">·</span><div class="qmain"><b title="123. 买卖股票的最佳时机 III">123. 买卖股票的最佳时机 III</b><span class="qsub"><em class="difficulty hard">Hard</em></span></div></a></div></div>
+            <div class="new-problems" hidden>
+            <div class="qlist">
+              <div class="q fresh" tabindex="0"><span class="flag" title="新题" aria-label="新题">+</span><div class="qmain"><b title="162. 寻找峰值">162. 寻找峰值</b><span class="qsub"><em class="difficulty medium">Med.</em></span></div></div>
+            </div></div>
+          </div>
+          
+        </div>
+      </div>
+
+      <div class="unit">
+        <div class="cap"><b>02</b> 做题中</div>
+        <div class="panel">
+          <div class="pbar"><span class="plogo" aria-hidden="true"></span><span class="pnav"><b>今天</b><b class="here">本题</b><b>设置</b></span><div class="recap-menu-wrap"><button class="recap-menu" aria-haspopup="menu" aria-expanded="false" aria-label="更多操作">···</button><div class="recap-actions" role="menu" hidden><button role="menuitem" id="recap-share"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 8H6a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V10a2 2 0 0 0-2-2h-2M12 15V2m-4 4 4-4 4 4"/></svg><span>分享</span></button><button role="menuitem" id="recap-edit"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m4 16-1 5 5-1L21 7l-4-4L4 16Zm11-11 4 4M3 23h18"/></svg><span>编辑</span></button><button role="menuitem" id="recap-copy"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 7H5a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-3M8 1h7l6 6v11H8V1Zm7 0v6h6"/></svg><span>复制</span></button></div></div></div>
+          <div class="pbody">
+            <div class="recap">
+              <div class="recap-head">
+                <span class="chip">题解</span>
+                <span class="interval-preview" id="nextup-ladder" role="group" aria-label="选择下次复习间隔"></span>
+              </div>
+              <p class="recap-body" id="recap-body">关键是「不用真的翻转」——只要窗口里 0 的个数不超过 k 就合法。第一次一直在想怎么「真的翻转」那 k 个 0，<mark>完全没意识到根本不需要翻转</mark>。第二次重做还是先写成了 if，<mark>忘了窗口可能要连续收缩好几格</mark>。</p>
+              <button class="text-button" id="recap-more">Show More</button>
+              <div class="recap-editor" id="recap-editor" hidden>
+                <textarea id="recap-draft" spellcheck="false" aria-label="编辑题解"></textarea>
+                <div class="editor-foot">
+                  <div class="editor-tools" role="toolbar" aria-label="格式">
+                    <button type="button" data-md="bold" title="粗体 ⌘B"><b>B</b></button>
+                    <button type="button" data-md="ul" title="无序列表">☰</button>
+                    <button type="button" data-md="ol" title="有序列表">1.</button>
+                    <button type="button" data-md="hl" class="is-hl" title="高亮 ⌘E">A</button>
+                    <button type="button" data-md="code" title="行内代码">&lt;/&gt;</button>
+                  </div>
+                  <span class="draft-state" id="draft-state">草稿自动保存</span>
+                  <span class="draft-count" id="draft-count">0 字</span>
+                  <button class="save-dot" id="recap-save" aria-label="保存题解" title="保存 ⌘Enter"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m5 13 4 4L19 7"/></svg></button>
+                </div>
+              </div>
+              <div class="sync-note" id="sync-note" role="status" hidden>
+                <span class="sn-text"></span>
+                <button class="sn-act" id="sync-act" hidden></button>
+              </div>
+            </div>
+          </div>
+          
+        </div>
+      </div>
+
+      <div class="unit">
+        <div class="cap"><b>04</b> 设置 <em>· 模式、节奏与复习范围</em></div>
+        <div class="panel"><div class="pbar"><span class="plogo" aria-hidden="true"></span><span class="pnav"><b>今天</b><b>本题</b><b class="here">设置</b></span></div><div class="pbody" id="scope-panel">
+          <div id="scope-overview">
+          <div class="lists">
+            <div class="row"><span class="ttl">练习内容</span><div class="mode-control" role="group" aria-label="练习内容"><button type="button" data-mode="review" aria-pressed="true">复习</button><button type="button" data-mode="new" aria-pressed="false">新题</button><button type="button" data-mode="learn" aria-pressed="false">复习+新题</button></div></div>
+            <div class="new-problems" hidden>
+              <label class="row"><span class="ttl">每天新题</span><span class="capfield"><input id="new-goal" class="cap" type="number" min="1" max="50" step="1" value="3" inputmode="numeric" aria-label="每天新题数量，单位：道"><em>道</em></span></label>
+              <label class="row"><span class="ttl">主线题单</span><select><option>秋招冲刺</option></select></label>
+            </div>
+            <div class="review-settings">
+              <div class="row"><span class="ttl">复习方式</span><div class="schedule-control" role="group" aria-label="复习方式"><button data-review-policy="interval" aria-pressed="true">阶梯复习</button><button data-review-policy="round" aria-pressed="false">轮次复习</button></div></div>
+              <label class="row"><span class="ttl">每日复习上限</span><span class="capfield"><input id="daily-cap" class="cap" type="number" min="1" max="200" step="1" value="20" inputmode="numeric" aria-label="每日复习上限，单位：道"><em>道</em></span></label>
+              <div class="row" id="interval-settings"><span class="ttl">间隔阶梯</span><span class="interval-preview" id="interval-ladder" role="group" aria-label="复习间隔阶梯"></span></div>
+              <div class="row" id="round-settings" hidden><span class="ttl">轮次进度</span><span class="pg">第 1 轮 · 18 / 61</span></div>
+            </div>
+          </div>
+          <div class="lists">
+            <div class="row"><span class="ttl">公司</span><span class="selected-tags" id="selected-company"></span><button class="text-button picker-open" data-dimension="company" aria-haspopup="dialog">选择 ›</button></div>
+            <div class="row"><span class="ttl">标签</span><span class="selected-tags" id="selected-technique"></span><button class="text-button picker-open" data-dimension="technique" aria-haspopup="dialog">选择 ›</button></div>
+            <div class="row"><span class="ttl">题单</span><span class="selected-tags" id="selected-list"></span><button class="text-button picker-open" data-dimension="list" aria-haspopup="dialog">选择 ›</button></div>
+            <label class="row"><span class="ttl">时间</span><select id="scope-time"><option value="all">不限</option><option value="30">最近 30 天</option><option value="7">最近 7 天</option></select></label>
+            <div class="row"><span class="ttl">重置筛选</span><button class="text-button" id="clear-scope">清空</button></div>
+          </div>
+          <div class="lists">
+            <div class="row"><span class="ttl">GitHub 仓库</span><span class="pg">echo-xiao / lc-data · 已连接</span></div>
+            <div class="row"><span class="ttl">同步状态</span><span class="pg"><span class="state">已同步</span></span></div>
+          </div>
+          <div class="scope-result" aria-live="polite"><strong id="scope-count"></strong><span id="scope-empty" hidden>试试减少条件，或清空后查看全部。</span></div>
+        </div>
+          <section id="scope-picker" role="dialog" aria-modal="true" aria-labelledby="picker-title" hidden>
+            <div class="picker-head"><button class="text-button" id="picker-back">‹ 复习范围</button><h3 id="picker-title">选择标签</h3></div>
+            <label class="picker-search"><span aria-hidden="true">⌕</span><input id="picker-query" type="search" placeholder="搜索标签" aria-label="搜索标签" autocomplete="off"></label>
+            <p class="picker-hint">已选项置顶 · 支持多选</p>
+            <div id="picker-options" class="picker-options"></div>
+            <p id="picker-no-results" class="aside" hidden>没有匹配项，试试其他关键词。</p>
+            <div class="picker-footer"><button class="text-button" id="picker-clear">清空</button><button class="cta" id="picker-done">完成（0）</button></div>
+          </section>
+        </div></div>
+      </div>
+    </div>
+
+    <div class="grid">
+      <div>
+        <h4>目标设在扩展，不在 app</h4>
+        <p>不是偏好，是架构定的：app 只申请 read 权限，写不了任何东西。会改变调度行为的设置，只能放在能写的那一端。Chrome 设目标，app 当记分牌。</p>
+      </div>
+      <div>
+        <h4>范围可以交叉，不改变调度</h4>
+        <p>公司、标签和题单通过可搜索的多选页选择，首页只保留已选项；超过两项折叠为 +N。同组取或、不同组取且。点完成应用选择，返回或 Esc 放弃本次修改，其他维度与时间保持不变。</p>
+      </div>
+      <div>
+        <h4>为什么是 side panel 不是 popup</h4>
+        <p>popup 点一下别处就关了（flomo 的扩展就是）。side panel 一直开着、跟着你换题自动更新，这才撑得住「做题全程它都在」。</p>
+      </div>
+      <div>
+        <h4>为什么不注入 DOM</h4>
+        <p>注入 DOM 要猜 LeetCode 的 HTML 结构，人家一改版就瞎。side panel 是浏览器给的独立区域，只从 GraphQL 读数据。LeetHub 被 fork 四次就是这么来的。</p>
+      </div>
+      <div>
+        <h4>完成自动记录，不需要评分</h4><p>队列中的题出现新的 AC 后，自动记录完成。阶梯复习按预设阶梯推进，轮次复习按整轮进度推进；手机阅读不记为完成。</p>
+      </div>
+      <div>
+        <h4>为什么答案默认折叠</h4>
+        <p>一打开就看见答案，间隔重复立刻失效。折叠不是为了省地方，是为了逼出一次真实的回忆尝试。</p>
+      </div>
+      <div>
+        <h4>为什么分两层展开</h4>
+        <p>伪代码和题解是不同深度的提示。记录你停在哪一层，比只记「看没看答案」信息量大得多。</p>
+      </div>
+      <div>
+        <h4>降级态要明说，不能装没事</h4>
+        <p>没网、token 过期、LeetCode 掉登录——标题栏的状态点变色，正文下方出一条可操作的琥珀条。数据进本地队列不会丢，但必须让人看见它还没推上去。</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========================= iOS ========================= -->
+  <section>
+    <div class="sec-head">
+      <h2><span class="kicker">iOS</span>首页是一个抽屉</h2>
+      <p>
+        和 flomo 手机版一样：平时你看到的是阅读页，点左上角 ☰，左侧导航展开，占 79% 屏宽，阅读页整体推向右侧，
+        右边露出带圆角的阅读页窄条。<strong>选一个分类，抽屉自动收回</strong>，屏幕上剩下那一类的题。
+      </p>
+      <p>
+        抽屉里是三个大数字、热力图、今天的进度，和 <code>题单 / 标签 / 公司 / 时间</code> 四个维度的
+        横向分类栏和对应列表。每行右边是 <code>待复习 / 总数</code>。全程没有卡片。
+      </p>
+    </div>
+
+    <div class="rail">
+
+      <div class="unit">
+        <div class="cap"><b>首页</b> 点 ☰ 从左边滑出 <em>· 可交互</em></div>
+        <div class="phone tall drawer-demo">
+          <input type="checkbox" id="drawer">
+          <div class="bar0"><span>9:41</span><span class="bar-mark" role="img" aria-label="Kerno"></span><span>●●● ⌁</span></div>
+
+          <div class="read">
+            
+            <div class="readtop">
+              <label class="hamb" for="drawer" tabindex="0">☰</label>
+              <label class="now" for="drawer" tabindex="0">标签/二叉树</label>
+            </div>
+            <div class="chain">
+              <div class="link">
+                <div class="leaf">
+                  <h3><span class="layer">题意</span><a class="tlink" href="https://leetcode.com/problems/max-consecutive-ones-iii/" target="_blank" rel="noopener noreferrer">1004. 最大连续1的个数 III</a></h3>
+                  <p>给一个 0/1 数组和一个 k，最多可以把 k 个 0 翻成 1，问能得到的最长连续 1 有多长。</p>
+                </div>
+              </div>
+              <div class="link">
+                <div class="leaf">
+                  <p class="code"><span class="layer">伪代码</span>left = 0, zeros = 0
+for right in range(n):
+    if nums[right] == 0: zeros += 1
+    while zeros &gt; k: 收缩 left
+    ans = max(ans, right-left+1)</p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <label class="veil" for="drawer" aria-label="收起抽屉"></label>
+
+          <div class="drawer">
+            <div class="dtop">
+              <span class="me">Echo</span>
+              <span class="icons" aria-label="提醒和设置">
+                <span class="badge" aria-label="提醒（有新内容）"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9M10 21h4"/></svg></span>
+                <span aria-label="设置"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m7 3-5 9 5 9h10l5-9-5-9Z"/><circle cx="12" cy="12" r="3"/></svg></span>
+              </span>
+            </div>
+
+            <div class="counts">
+              <div><b>72<em>/104</em></b><span>EASY</span></div>
+              <div><b>158<em>/201</em></b><span>MEDIUM</span></div>
+              <div><b>50<em>/109</em></b><span>HARD</span></div>
+            </div>
+
+
+            <div class="cal">
+              <div class="cells">
+                <i></i><i class="a"></i><i class="b"></i><i></i><i class="a"></i><i class="c"></i><i class="b"></i>
+                <i class="a"></i><i></i><i class="b"></i><i class="c"></i><i class="a"></i><i></i><i class="a"></i>
+                <i class="b"></i><i class="c"></i><i class="a"></i><i></i><i class="b"></i><i class="a"></i><i></i>
+                <i></i><i class="a"></i><i class="a"></i><i class="b"></i><i class="c"></i><i class="b"></i><i class="a"></i>
+                <i class="c"></i><i class="b"></i><i></i><i class="a"></i><i class="b"></i><i class="c"></i><i class="c"></i>
+                <i class="a"></i><i></i><i class="b"></i><i class="a"></i><i class="a"></i><i class="b"></i><i></i>
+                <i class="b"></i><i class="c"></i><i class="c"></i><i class="b"></i><i></i><i class="a"></i><i class="b"></i>
+                <i></i><i class="a"></i><i class="b"></i><i class="b"></i><i class="c"></i><i class="a"></i><i></i>
+                <i class="a"></i><i class="b"></i><i class="c"></i><i class="c"></i><i class="b"></i><i class="a"></i><i class="a"></i>
+                <i class="a"></i><i class="b"></i><i></i><i class="c"></i><i class="b"></i><i class="a"></i><i class="b"></i>
+                <i class="c"></i><i class="a"></i><i class="b"></i><i class="b"></i><i></i><i class="a"></i><i class="c"></i>
+                <i class="b"></i><i></i><i class="a"></i><i class="b"></i><i class="c"></i><i class="b"></i><i class="now"></i>
+              </div>
+              <div class="mons"><span>9月</span><span>10月</span><span>11月</span></div>
+            </div>
+
+            <!-- 「连续 N 天 / 今天 N 题」整条拿掉。flomo 把连续天数做成第三个
+                 大数字（DAY 1611），不单独起一行 —— 统计区已经在说这件事。
+                 顺带：进度条是抽屉里最后一处非热力图的绿，一起消失了。 -->
+
+            <div class="dims">
+              <input type="radio" name="dim" id="d-list">
+              <input type="radio" name="dim" id="d-cat" checked>
+              <input type="radio" name="dim" id="d-company">
+              <input type="radio" name="dim" id="d-time">
+
+              <div class="switch" aria-label="阅读分类"><label for="d-list">题单</label><label for="d-cat">标签</label><label for="d-company">公司</label><label for="d-time">时间</label></div>
+              <div class="faces">
+                <div class="face f-list">
+                  <label class="hash" for="drawer" tabindex="0"><span class="sg">#</span><span class="nm">Top Interview 150</span><span class="ct">41/150</span></label>
+                  <label class="hash" for="drawer" tabindex="0"><span class="sg">#</span><span class="nm">NeetCode 150</span><span class="ct">63/150</span></label>
+                  <label class="hash" for="drawer" tabindex="0"><span class="sg">#</span><span class="nm">Blind 75</span><span class="ct">38/75</span></label>
+                  <label class="hash" for="drawer" tabindex="0"><span class="sg">#</span><span class="nm">秋招冲刺</span><span class="ct">7/28</span></label>
+                </div>
+                <div class="face f-cat">
+                  <label class="hash open" for="drawer" tabindex="0"><span class="sg">#</span><span class="nm">二叉树</span><span class="ct">5/61</span><span class="cv"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M9 5l7 7-7 7"/></svg></span></label>
+                  <div class="kids">
+                    <label class="hash" for="drawer" tabindex="0"><span class="sg">#</span><span class="nm">遍历</span><span class="ct">2/28</span><span class="cv"></span></label>
+                    <label class="hash" for="drawer" tabindex="0"><span class="sg">#</span><span class="nm">构造</span><span class="ct">3/19</span><span class="cv"></span></label>
+                  </div>
+                  <label class="hash" for="drawer" tabindex="0"><span class="sg">#</span><span class="nm">滑动窗口</span><span class="ct">8/42</span><span class="cv"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M9 5l7 7-7 7"/></svg></span></label>
+                  <label class="hash" for="drawer" tabindex="0"><span class="sg">#</span><span class="nm">动态规划</span><span class="ct">12/38</span><span class="cv"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M9 5l7 7-7 7"/></svg></span></label>
+                  <label class="hash" for="drawer" tabindex="0"><span class="sg">#</span><span class="nm">二分查找</span><span class="ct">3/34</span><span class="cv"></span></label>
+                  <label class="hash" for="drawer" tabindex="0"><span class="sg">#</span><span class="nm">双指针</span><span class="ct">6/31</span><span class="cv"></span></label>
+                </div>
+                <div class="face f-company">
+                  <label class="hash" for="drawer" tabindex="0"><span class="sg">#</span><span class="nm">Google</span><span class="ct">8/56</span></label>
+                  <label class="hash" for="drawer" tabindex="0"><span class="sg">#</span><span class="nm">Meta</span><span class="ct">6/42</span></label>
+                  <label class="hash" for="drawer" tabindex="0"><span class="sg">#</span><span class="nm">Amazon</span><span class="ct">4/38</span></label>
+                  <label class="hash" for="drawer" tabindex="0"><span class="sg">#</span><span class="nm">未标注公司</span><span class="ct">12/98</span></label>
+                </div>
+                <div class="face f-time">
+                  <label class="hash" for="drawer" tabindex="0"><span class="sg">#</span><span class="nm">本周做的</span><span class="ct">3/9</span></label>
+                  <label class="hash" for="drawer" tabindex="0"><span class="sg">#</span><span class="nm">最近 30 天</span><span class="ct">14/37</span></label>
+                  <label class="hash" for="drawer" tabindex="0"><span class="sg">#</span><span class="nm">最近 90 天</span><span class="ct">28/96</span></label>
+                  <label class="hash" for="drawer" tabindex="0"><span class="sg">#</span><span class="nm">最新在前</span><span class="ct">84/414</span></label>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+<div class="unit">
+        <div class="cap"><b>阅读</b> 四层全展开 <em>· 长正文可收起</em></div>
+        <div class="phone tall">
+          <div class="read">
+            <div class="bar0"><span>9:41</span><span class="bar-mark" role="img" aria-label="Kerno"></span><span>●●● ⌁</span></div>
+            <div class="chain">
+              <div class="link">
+                <div class="leaf">
+                  <h3><span class="layer">题意</span><a class="tlink" href="https://leetcode.com/problems/max-consecutive-ones-iii/" target="_blank" rel="noopener noreferrer">1004. 最大连续1的个数 III</a></h3>
+                  <p>给一个 0/1 数组和一个 k，最多可以把 k 个 0 翻成 1，问能得到的最长连续 1 有多长。</p>
+                </div>
+              </div>
+              <div class="link">
+                <div class="leaf">
+                  <p class="code"><span class="layer">伪代码</span>left = 0, zeros = 0
+for right in range(n):
+    while zeros &gt; k: 收缩 left</p>
+                </div>
+              </div>
+              <div class="link">
+                <div class="leaf">
+                  <p class="clampable"><span class="layer">题解</span>关键是「不用真的翻转」——只要窗口里 0 的个数不超过 k 就合法。</p>
+                  <p>第一次一直在想怎么「真的翻转」那 k 个 0，<mark>完全没意识到根本不需要翻转</mark>。</p>
+                  <p>第二次重做还是先写成了 if，<mark>忘了窗口可能要连续收缩好几格</mark>。</p>
+                  <button class="text-button leaf-more">Show More</button>
+                </div>
+              </div>
+              <div class="link">
+                <div class="leaf">
+                  <p class="code"><span class="layer">我的代码</span>def longestOnes(nums, k):
+    left = zeros = ans = 0
+    for right, v in enumerate(nums):
+        ...</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="grid">
+      <div>
+        <h4>卡片是点出来的，不是折叠的</h4>
+        <p>下一张卡在点之前并不存在——这是 <code>ChainCardView</code> 原本的机制（<code>opened as far as revealed</code>）。所以屏幕上永远没有灰着的占位行。</p>
+      </div>
+      <div>
+        <h4>第一层给题意，不给解法</h4>
+        <p>知道问的是什么，但要自己想出怎么做——这才是复习的起点。题意是自己复述的一两句话：版权干净、离线可用，而且复述本身就是理解的检验。</p>
+      </div>
+      <div>
+        <h4>题解就是 review.md</h4>
+        <p>不存在单独的题解文件——原来的「复盘」写的本来就是「这题该怎么想、我当时怎么卡的」。界面上叫题解，文件名不动。里面 <code>==标记==</code> 的橙色高亮是这份数据里最贵的部分。</p>
+      </div>
+      <div>
+        <h4>热力图直连 LeetCode</h4>
+        <p>绕过仓库，每次回到前台重新拉。断网时画上次的结果并标「数据截至 X 月 X 日」——不能画成空白，那会读成「没练习」。</p>
+      </div>
+      <div>
+        <h4>没有评分按钮</h4>
+        <p>手机上翻过的题不计入调度。这是换来「系统里只有一个调度器」的代价，是自愿付的。</p>
+      </div>
+      <div>
+        <h4>数字是「待复习 / 总数」</h4>
+        <p>不是进度条。绿色那个是现在等着你的，灰色那个是这一类一共有多少。沿用现有 <code>HomeEntry</code> 的 backlog / total。</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========================= 三种分享卡 ========================= -->
+  <section id="milestones">
+    <div class="sec-head">
+      <h2><span class="kicker">分享</span>三种卡片，留下三种积累</h2>
+      <p>X 天内的成绩，用三个数字和热力图记下来；一道题想通了，分享题目、链接和自己的题解；一天结束，列出今天做过的题。三种图片统一使用 flomo 的深色卡片、字号、间距与低饱和绿色。</p>
+    </div>
+    <div class="rail share-templates">
+
+      <div class="unit"><div class="cap"><b>02</b> 单题分享 <em>· 默认全选，可取消</em></div>
+        <article class="share-chain" aria-label="单题题解分享卡">
+          <div class="share-pick" role="group" aria-label="选择要带上的部分">
+            <label class="locked" title="题意必选：没有它，分享出去的题解就没有上下文"><input type="checkbox" data-part="题意" checked disabled><span>题意</span></label>
+            <label><input type="checkbox" data-part="伪代码" checked><span>伪代码</span></label>
+            <label><input type="checkbox" data-part="题解" checked><span>题解</span></label>
+            <label><input type="checkbox" data-part="我的代码" checked><span>我的代码</span></label>
+          </div>
+          <div class="chain">
+              <div class="link" data-part="题意">
+                <div class="leaf">
+                  <h3><span class="layer">题意</span><a class="tlink" href="https://leetcode.com/problems/max-consecutive-ones-iii/" target="_blank" rel="noopener noreferrer">1004. 最大连续1的个数 III</a></h3>
+                  <p>给一个 0/1 数组和一个 k，最多可以把 k 个 0 翻成 1，问能得到的最长连续 1 有多长。</p>
+                </div>
+              </div>
+              <div class="link" data-part="伪代码">
+                <div class="leaf">
+                  <p class="code"><span class="layer">伪代码</span>left = 0, zeros = 0
+for right in range(n):
+    while zeros &gt; k: 收缩 left</p>
+                </div>
+              </div>
+              <div class="link" data-part="题解">
+                <div class="leaf">
+                  <p><span class="layer">题解</span>关键是「不用真的翻转」——只要窗口里 0 的个数不超过 k 就合法。</p>
+                  <p>第一次一直在想怎么「真的翻转」那 k 个 0，<mark>完全没意识到根本不需要翻转</mark>。</p>
+                  <p>第二次重做还是先写成了 if，<mark>忘了窗口可能要连续收缩好几格</mark>。</p>
+                </div>
+              </div>
+              <div class="link" data-part="我的代码">
+                <div class="leaf">
+                  <p class="code"><span class="layer">我的代码</span>def longestOnes(nums, k):
+    left = zeros = ans = 0
+    for right, v in enumerate(nums):
+        ...</p>
+                </div>
+              </div>
+          </div>
+          <div class="share-foot">
+            <span class="share-foot-text">
+              <b>Echo 的题解</b>
+              <span>leetcode.com/problems/max-consecutive-ones-iii</span>
+            </span>
+            <span class="share-mark" role="img" aria-label="Kerno"></span>
+          </div>
+        </article>
+        <div class="size">和阅读视图同一套卡片 —— 内容只有一处，不会两边写出两种说法</div>
+      </div>
+      <div class="unit"><div class="cap"><b>03</b> 每日打卡 · 今天做了哪些题</div>
+        <article class="share-daily" aria-label="每日做题清单分享卡">
+          <div class="daily-card-head"><div><b>Echo</b><span>2026.11.16 · 今天的练习</span></div><span class="daily-card-brand share-mark" role="img" aria-label="Kerno"></span></div>
+          
+          <div class="daily-table-scroll" tabindex="0" role="region" aria-label="每日做题记录表，可横向滚动">
+            <table class="daily-submissions">
+              <colgroup><col class="daily-col-time"><col><col class="daily-col-result"><col class="daily-col-attempts"></colgroup>
+              <thead><tr><th scope="col">最近提交</th><th scope="col">题目</th><th scope="col">最近结果</th><th scope="col">提交次数</th></tr></thead>
+              <tbody><tr><td class="daily-time">刚刚</td><td class="daily-problem-cell"><span class="daily-check" aria-label="已通过">✓</span><div class="daily-question"><b title="689. Maximum Sum of 3 Non-Overlapping Subarrays">689. Maximum Sum of 3 Non-Overlapping Subarrays</b><em class="difficulty hard">Hard</em></div></td><td class="daily-accepted">Accepted</td><td class="daily-attempts">21<svg viewBox="0 0 12 12" aria-hidden="true"><path d="m2 4 4 4 4-4"/></svg></td></tr>
+<tr><td class="daily-time">2 小时前</td><td class="daily-problem-cell"><span class="daily-check" aria-label="已通过">✓</span><div class="daily-question"><b title="1031. Maximum Sum of Two Non-Overlapping Subarrays">1031. Maximum Sum of Two Non-Overlapping Subarrays</b><em class="difficulty medium">Med.</em></div></td><td class="daily-accepted">Accepted</td><td class="daily-attempts">16<svg viewBox="0 0 12 12" aria-hidden="true"><path d="m2 4 4 4 4-4"/></svg></td></tr>
+<tr><td class="daily-time">3 小时前</td><td class="daily-problem-cell"><span class="daily-check" aria-label="已通过">✓</span><div class="daily-question"><b title="123. Best Time to Buy and Sell Stock III">123. Best Time to Buy and Sell Stock III</b><em class="difficulty hard">Hard</em></div></td><td class="daily-accepted">Accepted</td><td class="daily-attempts">29<svg viewBox="0 0 12 12" aria-hidden="true"><path d="m2 4 4 4 4-4"/></svg></td></tr>
+<tr><td class="daily-time">4 小时前</td><td class="daily-problem-cell"><span class="daily-check" aria-label="已通过">✓</span><div class="daily-question"><b title="2100. Find Good Days to Rob the Bank">2100. Find Good Days to Rob the Bank</b><em class="difficulty medium">Med.</em></div></td><td class="daily-accepted">Accepted</td><td class="daily-attempts">7<svg viewBox="0 0 12 12" aria-hidden="true"><path d="m2 4 4 4 4-4"/></svg></td></tr>
+<tr><td class="daily-time">4 小时前</td><td class="daily-problem-cell"><span class="daily-check" aria-label="已通过">✓</span><div class="daily-question"><b title="845. Longest Mountain in Array">845. Longest Mountain in Array</b><em class="difficulty medium">Med.</em></div></td><td class="daily-accepted">Accepted</td><td class="daily-attempts">6<svg viewBox="0 0 12 12" aria-hidden="true"><path d="m2 4 4 4 4-4"/></svg></td></tr>
+<tr><td class="daily-time">4 小时前</td><td class="daily-problem-cell"><span class="daily-check" aria-label="已通过">✓</span><div class="daily-question"><b title="2909. Minimum Sum of Mountain Triplets II">2909. Minimum Sum of Mountain Triplets II</b><em class="difficulty medium">Med.</em></div></td><td class="daily-accepted">Accepted</td><td class="daily-attempts">9<svg viewBox="0 0 12 12" aria-hidden="true"><path d="m2 4 4 4 4-4"/></svg></td></tr>
+<tr><td class="daily-time">5 小时前</td><td class="daily-problem-cell"><span class="daily-check" aria-label="已通过">✓</span><div class="daily-question"><b title="42. Trapping Rain Water">42. Trapping Rain Water</b><em class="difficulty hard">Hard</em></div></td><td class="daily-accepted">Accepted</td><td class="daily-attempts">26<svg viewBox="0 0 12 12" aria-hidden="true"><path d="m2 4 4 4 4-4"/></svg></td></tr>
+<tr><td class="daily-time">5 小时前</td><td class="daily-problem-cell"><span class="daily-check" aria-label="已通过">✓</span><div class="daily-question"><b title="238. Product of Array Except Self">238. Product of Array Except Self</b><em class="difficulty medium">Med.</em></div></td><td class="daily-accepted">Accepted</td><td class="daily-attempts">26<svg viewBox="0 0 12 12" aria-hidden="true"><path d="m2 4 4 4 4-4"/></svg></td></tr>
+<tr><td class="daily-time">5 小时前</td><td class="daily-problem-cell"><span class="daily-check" aria-label="已通过">✓</span><div class="daily-question"><b title="1653. Minimum Deletions to Make String Balanced">1653. Minimum Deletions to Make String Balanced</b><em class="difficulty medium">Med.</em></div></td><td class="daily-accepted">Accepted</td><td class="daily-attempts">13<svg viewBox="0 0 12 12" aria-hidden="true"><path d="m2 4 4 4 4-4"/></svg></td></tr>
+<tr><td class="daily-time">6 小时前</td><td class="daily-problem-cell"><span class="daily-check" aria-label="已通过">✓</span><div class="daily-question"><b title="926. Flip String to Monotone Increasing">926. Flip String to Monotone Increasing</b><em class="difficulty medium">Med.</em></div></td><td class="daily-accepted">Accepted</td><td class="daily-attempts">7<svg viewBox="0 0 12 12" aria-hidden="true"><path d="m2 4 4 4 4-4"/></svg></td></tr>
+<tr><td class="daily-time">6 小时前</td><td class="daily-problem-cell"><span class="daily-check" aria-label="已通过">✓</span><div class="daily-question"><b title="1422. Maximum Score After Splitting a String">1422. Maximum Score After Splitting a String</b><em class="difficulty easy">Easy</em></div></td><td class="daily-accepted">Accepted</td><td class="daily-attempts">11<svg viewBox="0 0 12 12" aria-hidden="true"><path d="m2 4 4 4 4-4"/></svg></td></tr></tbody>
+            </table>
+          </div>
+          <div class="daily-card-foot"><span>今天完成 11 道题</span><span>Easy 1 · Medium 7 · Hard 3</span></div>
+        </article>
+        <div class="size">四列提交记录 · 同题一行 · flomo 字体与间距</div>
+      </div>
+    </div>
+    <div class="grid">
+      <div><h4>X 天内的成绩</h4><p>三个数字按 EASY / MEDIUM / HARD 排列；分子是区间内 AC 的不同题目，分母是区间内练习的不同题目。热力图、日期和数字使用同一个时间范围，不混入历史累计。</p></div>
+      <div><h4>单题题解分享</h4><p>题号、标题、难度、题目链接和自己的题解组成一张图片。代码可随题解附上；长题解按内容延展，不截断关键说明。图片里的链接为文字，分享时也可附可点击链接。</p></div>
+      <div><h4>每日做题清单</h4><p>沿用提交记录表的四列：最近提交、题目与难度、最近结果、提交次数。同题一行，交替行底色；长标题省略显示，鼠标悬停查看全名。此处箭头仅作图片样式示意。</p></div>
+    </div>
+    <p class="note">以上均为设计稿示例数据。三种分享都由用户主动触发；这里只展示样式，不接入真实提交记录。</p>
+  </section>
+
+  <!-- ========================= 规范 ========================= -->
+  <section>
+    <div class="sec-head">
+      <h2><span class="kicker">规范</span>两端共用的值</h2>
+      <p>按提供的 flomo 截图比例折算为 390px 画布；卡片、侧栏、阅读页和分享图使用一致的字号、留白与深色层级。</p>
+    </div>
+    <div class="tablewrap">
+      <table>
+        <thead><tr><th>名称</th><th>值</th><th>用在哪</th></tr></thead>
+        <tbody>
+          <tr><td class="k">accent</td><td class="v">#30CF79</td><td class="w">只表示「你在这里」。一屏一次。热力图最深格是唯一的例外（氛围）</td></tr>
+          <tr><td class="k">中性七档</td><td class="v">ink-1 … ink-4 / ground / card / inset</td><td class="w">色相随 accent 偏到 ~148°，饱和 3–6%。看着像灰，和绿是一家人</td></tr>
+          <tr><td class="k">统计数字</td><td class="v">34 semibold · ink-2</td><td class="w">是灰的不是黑的。三列并排带分母时收到 30</td></tr>
+          <tr><td class="k">维度切换器</td><td class="v">inset 凹槽 + card 浮片 + lift</td><td class="w">导航用颜色，维度用高度 —— 这里不碰绿</td></tr>
+          <tr><td class="k">正文</td><td class="v">16 / 行距 +8</td><td class="w">对着 flomo 截图量出来的，别改</td></tr>
+          <tr><td class="k">标题</td><td class="v">21 semibold</td><td class="w">串珠卡片的题目</td></tr>
+          <tr><td class="k">meta</td><td class="v">13</td><td class="w">难度、题号、日期</td></tr>
+          <tr><td class="k">tag pill</td><td class="v">12 / #F0F3FC / #6082EF</td><td class="w">technique 标签。蓝只做内联可点，绝不做选中态</td></tr>
+          <tr><td class="k">卡片</td><td class="v">圆角 18 · 内距 22</td><td class="w">iOS 阅读卡片。扩展面板窄，收到 9–12 / 13–14</td></tr>
+          <tr><td class="k">计数器</td><td class="v">34 bold / 标签 11</td><td class="w">抽屉顶部的三个大数字</td></tr>
+          <tr><td class="k">热力图四档</td><td class="v">fill · .28 · .58 · 1.0</td><td class="w">阈值 1 / 5 / 15 次提交；今天那格描边不填充</td></tr>
+          <tr><td class="k">复盘高亮</td><td class="v">橙 36%</td><td class="w">渲染 <code>==标记==</code></td></tr>
+          <tr><td class="k">逾期</td><td class="v">#D97757</td><td class="w">仅扩展。语义色，不算 accent</td></tr>
+          <tr><td class="k">抽屉</td><td class="v">79% 宽 · .42s</td><td class="w">缓动 <code>cubic-bezier(.22,.61,.36,1)</code>，三层同一条曲线同一时长</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- ========================= 删除 ========================= -->
+  <section>
+    <div class="sec-head">
+      <h2><span class="kicker">删除</span>不再存在的界面</h2>
+      <p>app 改成纯读之后失去理由的那些。视觉规范一个值都不动。</p>
+    </div>
+    <div class="tablewrap">
+      <table>
+        <thead><tr><th>组件</th><th>理由</th></tr></thead>
+        <tbody>
+          <tr class="gone"><td class="k">SessionView</td><td class="w">session 是评分流程的容器。没有评分就没有 session，只有「翻到哪了」</td></tr>
+          <tr class="gone"><td class="k">GradeBar</td><td class="w">不再需要评分；扩展检测到 AC 后自动记录完成</td></tr>
+          <tr class="gone"><td class="k">SessionRunner / SessionBuilder</td><td class="w">同上</td></tr>
+          <tr class="gone"><td class="k">FSRS.swift / Grading</td><td class="w">调度只在扩展里跑一份：阶梯复习或轮次复习。app 只读到期日期排本地通知</td></tr>
+          <tr class="gone"><td class="k">SettingsView 的 session 长度</td><td class="w">app 唯一的那个旋钮，随 session 一起消失</td></tr>
+          <tr class="gone"><td class="k">Widget</td><td class="w">明确不做。放大器不是发动机——它放大已成立的习惯，造不出习惯。随时可补，零架构代价</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="note">
+      <strong>HomeView 不是删，是改。</strong>
+      原来一行一个可以开 session 的 scope，现在变成抽屉：计数器 + 热力图 + 今天 + 四个维度的 <code>#</code> 列表。
+      点进某一行仍然是原封不动的串珠阅读体验。
+    </p>
+  </section>
+
+  <footer>
+    配套设计文档：<code>docs/superpowers/specs/2026-11-16-chrome-extension-github-as-source-design.md</code>。
+    本次只修改 UI 设计稿：仓库题单读取、公司维度、交叉范围、复习模式和三种分享卡。示例数据不代表真实账号；没有修改扩展、iOS 或同步逻辑。
+  </footer>
+
+</div>
+
+
+<script>
+(() => {
+  const $ = (s) => document.querySelector(s);
+  const $$ = (s) => [...document.querySelectorAll(s)];
+
+  /* 导出图里的颜色也必须来自 token —— 两套调色板都挂在 :root 上，
+     所以按前缀取，不在 JS 里重写一份 hex。 */
+  const tok = (name) =>
+    getComputedStyle(document.documentElement).getPropertyValue(name).trim();
+  const palette = (light) => {
+    const p = light ? '--light-' : '--dark-';
+    return {
+      ground: tok(p + 'ground'), card: tok(p + 'card'), inset: tok(p + 'inset'),
+      ink1: tok(p + 'ink-1'), ink2: tok(p + 'ink-2'),
+      ink3: tok(p + 'ink-3'), hair: tok(p + 'hair'),
+      heat0: tok(p + 'heat-0'), tagInk: tok(p + 'tag-ink'),
+      heat1: tok('--heat-1'), heat2: tok('--heat-2'), accent: tok('--accent'),
+    };
+  };
+  const isLight = () => document.documentElement.dataset.appearance === 'light';
+  /* Show More 只收长段落，不收整张卡 */
+  $$('.leaf-more').forEach(btn=>btn.addEventListener('click',()=>{
+    const card=btn.closest('.leaf');
+    const open=[...card.querySelectorAll('.clampable')].map(x=>x.classList.toggle('open')).pop();
+    btn.textContent = open ? 'Show Less' : 'Show More';
+  }));
+  /* 跨两个列表连续编号、跳过隐藏行 —— 这是斑马纹不依赖 DOM 结构的关键。
+     用 closest('[hidden]') 而不是看元素自己：被隐藏的是外层 .today-reviews /
+     .new-problems，行本身并没有 hidden 属性。 */
+  function restripeQueue(){
+    let i=0;
+    $$('.today-reviews .q, .new-problems .q').forEach(q=>{
+      if(q.closest('[hidden]')){ q.classList.remove('alt'); return; }
+      q.classList.toggle('alt', i%2===1); i++;
+    });
+  }
+  restripeQueue();
+  $$('.mode-control button').forEach(button => button.addEventListener('click', () => {
+    const mode=button.dataset.mode;
+    $$('.mode-control button').forEach(b => b.setAttribute('aria-pressed', String(b===button)));
+    $$('.new-problems').forEach(el => el.hidden=mode==='review');
+    $$('.today-reviews, .review-settings').forEach(el => el.hidden=mode==='new');
+    restripeQueue();
+    $$('.review-only-note').forEach(el => el.hidden=mode!=='review');
+    /* 和按钮文案保持一致：改了按钮没改这里，.mode-label 会显示旧名 */
+    const names={review:'复习',new:'新题',learn:'复习+新题'};
+    $$('.mode-label').forEach(el => el.textContent=names[mode]);
+  }));
+  let currentReviewPolicy='interval';
+  function renderReviewPolicy() {
+    const rounds=currentReviewPolicy==='round';
+    $$('.schedule-control button').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.reviewPolicy===currentReviewPolicy)));
+    $('#interval-settings').hidden=rounds;$('#round-settings').hidden=!rounds;
+  }
+  $$('.schedule-control button').forEach(b=>b.addEventListener('click',()=>{currentReviewPolicy=b.dataset.reviewPolicy;renderReviewPolicy();}));renderReviewPolicy();
+  const themeMedia=window.matchMedia('(prefers-color-scheme: dark)');
+  function setAppearance(choice) {
+    document.documentElement.dataset.appearance=choice==='system'?(themeMedia.matches?'dark':'light'):choice;
+    document.documentElement.dataset.theme=document.documentElement.dataset.appearance;
+    $$('.theme-options button').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.themeChoice===choice)));
+    document.documentElement.dataset.themeChoice=choice;
+    try{localStorage.setItem('kerno-appearance',choice);}catch{}
+  }
+  $$('.theme-options button').forEach(b=>b.addEventListener('click',()=>setAppearance(b.dataset.themeChoice)));
+  themeMedia.addEventListener('change',()=>{if(document.documentElement.dataset.themeChoice==='system')setAppearance('system');});
+  let savedTheme='system';try{savedTheme=localStorage.getItem('kerno-appearance')||'system';}catch{}setAppearance(['light','dark','system'].includes(savedTheme)?savedTheme:'system');
+  $('#cauth-github').addEventListener('click',()=>{});
+  $('#cauth-leetcode').addEventListener('click',()=>{window.open('https://leetcode.com/accounts/login/','_blank','noopener,noreferrer');});
+  $('#auth-github').addEventListener('click',()=>{$('#auth-device').hidden=!$('#auth-device').hidden;});
+  $('#auth-leetcode').addEventListener('click',()=>{window.open('https://leetcode.com/accounts/login/','_blank','noopener,noreferrer');});
+  const records = [
+    {id:198,company:['Google','Meta'],technique:'动态规划',list:['秋招冲刺'],days:4,due:true},
+    {id:70,company:['Google'],technique:'动态规划',list:['秋招冲刺','基础巩固'],days:18,due:true},
+    {id:322,company:['Meta'],technique:'动态规划',list:['秋招冲刺'],days:40,due:false},
+    {id:104,company:['Amazon'],technique:'二叉树',list:['秋招冲刺','基础巩固'],days:3,due:true},
+    {id:239,company:['Google','Meta'],technique:'滑动窗口',list:['秋招冲刺'],days:8,due:true},
+    {id:1004,company:['Meta'],technique:'滑动窗口',list:['基础巩固'],days:1,due:true},
+    {id:226,company:['Google'],technique:'二叉树',list:['基础巩固'],days:60,due:false},
+    {id:20,company:['Amazon'],technique:'栈',list:['基础巩固'],days:15,due:true}
+  ];
+  const scopeSelections={company:new Set(['Google','Meta']),technique:new Set(['动态规划']),list:new Set(['秋招冲刺'])};
+  const pickerCatalog={
+    company:['Google','Meta','Amazon','Apple','Microsoft','ByteDance','Bloomberg','Uber','LinkedIn','Netflix','Adobe','Salesforce','Airbnb','Oracle','Stripe','未标注公司'],
+    technique:['动态规划','滑动窗口','二叉树','二分查找','双指针','哈希表','数组','字符串','栈','队列','堆','链表','回溯','贪心','图论','拓扑排序','并查集','前缀和','单调栈','位运算','Trie','排序'],
+    list:['秋招冲刺','基础巩固','面试高频','二刷计划','本周练习']
+  };
+  const dimensionNames={company:'公司',technique:'标签',list:'题单'};
+  let pickerDimension=null,pickerDraft=new Set(),pickerTrigger=null;
+  function updateScope() {
+    const dimensions=['company','technique','list'];
+    const groups=dimensions.map(name=>[...scopeSelections[name]]);
+    const days=$('#scope-time').value;
+    const matches=records.filter(r=>dimensions.every((name,i)=>!groups[i].length||groups[i].some(v=>Array.isArray(r[name])?r[name].includes(v):r[name]===v))&&(days==='all'||r.days<=Number(days)));
+    $('#scope-count').textContent='匹配 '+matches.length+' 题 · 今天到期 '+matches.filter(r=>r.due).length+' 题';
+    $('#scope-empty').hidden=matches.length>0;
+    dimensions.forEach(name=>{
+      const container=$('#selected-'+name);container.replaceChildren();
+      const values=[...scopeSelections[name]];
+      if(!values.length){const el=document.createElement('span');el.className='scope-unlimited';el.textContent='不限';container.appendChild(el);}
+      /* 容器改成横向滚动后不再截断，全部渲染 —— 原来是 slice(0,2) + 「+N」计数 */
+      values.forEach(value=>{
+        const chip=document.createElement('span');chip.className='selected-tag';
+        const text=document.createElement('span');text.textContent=value;
+        const remove=document.createElement('button');remove.type='button';remove.textContent='×';remove.setAttribute('aria-label','移除'+value);
+        remove.addEventListener('click',()=>{scopeSelections[name].delete(value);updateScope();$('.picker-open[data-dimension="'+name+'"]').focus();});
+        chip.append(text,remove);container.appendChild(chip);
+      });
+    });
+  }
+  function renderPicker() {
+    const query=$('#picker-query').value.trim().toLocaleLowerCase();
+    const options=pickerCatalog[pickerDimension].filter(v=>v.toLocaleLowerCase().includes(query)).sort((a,b)=>Number(pickerDraft.has(b))-Number(pickerDraft.has(a)));
+    const container=$('#picker-options');container.replaceChildren();
+    options.forEach(value=>{
+      const row=document.createElement('label');row.className='picker-option';
+      const input=document.createElement('input');input.type='checkbox';input.checked=pickerDraft.has(value);input.value=value;
+      const text=document.createElement('span');text.textContent=value;
+      input.addEventListener('change',()=>{if(input.checked)pickerDraft.add(value);else pickerDraft.delete(value);$('#picker-done').textContent='完成（'+pickerDraft.size+'）';const selected=row.querySelector('small');if(selected)selected.remove();if(input.checked){const mark=document.createElement('small');mark.textContent='已选';row.appendChild(mark);}});
+      row.append(input,text);
+      if(input.checked){const mark=document.createElement('small');mark.textContent='已选';row.appendChild(mark);}
+      container.appendChild(row);
+    });
+    $('#picker-no-results').hidden=options.length>0;
+    $('#picker-done').textContent='完成（'+pickerDraft.size+'）';
+  }
+  function openPicker(name,trigger) {
+    pickerDimension=name;pickerTrigger=trigger;pickerDraft=new Set(scopeSelections[name]);
+    $('#picker-title').textContent='选择'+dimensionNames[name];$('#picker-query').placeholder='搜索'+dimensionNames[name];$('#picker-query').setAttribute('aria-label','搜索'+dimensionNames[name]);$('#picker-query').value='';
+    $('#scope-overview').hidden=true;$('#scope-picker').hidden=false;renderPicker();$('#picker-options').scrollTop=0;$('#picker-query').focus();
+  }
+  function closePicker(commit) {
+    if(commit){scopeSelections[pickerDimension]=new Set(pickerDraft);updateScope();}
+    $('#scope-picker').hidden=true;$('#scope-overview').hidden=false;
+    const stableTrigger=$('.picker-open[data-dimension="'+pickerDimension+'"]');
+    (pickerTrigger&&pickerTrigger.isConnected?pickerTrigger:stableTrigger).focus();pickerDimension=null;
+  }
+  $$('.picker-open').forEach(button=>button.addEventListener('click',()=>openPicker(button.dataset.dimension,button)));
+  $('#picker-query').addEventListener('input',renderPicker);
+  $('#picker-clear').addEventListener('click',()=>{pickerDraft.clear();renderPicker();});
+  $('#picker-done').addEventListener('click',()=>closePicker(true));
+  $('#picker-back').addEventListener('click',()=>closePicker(false));
+  $('#scope-picker').addEventListener('keydown',event=>{
+    if(event.key==='Escape'){event.preventDefault();closePicker(false);}
+    if(event.key==='Tab'){
+      const controls=[...$('#scope-picker').querySelectorAll('button,input')];const first=controls[0],last=controls[controls.length-1];
+      if(event.shiftKey&&document.activeElement===first){event.preventDefault();last.focus();}else if(!event.shiftKey&&document.activeElement===last){event.preventDefault();first.focus();}
+    }
+  });
+  /* 间隔阶梯：候选档位全列出来，点一下决定这一档在不在默认阶梯里（多选）。
+     做题中那条是单选（挑这一道题的下次间隔），这条定义全局默认 —— 两者共用
+     同一份 ladder，单向：那边只读，不回写。
+     三条约束挡掉没意义的组合，违反的档位直接 disabled，而不是点了没反应：
+       · 档数 3–6     —— 少于 3 档不成阶梯，多于 6 档记不住也没收益
+       · 首档 ≤ 3 天  —— 第一次复习必须快，否则起不到巩固作用
+       · 末档 ≥ 30 天 —— 拉不到长期的话，和固定间隔就没区别了 */
+  const LADDER_STEPS=[1,2,3,5,7,10,14,21,30,45,60,90];
+  const MIN_STEPS=3, MAX_STEPS=6, FIRST_MAX=3, LAST_MIN=30;
+  let ladder=[1,3,7,14,30,60];
+  const ladderOK=n => n.length>=MIN_STEPS && n.length<=MAX_STEPS
+                   && n[0]<=FIRST_MAX && n[n.length-1]>=LAST_MIN;
+  function renderLadder(){
+    const box=$('#interval-ladder'); if(!box) return;
+    box.replaceChildren();
+    LADDER_STEPS.forEach(days=>{
+      const on=ladder.includes(days);
+      const next=on ? ladder.filter(d=>d!==days) : [...ladder,days].sort((x,y)=>x-y);
+      const ok=ladderOK(next);
+      const b=document.createElement('button');
+      b.type='button'; b.textContent=days+'天';
+      b.setAttribute('aria-pressed',String(on));
+      b.disabled=!ok;
+      b.setAttribute('aria-label', days+'天'+(on?'，已在阶梯中':'，不在阶梯中')+(ok?(on?'，点击移除':'，点击加入'):'，当前不可改'));
+      if(ok) b.addEventListener('click',()=>{ ladder=next; renderLadder(); renderNextup(); });
+      box.appendChild(b);
+    });
+  }
+  renderLadder();
+  /* 单题改期：逃生口，不是必答题。只给三档（当前档 + 左右邻居）——
+     「更早 / 照常 / 更晚」两个方向已经覆盖，再多的选择不会让你决定得更好。
+     必须有预选项：渲染成一排没有选中项的按钮，它就从「告诉你结果」变成
+     「问你一个问题」，那就是我们不做的 Anki 打分条了。 */
+  let nextDays=7;
+  function renderNextup(){
+    const box=$('#nextup-ladder'); if(!box) return;
+    let i=ladder.indexOf(nextDays);
+    if(i<0){ i=0; ladder.forEach((d,k)=>{ if(Math.abs(d-nextDays)<Math.abs(ladder[i]-nextDays)) i=k; }); nextDays=ladder[i]; }
+    const start=Math.max(0,Math.min(i-1,ladder.length-3));
+    box.replaceChildren();
+    ladder.slice(start,start+3).forEach(days=>{
+      const b=document.createElement('button');
+      b.type='button'; b.textContent=days+'天';
+      b.setAttribute('aria-pressed',String(days===nextDays));
+      b.addEventListener('click',()=>{ nextDays=days; renderNextup(); });
+      box.appendChild(b);
+    });
+  }
+  renderNextup();
+  /* 输入框随内容长高，不出滚动条。必须先置 auto 再读 scrollHeight —— 不置的话
+     scrollHeight 永远 >= 当前高度，删字时框不会缩回去。 */
+  const autosize = ta => { ta.style.height='auto'; ta.style.height=ta.scrollHeight+'px'; };
+  $$('.recap-editor textarea').forEach(ta=>{ autosize(ta); ta.addEventListener('input',()=>autosize(ta)); });
+  /* 题解编辑。阅读态和编辑态共用同一张卡，只换中间那一块。 */
+  const rBody=$('#recap-body'), rEditor=$('#recap-editor'), rDraft=$('#recap-draft'),
+        rMore=$('#recap-more'), syncNote=$('#sync-note');
+  /* 正文 ⇄ Markdown 双向转换。高亮在文件里是 ==…==（规格 §8），界面里是 <mark>；
+     两个方向都走这里，不能一边手写一边正则，否则反复编辑几轮高亮就丢了。 */
+  const toMarkdown = el => { const t=document.createElement('div'); t.innerHTML=el.innerHTML;
+    t.querySelectorAll('mark').forEach(m=>m.replaceWith('=='+m.textContent+'==')); return t.textContent.trim(); };
+  const esc = t => t.replace(/[&<>]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));
+  const toHtml = md => esc(md)
+    .replace(/==([^=]+)==/g,'<mark>$1</mark>')
+    .replace(/\*\*([^*]+)\*\*/g,'<b>$1</b>')
+    .replace(/`([^`]+)`/g,'<code>$1</code>');
+  let savedMarkdown='', draftTimer=null;
+
+  /* 工具栏：包裹型（粗体/高亮/代码）和行首型（列表）是两种不同的操作，
+     合成一个函数会把列表写成 `- 选中的整段`，而不是每行一个 -。 */
+  const WRAP={bold:['**','**'], hl:['==','=='], code:['`','`']};
+  const LINE={ul:'- ', ol:'1. '};
+  function applyFormat(kind){
+    const v=rDraft.value, a=rDraft.selectionStart, b=rDraft.selectionEnd;
+    if(WRAP[kind]){
+      const [l,r]=WRAP[kind];
+      if(a===b){ rDraft.focus(); return; }
+      rDraft.value=v.slice(0,a)+l+v.slice(a,b)+r+v.slice(b);
+      rDraft.setSelectionRange(a, b+l.length+r.length);
+    } else {
+      const ls=v.lastIndexOf('\n',a-1)+1;
+      const le=v.indexOf('\n',b)<0?v.length:v.indexOf('\n',b);
+      /* 有序列表要逐行重新编号，不能每行都写 1. —— 这也是无序和有序
+         不能共用一个前缀常量的原因。 */
+      const lines=v.slice(ls,le).split('\n').map((t,i)=>
+        kind==='ol' ? (i+1)+'. '+t : LINE.ul+t);
+      rDraft.value=v.slice(0,ls)+lines.join('\n')+v.slice(le);
+      rDraft.setSelectionRange(ls, ls+lines.join('\n').length);
+    }
+    rDraft.focus(); markDirty();
+  }
+  /* 限定在真编辑器里：演示屏也有一排同样的按钮，按类绑会让它们去改这个
+     看不见的 textarea —— 用户点了没反应，而数据已经被改了。 */
+  $$('#recap-editor .editor-tools button').forEach(btn=>
+    btn.addEventListener('click',()=>applyFormat(btn.dataset.md)));
+
+  /* 草稿自动保存。字数按非空白字符算 —— 中文没有空格分词，按词数算永远是 1。 */
+  function markDirty(){
+    const n=rDraft.value.replace(/\s/g,'').length;
+    $('#draft-count').textContent=n+' 字';
+    const st=$('#draft-state');
+    st.classList.add('saving'); st.textContent='保存中';
+    clearTimeout(draftTimer);
+    draftTimer=setTimeout(()=>{ st.classList.remove('saving'); st.textContent='草稿已保存'; }, 600);
+  }
+  if(rDraft) rDraft.addEventListener('input', markDirty);
+
+  function openEditor(){
+    savedMarkdown=toMarkdown(rBody);
+    rDraft.value=savedMarkdown;
+    rBody.hidden=true; rMore.hidden=true; rEditor.hidden=false;
+    autosize(rDraft);   /* 隐藏时 scrollHeight 是 0，必须显示后再量 */
+    $('#draft-count').textContent=savedMarkdown.replace(/\s/g,'').length+' 字';
+    $('#draft-state').textContent='草稿自动保存';
+    rDraft.focus();
+  }
+  function closeEditor(){ rEditor.hidden=true; rBody.hidden=false; rMore.hidden=false; }
+  if($('#recap-edit')) $('#recap-edit').addEventListener('click',openEditor);
+
+  /* 保存分两段显示：本地落盘和进 GitHub 是两件事，中间隔着网络、授权、限流和分支冲突。
+     合成一个「已保存」是在骗人（规格 §3、§10.1）。 */
+  if($('#recap-save')) $('#recap-save').addEventListener('click',()=>{
+    const md=rDraft.value.trim();
+    rBody.innerHTML=toHtml(md)||'<span style="color:var(--ink-3)">还没写题解</span>';
+    savedMarkdown=md; closeEditor();
+    const snText=syncNote.querySelector('.sn-text');
+    syncNote.hidden=false; syncNote.classList.add('warn');
+    snText.textContent='本地已保存 · 1 条待同步';
+    setTimeout(()=>{ syncNote.classList.remove('warn');
+      snText.textContent='已同步到 GitHub · 刚刚';
+      setTimeout(()=>{ syncNote.hidden=true; }, 2600); }, 1400);
+  });
+  if(rDraft) rDraft.addEventListener('keydown',e=>{
+    const mod=e.metaKey||e.ctrlKey;
+    if(mod&&e.key.toLowerCase()==='b'){ e.preventDefault(); applyFormat('bold'); }
+    if(mod&&e.key.toLowerCase()==='e'){ e.preventDefault(); applyFormat('hl'); }
+    if(mod&&e.key==='Enter'){ e.preventDefault(); $('#recap-save').click(); }
+    if(e.key==='Escape'){ e.preventDefault(); closeEditor(); }
+  });
+  /* ··· 菜单。页面上现在有 5 个（4 条标题栏 + 题解卡），所以按类绑而不是按 id。
+     打开任一个之前先关掉其余的，否则会同时挂着两个浮层。 */
+  /* 勾选决定哪几块进图。两条规则：
+     · 有内容的默认勾上 —— 「点一下分享」的路径不变长，取消是逃生口不是必答题
+     · 没内容的自动灰掉 —— 这道题还没写伪代码，就不该给一个勾了也是空的框。
+       状态从数据推导，不写死：换一道题，哪几块可选自己就对了。 */
+  $$('.share-pick input').forEach(box=>{
+    const part=box.dataset.part;
+    const blocks=$$('.share-chain .link[data-part="'+part+'"]');
+    const filled=blocks.some(b=>b.textContent.replace(/\s/g,'').length>part.length);
+    if(!filled){
+      box.checked=false; box.disabled=true;
+      const lab=box.closest('label');
+      lab.classList.add('empty'); lab.title='这道题还没有'+part;
+    }
+    blocks.forEach(el=>el.hidden=!box.checked);
+    box.addEventListener('change',()=>blocks.forEach(el=>el.hidden=!box.checked));
+  });
+  const closeMenus=()=>{ $$('.recap-actions').forEach(m=>m.hidden=true);
+    $$('.recap-menu').forEach(b=>b.setAttribute('aria-expanded','false')); };
+  $$('.recap-menu').forEach(btn=>{
+    const menu=btn.nextElementSibling;
+    btn.addEventListener('click',e=>{ e.stopPropagation();
+      const open=menu.hidden; closeMenus();
+      menu.hidden=!open; btn.setAttribute('aria-expanded',String(open)); });
+    menu.addEventListener('click',e=>e.stopPropagation());
+  });
+  document.addEventListener('click',closeMenus);
+  document.addEventListener('keydown',e=>{ if(e.key==='Escape') closeMenus(); });
+  $('#scope-time').addEventListener('change',updateScope);
+  $('#clear-scope').addEventListener('click',()=>{Object.values(scopeSelections).forEach(set=>set.clear());$('#scope-time').value='all';updateScope();});
+  updateScope();
+  /* 顶栏说的是「在读哪一类」，不是「在读哪道题」—— 题名归卡片，顶栏不重复。
+     维度名从当前选中的那个 radio 对应的 label 上取，所以点公司面里的行会
+     得到「公司/Google」，点时间面会得到「时间/本周做的」，不用写死。 */
+  /* Show More 真的要能展开。样稿里放一个点不动的按钮，比不放更误导。 */
+  const recapBody=$('#recap-body'), recapMore=$('#recap-more');
+  if(recapMore) recapMore.addEventListener('click',()=>{
+    recapMore.textContent = recapBody.classList.toggle('open') ? 'Show Less' : 'Show More';
+  });
+  const dimName=()=>$('.switch label[for="'+$('input[name="dim"]:checked').id+'"]').textContent;
+  $$('.hash').forEach(row=>row.addEventListener('click',()=>{
+    $('.read .now').textContent=dimName()+'/'+row.querySelector('.nm').textContent;
+  }));
+  $$('.hamb[tabindex], .hash[tabindex], .now[tabindex]').forEach(el=>el.addEventListener('keydown',event=>{ if(event.key==='Enter'||event.key===' '){event.preventDefault();el.click();} }));
+})();
+</script>
+
+</body></html>
