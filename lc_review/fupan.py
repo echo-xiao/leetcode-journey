@@ -64,7 +64,7 @@ def _rebalance_dangling_span(span_open: str | None, body: str) -> str:
     ``_SPAN_OPEN`` above), the entry-header regex consumes the opening tag as
     header noise, leaving a ``</span>`` in the body with no matching opener.
     That drops the highlighted text (``extract_highlights`` needs a matched
-    pair) and leaves malformed HTML for ``to_anki_html`` to choke on.
+    pair) and leaves a dangling, unmatched span in the body.
     Re-prepending the original opening tag to the body restores the pair
     without pulling the number/title back into the highlight, since those
     were already stripped by the header match.
@@ -102,7 +102,6 @@ def _entries_in_line(pattern: re.Pattern[str], line: str) -> list[tuple[str, str
 # backslash-escapes the quotes, so both spellings must match.
 HIGHLIGHT_RE = re.compile(r'<span color=\\?"[a-z_]+\\?">(.*?)</span>', re.DOTALL)
 HIGHLIGHT_OPEN_RE = re.compile(r'<span color=\\?"[a-z_]+\\?">')
-HIGHLIGHT_STYLE = '<span style="background:#ffe0b2">'
 
 
 @dataclass(frozen=True)
@@ -121,15 +120,6 @@ class Retrospective:
 def extract_highlights(body: str) -> tuple[str, ...]:
     """Return the text echo marked in orange — her own record of what she got wrong."""
     return tuple(match.strip() for match in HIGHLIGHT_RE.findall(body) if match.strip())
-
-
-def to_anki_html(body: str) -> str:
-    """Rewrite Notion colour spans as background-shaded spans Anki can render.
-
-    Anki does not understand Notion's ``color`` attribute, so a straight copy
-    would render as unstyled text and the highlight would silently vanish.
-    """
-    return HIGHLIGHT_OPEN_RE.sub(HIGHLIGHT_STYLE, body)
 
 
 def parse_easy_page(text: str) -> list[Retrospective]:
@@ -179,54 +169,3 @@ def parse_medium_page(text: str) -> list[Retrospective]:
                 )
             )
     return found
-
-
-def attach(
-    state: dict[str, dict], retrospectives: list[Retrospective]
-) -> tuple[dict[str, dict], list[Retrospective]]:
-    """Hang retrospectives onto state records by problem id.
-
-    A retrospective with no matching local record is returned as an orphan
-    rather than dropped: echo wrote roughly 170 of those for problems whose
-    code never got synced down, and losing them would lose real work.
-
-    A problem id can appear more than once across the two Notion pages (42 do
-    in practice). Only the longest body is kept as ``正文``, but every
-    duplicate's highlights are unioned into ``高亮`` -- in first-seen order,
-    exact duplicates collapsed -- because a shorter, losing body can still
-    carry a highlight the winning body never mentions.
-    """
-    slug_by_id = {record["id"]: slug for slug, record in state.items()}
-    orphans: list[Retrospective] = []
-    highlights_by_slug: dict[str, list[str]] = {}
-    for slug, record in state.items():
-        existing = record.get("我的复盘")
-        if existing is not None:
-            highlights_by_slug[slug] = list(existing.get("高亮", []))
-
-    for retro in retrospectives:
-        slug = slug_by_id.get(retro.problem_id)
-        if slug is None:
-            orphans.append(retro)
-            continue
-        seen = highlights_by_slug.setdefault(slug, [])
-        for highlight in retro.highlights:
-            if highlight not in seen:
-                seen.append(highlight)
-        existing = state[slug].get("我的复盘")
-        if existing is not None and len(existing["正文"]) >= len(retro.body):
-            continue
-        state[slug]["我的复盘"] = {
-            "来源": retro.source,
-            "正文": retro.body,
-            "高亮": [],  # filled in below once every duplicate has been seen
-            "Day": retro.day,
-            "模式": retro.topic,
-            "日期": retro.date,
-        }
-
-    for slug, highlights in highlights_by_slug.items():
-        record = state[slug].get("我的复盘")
-        if record is not None:
-            record["高亮"] = highlights
-    return state, orphans

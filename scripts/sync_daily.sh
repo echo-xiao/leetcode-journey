@@ -8,7 +8,7 @@
 
 set -o pipefail
 
-REPO="/Users/echoooooo/PycharmProjects/leetcode-journey"
+REPO="/Users/echoooooo/Desktop/code/leetcode-journey"
 LOGS="$REPO/logs"
 LOG="$LOGS/sync-$(date +%Y-%m-%d).log"
 
@@ -37,7 +37,10 @@ notify() {
         exit 1
     fi
 
-    if ! /usr/bin/env python3 -m lc_review.cli sync-all --apply; then
+    # launchd runs with PATH=/usr/bin:/bin:/usr/sbin:/sbin, so `env python3`
+    # resolves to Apple's bare Python, not the miniconda3 base env where
+    # requests/anthropic/dotenv actually live. Use the absolute path.
+    if ! /Users/echoooooo/miniconda3/bin/python3 -m lc_review.cli sync-all --apply; then
         echo "!!! sync-all failed"
         notify "Pipeline aborted, log: $LOG"
         exit 1

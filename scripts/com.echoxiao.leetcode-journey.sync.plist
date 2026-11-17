@@ -7,7 +7,7 @@
 
     <key>ProgramArguments</key>
     <array>
-        <string>/Users/echoooooo/PycharmProjects/leetcode-journey/scripts/sync_daily.sh</string>
+        <string>/Users/echoooooo/Desktop/code/leetcode-journey/scripts/sync_daily.sh</string>
     </array>
 
     <!-- 3am. If the Mac is asleep launchd runs it once on wake, so a machine
@@ -26,8 +26,8 @@
     <!-- The script writes its own dated log; these catch anything that dies
          before it gets that far. -->
     <key>StandardOutPath</key>
-    <string>/Users/echoooooo/PycharmProjects/leetcode-journey/logs/launchd.out</string>
+    <string>/Users/echoooooo/Desktop/code/leetcode-journey/logs/launchd.out</string>
     <key>StandardErrorPath</key>
-    <string>/Users/echoooooo/PycharmProjects/leetcode-journey/logs/launchd.err</string>
+    <string>/Users/echoooooo/Desktop/code/leetcode-journey/logs/launchd.err</string>
 </dict>
 </plist>

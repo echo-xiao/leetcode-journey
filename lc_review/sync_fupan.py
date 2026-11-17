@@ -22,7 +22,6 @@ from .notion_api import (
     prop_number,
     prop_select,
     prop_rich,
-    prop_text,
     prop_title,
     prop_url,
     query_all,
@@ -77,7 +76,6 @@ class Plan:
     update: dict[int, str]                              # problem id -> combined body
     create: dict[int, str]
     segments: dict[int, list[tuple[str, bool]]]         # same content, highlight runs
-    skipped_no_id: int
 
 
 def collect(easy_text: str, medium_text: str) -> dict[int, list[Retrospective]]:
@@ -124,7 +122,7 @@ def build_plan(by_id: dict[int, list[Retrospective]], rows: list[dict]) -> Plan:
             continue
         segments[problem_id] = combine_segments(entries)
         (update if problem_id in existing else create)[problem_id] = body
-    return Plan(update=update, create=create, segments=segments, skipped_no_id=0)
+    return Plan(update=update, create=create, segments=segments)
 
 
 def apply_plan(plan: Plan, rows: list[dict], titles: dict[int, str], dry_run: bool = True) -> None:

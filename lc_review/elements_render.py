@@ -40,14 +40,6 @@ def load_map():
     return m
 
 
-def inferred_set():
-    p = os.path.join(SCRATCH, "inferred_tags.tsv")
-    if not os.path.exists(p):
-        return set()
-    with open(p, encoding="utf-8") as f:
-        return {l.split("\t")[0] for l in f if l.strip()}
-
-
 def title_of(folder):
     p = os.path.join(PROBLEMS, folder, "problem.md")
     with open(p, encoding="utf-8") as f:
@@ -55,8 +47,8 @@ def title_of(folder):
     return first[2:].replace(" · 题目", "").strip()
 
 
-def render(folder, tag, answers, tag_inferred=False):
-    cat, slots, questions = SPEC[tag]
+def render(folder, tag, answers):
+    _, slots, _ = SPEC[tag]
     if len(answers) != len(slots):
         raise ValueError("{}: expected {} answers, got {}".format(folder, len(slots), len(answers)))
     title = title_of(folder)
@@ -69,7 +61,6 @@ def render(folder, tag, answers, tag_inferred=False):
 
 def main():
     ymap = load_map()
-    inferred = inferred_set()
     with open(os.path.join(SCRATCH, "answers.json"), encoding="utf-8") as f:
         answers = json.load(f)
     written = 0
@@ -80,7 +71,7 @@ def main():
             errs.append((folder, "no pattern tag"))
             continue
         try:
-            content = render(folder, tag, ans, folder in inferred)
+            content = render(folder, tag, ans)
         except Exception as e:
             errs.append((folder, str(e)))
             continue

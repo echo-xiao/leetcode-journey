@@ -23,7 +23,6 @@ API = "https://api.notion.com/v1"
 NOTION_VERSION = "2022-06-28"
 
 REVIEW_DB = "7b103d6a-78eb-4dcb-9167-f038237e6ce7"      # the review-tracker database
-ELEMENTS_DB = "660316d4-125b-43e2-b5cc-7189d99815c7"    # the elements table
 
 
 def load_env() -> dict[str, str]:
@@ -104,28 +103,12 @@ def create_page(database_id: str, properties: dict) -> dict:
     )
 
 
-def append_blocks(page_id: str, blocks: list[dict]) -> dict:
-    """Notion caps a children append at 100 blocks, so send it in chunks."""
-    result: dict = {}
-    for start in range(0, len(blocks), 100):
-        result = _request(
-            "PATCH", f"/blocks/{page_id}/children", json={"children": blocks[start:start + 100]}
-        )
-    return result
-
-
 # --- property helpers -------------------------------------------------------
 # Notion's property payloads are verbose and easy to get subtly wrong; these
 # keep the call sites readable.
 
 def prop_title(text: str) -> dict:
     return {"title": [{"type": "text", "text": {"content": text[:2000]}}]}
-
-
-def prop_text(text: str) -> dict:
-    """Rich text caps at 2000 characters per chunk, so split long bodies."""
-    chunks = [text[i:i + 2000] for i in range(0, len(text), 2000)] or [""]
-    return {"rich_text": [{"type": "text", "text": {"content": c}} for c in chunks]}
 
 
 def prop_rich(segments: list[tuple[str, bool]]) -> dict:
@@ -162,11 +145,6 @@ def prop_url(url: str | None) -> dict:
     return {"url": url or None}
 
 
-def read_title(page: dict, name: str) -> str:
-    node = page.get("properties", {}).get(name, {})
-    return "".join(part.get("plain_text", "") for part in node.get("title", []))
-
-
 def read_text(page: dict, name: str) -> str:
     node = page.get("properties", {}).get(name, {})
     return "".join(part.get("plain_text", "") for part in node.get("rich_text", []))
@@ -178,8 +156,3 @@ def read_number(page: dict, name: str):
 
 def read_url(page: dict, name: str):
     return page.get("properties", {}).get(name, {}).get("url")
-
-
-def read_select(page: dict, name: str):
-    node = page.get("properties", {}).get(name, {}).get("select")
-    return node.get("name") if node else None

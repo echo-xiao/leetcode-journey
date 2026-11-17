@@ -15,7 +15,6 @@ claude = anthropic.Anthropic(api_key=os.getenv('CLAUDE_TOKEN'))
 # --- Environment check ---
 LC_SESSION = os.getenv('LEETCODE_SESSION')
 LC_CSRF = os.getenv('LEETCODE_CSRFTOKEN')
-CLAUDE_KEY = os.getenv('CLAUDE_TOKEN')
 
 # ================= Core: authenticated session setup =================
 # A global Session object that manages cookies and headers automatically
@@ -32,19 +31,6 @@ session.headers.update({
     'x-csrftoken': LC_CSRF,
     'Content-Type': 'application/json'
 })
-
-
-def describe_environment() -> str:
-    """What the module found in .env, for callers that want to log it.
-
-    Printing this at import time made the module unusable as a library: every
-    command that touched it dumped four lines of diagnostics first.
-    """
-    return (
-        f"Session: {'set' if LC_SESSION else 'missing'} | "
-        f"CSRF: {'set' if LC_CSRF else 'missing'} | "
-        f"Claude Key: {'set' if CLAUDE_KEY else 'missing'}"
-    )
 
 
 # ================= Configuration =================
@@ -216,25 +202,6 @@ def get_submission_code(sub_id):
     except:
         return ""
 
-
-def read_existing_description(folder):
-    """Recover a previously fetched problem statement.
-
-    Current layout keeps it in problem.md; older folders kept it inside
-    README_CN.md. Try both so a re-fetch never downgrades a good description
-    to '暂无描述'.
-    """
-    import re as _re
-    for name in ("problem.md", "README_CN.md"):
-        path = f"{folder}/{name}"
-        if not os.path.exists(path):
-            continue
-        with open(path, 'r', encoding='utf-8') as f:
-            content = f.read()
-        m = _re.search(r'## 题目描述\n\n(.+?)(?:\n\n---|\Z)', content, _re.DOTALL)
-        if m and m.group(1).strip() not in ('None', '暂无描述', ''):
-            return m.group(1).strip()
-    return None
 
 
 def write_problem_files(folder, q_id, cn_title, difficulty, tags,
