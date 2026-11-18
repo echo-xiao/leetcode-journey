@@ -331,7 +331,10 @@
   .pnav { display:flex; gap:var(--s3); }
   /* 每项预留固定宽度：选中项是 600 字重、比 400 宽，不留的话「哪一项被选中」
      会改变整条导航的宽度，三个字在每个面板的落点就都不一样。 */
-  .pnav b { min-width:30px; text-align:center;
+  /* nowrap 不能省：.pnav 是绝对定位的，不撑父元素高度 —— 标签折行时
+     .pbar 的高度一点不变，量高度完全看不出来，只有看渲染才发现。
+     英文标签比中文长，"This problem" 正好卡在折行线上。 */
+  .pnav b { white-space:nowrap; min-width:30px; text-align:center;
     font-size:var(--t-body); font-weight:400; color:var(--ink-3); cursor:pointer;
     transition:color .15s var(--ease); }
   .pnav b:hover { color:var(--ink-2); }
@@ -1473,7 +1476,7 @@
       <div class="unit">
         <div class="cap"><b>01</b> On opening the browser</div>
         <div class="panel">
-          <div class="pbar"><span class="plogo" aria-hidden="true"></span><span class="pnav"><b class="here">Today</b><b>This one</b><b>Settings</b></span><button class="pcheck" aria-label="Check in today" title="Check in today"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 8H6a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V10a2 2 0 0 0-2-2h-2M12 15V2m-4 4 4-4 4 4"/></svg></button></div>
+          <div class="pbar"><span class="plogo" aria-hidden="true"></span><span class="pnav"><b class="here">Today</b><b>Problem</b><b>Settings</b></span><button class="pcheck" aria-label="Check in today" title="Check in today"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 8H6a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V10a2 2 0 0 0-2-2h-2M12 15V2m-4 4 4-4 4 4"/></svg></button></div>
           <div class="pbody">
             <div class="today-reviews"><div class="qlist"><a class="q late" href="https://leetcode.com/problems/max-consecutive-ones-iii/" target="_blank" rel="noopener noreferrer"><span class="flag" title="Overdue" aria-label="Overdue">!</span><div class="qmain"><b title="1004. Max Consecutive Ones III">1004. Max Consecutive Ones III</b><span class="qsub"><em class="difficulty medium">Med.</em> · <span class="due">3d</span></span></div></a><a class="q late" href="https://leetcode.com/problems/sliding-window-maximum/" target="_blank" rel="noopener noreferrer"><span class="flag" title="Overdue" aria-label="Overdue">!</span><div class="qmain"><b title="239. Sliding Window Maximum">239. Sliding Window Maximum</b><span class="qsub"><em class="difficulty hard">Hard</em> · <span class="due">1d</span></span></div></a><a class="q " href="https://leetcode.com/problems/maximum-depth-of-binary-tree/" target="_blank" rel="noopener noreferrer"><span class="flag" title="Due today" aria-label="Due today">·</span><div class="qmain"><b title="104. Maximum Depth of Binary Tree">104. Maximum Depth of Binary Tree</b><span class="qsub"><em class="difficulty easy">Easy</em></span></div></a><a class="q " href="https://leetcode.com/problems/course-schedule/" target="_blank" rel="noopener noreferrer"><span class="flag" title="Due today" aria-label="Due today">·</span><div class="qmain"><b title="207. Course Schedule">207. Course Schedule</b><span class="qsub"><em class="difficulty medium">Med.</em></span></div></a><a class="q " href="https://leetcode.com/problems/house-robber/" target="_blank" rel="noopener noreferrer"><span class="flag" title="Due today" aria-label="Due today">·</span><div class="qmain"><b title="198. House Robber">198. House Robber</b><span class="qsub"><em class="difficulty medium">Med.</em></span></div></a><a class="q " href="https://leetcode.com/problems/climbing-stairs/" target="_blank" rel="noopener noreferrer"><span class="flag" title="Due today" aria-label="Due today">·</span><div class="qmain"><b title="70. Climbing Stairs">70. Climbing Stairs</b><span class="qsub"><em class="difficulty easy">Easy</em></span></div></a><a class="q " href="https://leetcode.com/problems/coin-change/" target="_blank" rel="noopener noreferrer"><span class="flag" title="Due today" aria-label="Due today">·</span><div class="qmain"><b title="322. Coin Change">322. Coin Change</b><span class="qsub"><em class="difficulty medium">Med.</em></span></div></a><a class="q " href="https://leetcode.com/problems/trapping-rain-water/" target="_blank" rel="noopener noreferrer"><span class="flag" title="Due today" aria-label="Due today">·</span><div class="qmain"><b title="42. Trapping Rain Water">42. Trapping Rain Water</b><span class="qsub"><em class="difficulty hard">Hard</em></span></div></a><a class="q " href="https://leetcode.com/problems/product-of-array-except-self/" target="_blank" rel="noopener noreferrer"><span class="flag" title="Due today" aria-label="Due today">·</span><div class="qmain"><b title="238. Product of Array Except Self">238. Product of Array Except Self</b><span class="qsub"><em class="difficulty medium">Med.</em></span></div></a><a class="q " href="https://leetcode.com/problems/invert-binary-tree/" target="_blank" rel="noopener noreferrer"><span class="flag" title="Due today" aria-label="Due today">·</span><div class="qmain"><b title="226. Invert Binary Tree">226. Invert Binary Tree</b><span class="qsub"><em class="difficulty easy">Easy</em></span></div></a><a class="q " href="https://leetcode.com/problems/valid-parentheses/" target="_blank" rel="noopener noreferrer"><span class="flag" title="Due today" aria-label="Due today">·</span><div class="qmain"><b title="20. Valid Parentheses">20. Valid Parentheses</b><span class="qsub"><em class="difficulty easy">Easy</em></span></div></a><a class="q " href="https://leetcode.com/problems/best-time-to-buy-and-sell-stock-iii/" target="_blank" rel="noopener noreferrer"><span class="flag" title="Due today" aria-label="Due today">·</span><div class="qmain"><b title="123. Best Time to Buy and Sell Stock III">123. Best Time to Buy and Sell Stock III</b><span class="qsub"><em class="difficulty hard">Hard</em></span></div></a></div></div>
             <div class="new-problems" hidden>
@@ -1488,7 +1491,7 @@
       <div class="unit">
         <div class="cap"><b>02</b> While solving</div>
         <div class="panel">
-          <div class="pbar"><span class="plogo" aria-hidden="true"></span><span class="pnav"><b>Today</b><b class="here">This one</b><b>Settings</b></span><div class="recap-menu-wrap"><button class="recap-menu" aria-haspopup="menu" aria-expanded="false" aria-label="More actions">···</button><div class="recap-actions" role="menu" hidden><button role="menuitem" id="recap-share"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 8H6a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V10a2 2 0 0 0-2-2h-2M12 15V2m-4 4 4-4 4 4"/></svg><span>Share</span></button><button role="menuitem" id="recap-edit"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m4 16-1 5 5-1L21 7l-4-4L4 16Zm11-11 4 4M3 23h18"/></svg><span>Edit</span></button><button role="menuitem" id="recap-copy"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 7H5a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-3M8 1h7l6 6v11H8V1Zm7 0v6h6"/></svg><span>Copy</span></button></div></div></div>
+          <div class="pbar"><span class="plogo" aria-hidden="true"></span><span class="pnav"><b>Today</b><b class="here">Problem</b><b>Settings</b></span><div class="recap-menu-wrap"><button class="recap-menu" aria-haspopup="menu" aria-expanded="false" aria-label="More actions">···</button><div class="recap-actions" role="menu" hidden><button role="menuitem" id="recap-share"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 8H6a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V10a2 2 0 0 0-2-2h-2M12 15V2m-4 4 4-4 4 4"/></svg><span>Share</span></button><button role="menuitem" id="recap-edit"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m4 16-1 5 5-1L21 7l-4-4L4 16Zm11-11 4 4M3 23h18"/></svg><span>Edit</span></button><button role="menuitem" id="recap-copy"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 7H5a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-3M8 1h7l6 6v11H8V1Zm7 0v6h6"/></svg><span>Copy</span></button></div></div></div>
           <div class="pbody">
             <div class="recap">
               <div class="recap-head">
@@ -1524,36 +1527,36 @@
 
       <div class="unit">
         <div class="cap"><b>04</b> Settings <em>· mode, pace and scope</em></div>
-        <div class="panel"><div class="pbar"><span class="plogo" aria-hidden="true"></span><span class="pnav"><b>Today</b><b>This one</b><b class="here">Settings</b></span></div><div class="pbody" id="scope-panel">
+        <div class="panel"><div class="pbar"><span class="plogo" aria-hidden="true"></span><span class="pnav"><b>Today</b><b>Problem</b><b class="here">Settings</b></span></div><div class="pbody" id="scope-panel">
           <div id="scope-overview">
           <div class="lists">
-            <div class="row"><span class="ttl">Practice</span><div class="mode-control" role="group" aria-label="Practice"><button type="button" data-mode="review" aria-pressed="true">Review</button><button type="button" data-mode="new" aria-pressed="false">New</button><button type="button" data-mode="learn" aria-pressed="false">Both</button></div></div>
+            <div class="row"><span class="ttl">Practice mode</span><div class="mode-control" role="group" aria-label="Practice mode"><button type="button" data-mode="review" aria-pressed="true">Review</button><button type="button" data-mode="new" aria-pressed="false">New</button><button type="button" data-mode="learn" aria-pressed="false">Review + New</button></div></div>
             <div class="new-problems" hidden>
               <label class="row"><span class="ttl">New per day</span><span class="capfield"><input id="new-goal" class="cap" type="number" min="1" max="50" step="1" value="3" inputmode="numeric" aria-label="New problems per day"><em>/day</em></span></label>
               <label class="row"><span class="ttl">Main list</span><select><option>Fall sprint</option></select></label>
             </div>
             <div class="review-settings">
-              <div class="row"><span class="ttl">Method</span><div class="schedule-control" role="group" aria-label="Method"><button data-review-policy="interval" aria-pressed="true">Ladder</button><button data-review-policy="round" aria-pressed="false">Rounds</button></div></div>
-              <label class="row"><span class="ttl">Daily cap</span><span class="capfield"><input id="daily-cap" class="cap" type="number" min="1" max="200" step="1" value="20" inputmode="numeric" aria-label="Daily review cap"><em>/day</em></span></label>
+              <div class="row"><span class="ttl">Review schedule</span><div class="schedule-control" role="group" aria-label="Review schedule"><button data-review-policy="interval" aria-pressed="true">Spaced</button><button data-review-policy="round" aria-pressed="false">Rounds</button></div></div>
+              <label class="row"><span class="ttl">Daily limit</span><span class="capfield"><input id="daily-cap" class="cap" type="number" min="1" max="200" step="1" value="20" inputmode="numeric" aria-label="Daily review limit"><em>/day</em></span></label>
               <div class="row" id="interval-settings"><span class="ttl">Intervals</span><span class="interval-preview" id="interval-ladder" role="group" aria-label="Review interval ladder"></span></div>
               <div class="row" id="round-settings" hidden><span class="ttl">Round progress</span><span class="pg">Round 1 · 18 / 61</span></div>
             </div>
           </div>
           <div class="lists">
-            <div class="row"><span class="ttl">Company</span><span class="selected-tags" id="selected-company"></span><button class="text-button picker-open" data-dimension="company" aria-haspopup="dialog">Choose ›</button></div>
-            <div class="row"><span class="ttl">Tag</span><span class="selected-tags" id="selected-technique"></span><button class="text-button picker-open" data-dimension="technique" aria-haspopup="dialog">Choose ›</button></div>
-            <div class="row"><span class="ttl">List</span><span class="selected-tags" id="selected-list"></span><button class="text-button picker-open" data-dimension="list" aria-haspopup="dialog">Choose ›</button></div>
+            <div class="row"><span class="ttl">Companies</span><span class="selected-tags" id="selected-company"></span><button class="text-button picker-open" data-dimension="company" aria-haspopup="dialog">Select ›</button></div>
+            <div class="row"><span class="ttl">Tags</span><span class="selected-tags" id="selected-technique"></span><button class="text-button picker-open" data-dimension="technique" aria-haspopup="dialog">Select ›</button></div>
+            <div class="row"><span class="ttl">Lists</span><span class="selected-tags" id="selected-list"></span><button class="text-button picker-open" data-dimension="list" aria-haspopup="dialog">Select ›</button></div>
             <label class="row"><span class="ttl">Time</span><select id="scope-time"><option value="all">Any</option><option value="30">Last 30 days</option><option value="7">Last 7 days</option></select></label>
             <div class="row"><span class="ttl">Reset filters</span><button class="text-button" id="clear-scope">Clear</button></div>
           </div>
           <div class="lists">
-            <div class="row"><span class="ttl">GitHub repo</span><span class="pg">echo-xiao / lc-data · connected</span></div>
+            <div class="row"><span class="ttl">GitHub repo</span><span class="pg">echo-xiao / lc-data</span></div>
             <div class="row"><span class="ttl">Sync</span><span class="pg"><span class="state">Synced</span></span></div>
           </div>
           <div class="scope-result" aria-live="polite"><strong id="scope-count"></strong><span id="scope-empty" hidden>Try fewer conditions, or clear them to see everything.</span></div>
         </div>
           <section id="scope-picker" role="dialog" aria-modal="true" aria-labelledby="picker-title" hidden>
-            <div class="picker-head"><button class="text-button" id="picker-back">‹ Scope</button><h3 id="picker-title">Choose tags</h3></div>
+            <div class="picker-head"><button class="text-button" id="picker-back">‹ Scope</button><h3 id="picker-title">Select tags</h3></div>
             <label class="picker-search"><span aria-hidden="true">⌕</span><input id="picker-query" type="search" placeholder="Search tags" aria-label="Search tags" autocomplete="off"></label>
             <p class="picker-hint">Selected first · multi-select</p>
             <div id="picker-options" class="picker-options"></div>
@@ -1689,7 +1692,7 @@ for right in range(n):
               <input type="radio" name="dim" id="d-company">
               <input type="radio" name="dim" id="d-time">
 
-              <div class="switch" aria-label="Reading category"><label for="d-list">List</label><label for="d-cat">Tag</label><label for="d-company">Company</label><label for="d-time">Time</label></div>
+              <div class="switch" aria-label="Reading category"><label for="d-list">Lists</label><label for="d-cat">Tags</label><label for="d-company">Companies</label><label for="d-time">Time</label></div>
               <div class="faces">
                 <div class="face f-list">
                   <label class="hash" for="drawer" tabindex="0"><span class="sg">#</span><span class="nm">Top Interview 150</span><span class="ct">41/150</span></label>
@@ -1704,7 +1707,7 @@ for right in range(n):
                     <label class="hash" for="drawer" tabindex="0"><span class="sg">#</span><span class="nm">Construction</span><span class="ct">3/19</span><span class="cv"></span></label>
                   </div>
                   <label class="hash" for="drawer" tabindex="0"><span class="sg">#</span><span class="nm">Sliding window</span><span class="ct">8/42</span><span class="cv"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M9 5l7 7-7 7"/></svg></span></label>
-                  <label class="hash" for="drawer" tabindex="0"><span class="sg">#</span><span class="nm">Dynamic programming</span><span class="ct">12/38</span><span class="cv"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M9 5l7 7-7 7"/></svg></span></label>
+                  <label class="hash" for="drawer" tabindex="0"><span class="sg">#</span><span class="nm">DP</span><span class="ct">12/38</span><span class="cv"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M9 5l7 7-7 7"/></svg></span></label>
                   <label class="hash" for="drawer" tabindex="0"><span class="sg">#</span><span class="nm">Binary search</span><span class="ct">3/34</span><span class="cv"></span></label>
                   <label class="hash" for="drawer" tabindex="0"><span class="sg">#</span><span class="nm">Two pointers</span><span class="ct">6/31</span><span class="cv"></span></label>
                 </div>
@@ -2016,19 +2019,19 @@ for right in range(n):
   $('#auth-github').addEventListener('click',()=>{$('#auth-device').hidden=!$('#auth-device').hidden;});
   $('#auth-leetcode').addEventListener('click',()=>{window.open('https://leetcode.com/accounts/login/','_blank','noopener,noreferrer');});
   const records = [
-    {id:198,company:['Google','Meta'],technique:'Dynamic programming',list:['Fall sprint'],days:4,due:true},
-    {id:70,company:['Google'],technique:'Dynamic programming',list:['Fall sprint','Fundamentals'],days:18,due:true},
-    {id:322,company:['Meta'],technique:'Dynamic programming',list:['Fall sprint'],days:40,due:false},
+    {id:198,company:['Google','Meta'],technique:'DP',list:['Fall sprint'],days:4,due:true},
+    {id:70,company:['Google'],technique:'DP',list:['Fall sprint','Fundamentals'],days:18,due:true},
+    {id:322,company:['Meta'],technique:'DP',list:['Fall sprint'],days:40,due:false},
     {id:104,company:['Amazon'],technique:'Binary tree',list:['Fall sprint','Fundamentals'],days:3,due:true},
     {id:239,company:['Google','Meta'],technique:'Sliding window',list:['Fall sprint'],days:8,due:true},
     {id:1004,company:['Meta'],technique:'Sliding window',list:['Fundamentals'],days:1,due:true},
     {id:226,company:['Google'],technique:'Binary tree',list:['Fundamentals'],days:60,due:false},
     {id:20,company:['Amazon'],technique:'Stack',list:['Fundamentals'],days:15,due:true}
   ];
-  const scopeSelections={company:new Set(['Google','Meta']),technique:new Set(['Dynamic programming']),list:new Set(['Fall sprint'])};
+  const scopeSelections={company:new Set(['Google','Meta']),technique:new Set(['DP']),list:new Set(['Fall sprint'])};
   const pickerCatalog={
     company:['Google','Meta','Amazon','Apple','Microsoft','ByteDance','Bloomberg','Uber','LinkedIn','Netflix','Adobe','Salesforce','Airbnb','Oracle','Stripe','No company tag'],
-    technique:['Dynamic programming','Sliding window','Binary tree','Binary search','Two pointers','Hash table','Arrays','Strings','Stack','Queue','Heap','Linked list','Backtracking','Greedy','Graphs','Topological sort','Union find','Prefix sum','Monotonic stack','Bit manipulation','Trie','Sorting'],
+    technique:['DP','Sliding window','Binary tree','Binary search','Two pointers','Hash table','Arrays','Strings','Stack','Queue','Heap','Linked list','Backtracking','Greedy','Graphs','Topo sort','Union find','Prefix sum','Mono stack','Bit manipulation','Trie','Sorting'],
     list:['Fall sprint','Fundamentals','Interview favourites','Second pass','This week']
   };
   const dimensionNames={company:'Company',technique:'Tag',list:'List'};
@@ -2072,7 +2075,7 @@ for right in range(n):
   }
   function openPicker(name,trigger) {
     pickerDimension=name;pickerTrigger=trigger;pickerDraft=new Set(scopeSelections[name]);
-    $('#picker-title').textContent='Choose'+dimensionNames[name];$('#picker-query').placeholder='Search'+dimensionNames[name];$('#picker-query').setAttribute('aria-label','Search'+dimensionNames[name]);$('#picker-query').value='';
+    $('#picker-title').textContent='Select'+dimensionNames[name];$('#picker-query').placeholder='Search'+dimensionNames[name];$('#picker-query').setAttribute('aria-label','Search'+dimensionNames[name]);$('#picker-query').value='';
     $('#scope-overview').hidden=true;$('#scope-picker').hidden=false;renderPicker();$('#picker-options').scrollTop=0;$('#picker-query').focus();
   }
   function closePicker(commit) {
