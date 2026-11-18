@@ -16,10 +16,10 @@
   :root {
     /* —— 调色板：浅 —— */
     --light-ground: #F0F5F2;  --light-card: #FFFFFF;  --light-inset: #F6FAF8;
-    --light-ink-1: #1B231F;   --light-ink-2: #6A7670;
-    --light-ink-3: #A0AAA5;   --light-ink-4: #C3CCC7;
+    --light-ink-1: #1B231F;   --light-ink-2: #4C5450;
+    --light-ink-3: #66726C;   --light-ink-4: #7E9287;
     --light-hair: #E3EAE6;    --light-heat-0: #E5EBE8;
-    --light-tag-bg: #F0F3FC;  --light-tag-ink: #6082EF;
+    --light-tag-bg: #F0F3FC;  --light-tag-ink: #3A64EB;
     --light-shadow: 0 6px 20px rgba(27, 35, 31, .07);
     --light-lift: 0 1px 3px rgba(27, 35, 31, .11);
     --light-hl: rgba(255, 178, 46, .36);
@@ -28,7 +28,7 @@
     /* —— 调色板：深。L3 仍比 L2 暗 —— 明暗关系同向，不做反转 —— */
     --dark-ground: #0E1310;   --dark-card: #181E1B;   --dark-inset: #141916;
     --dark-ink-1: #E6EEEA;    --dark-ink-2: #9AA59F;
-    --dark-ink-3: #717A75;    --dark-ink-4: #4B534F;
+    --dark-ink-3: #7C8680;    --dark-ink-4: #5F6964;
     --dark-hair: #262D29;     --dark-heat-0: #232926;
     --dark-tag-bg: #1E2535;   --dark-tag-ink: #8FA6F0;
     --dark-shadow: 0 6px 20px rgba(0, 0, 0, .45);
@@ -37,15 +37,24 @@
     --dark-veil: rgba(0, 0, 0, .52);
 
     /* —— 强调：两个主题同值。一屏一次 —— */
-    --accent: #30CF79;
+    /* 绿有三个用途，不是一个值：
+       --accent       填充（按钮底、选中药丸、热力图）—— 品牌色，一个像素都不改
+       --accent-ink   压在填充上的字 —— 白字 2.03:1 读不出来，翻成深墨 7.90:1
+       --accent-text  绿色的「字和图标」—— #30CF79 压浅底只有 1.84:1，浅色模式必须加深
+     overdue / gold 同理：深底上够用，浅底上都不到 3:1。 */
+  --light-accent-text: #1E7F4B;  /* 4.54:1，按 --ground 这个最暗的浅色面算 */
+  --dark-accent-text:  #30CF79;  /* 压深卡 9.23:1，原值够用 */
+  --light-overdue: #BA4E2A;      /* 4.52:1（原 #D97757 压 ground 只有 2.83） */
+  --dark-overdue:  #D97757;
+  --light-gold: #876B41;         /* 4.52:1（原 #BFA47A 压 ground 只有 2.16） */
+  --dark-gold:  #BFA47A;
+  --accent: #30CF79;
     --accent-press: #2CBE6F;
     /* 压在强调色上的前景色。白字对 #30CF79 只有 2.03:1，低于 WCAG AA
        正文要求的 4.5 —— 这是为了和 flomo 视觉一致而「明知故犯」的例外，
        已记录在设定稿 §9，不要当 bug 改回深色。
        要反悔就改这一行：近黑 #04220E 可得 8.33:1。 */
-    --accent-ink: #FFFFFF;
-    --overdue: #D97757;
-    --gold: #BFA47A;
+    --accent-ink: #1B231F;
 
     /* —— 热力图：1/2 档用不透明度，自动压在当前底色上 —— */
     --heat-1: rgba(48, 207, 121, .24);
@@ -60,10 +69,14 @@
     --r1: 4px;  --r2: 8px;  --r3: 12px;
     --r4: 16px; --r5: 18px; --rp: 999px;
 
-    --sans: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Helvetica Neue",
-            "PingFang SC", "Hiragino Sans GB", sans-serif;
-    --serif: "Iowan Old Style", Charter, Palatino, Georgia, "Songti SC", serif;
-    --mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, monospace;
+  /* 拉丁字族必须排在中文字族前面。字体栈是逐字符解析的 —— 拉丁字母从第一个
+     有该字形的字族取，汉字从第一个有汉字的字族取。中文字族排前面的话它会连
+     拉丁一起供给，而中文字体自带的西文通常很差（SimSun 尤其惨）。
+     覆盖面：Apple → SF Pro / 苹方；Windows → Segoe UI / 微软雅黑；
+     Linux → 思源。Chrome 扩展不只跑在 Mac 上。 */
+    --sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "PingFang SC", "HarmonyOS Sans SC", "Microsoft YaHei", "Source Han Sans SC", "Noto Sans CJK SC", sans-serif;
+    --serif: "Iowan Old Style", Charter, "Source Serif 4", Georgia, Cambria, "Songti SC", "Source Han Serif SC", "Noto Serif CJK SC", SimSun, serif;
+    --mono: ui-monospace, SFMono-Regular, "SF Mono", "Cascadia Code", Consolas, "JetBrains Mono", "Roboto Mono", Menlo, monospace;
 
     /* 品牌资产内联成 token：每个 URI 只出现一次，引用点再多也不重复。
        --kmark 用的是 k-mark-transparent（纯 K，无底），不是 app-icon ——
@@ -102,7 +115,7 @@
     --ink: var(--light-ink-1);  --ink-2: var(--light-ink-2);
     --ink-3: var(--light-ink-3); --ink-4: var(--light-ink-4);
     --rule: var(--light-hair);  --chrome: var(--light-inset);
-    --tag-bg: var(--light-tag-bg); --tag-ink: var(--light-tag-ink);
+    --tag-bg: var(--light-tag-bg); --tag-ink: var(--light-tag-ink); --accent-text: var(--light-accent-text); --overdue: var(--light-overdue); --gold: var(--light-gold);
     --shadow: var(--light-shadow); --lift: var(--light-lift);
     --hl: var(--light-hl); --veil: var(--light-veil);
     --heat-0: var(--light-heat-0);
@@ -122,7 +135,7 @@
       --ink: var(--dark-ink-1);  --ink-2: var(--dark-ink-2);
       --ink-3: var(--dark-ink-3); --ink-4: var(--dark-ink-4);
       --rule: var(--dark-hair);  --chrome: var(--dark-inset);
-      --tag-bg: var(--dark-tag-bg); --tag-ink: var(--dark-tag-ink);
+      --tag-bg: var(--dark-tag-bg); --tag-ink: var(--dark-tag-ink); --accent-text: var(--dark-accent-text); --overdue: var(--dark-overdue); --gold: var(--dark-gold);
       --shadow: var(--dark-shadow); --lift: var(--dark-lift);
       --hl: var(--dark-hl); --veil: var(--dark-veil);
       --heat-0: var(--dark-heat-0);
@@ -141,7 +154,7 @@
     --ink: var(--dark-ink-1);  --ink-2: var(--dark-ink-2);
     --ink-3: var(--dark-ink-3); --ink-4: var(--dark-ink-4);
     --rule: var(--dark-hair);  --chrome: var(--dark-inset);
-    --tag-bg: var(--dark-tag-bg); --tag-ink: var(--dark-tag-ink);
+    --tag-bg: var(--dark-tag-bg); --tag-ink: var(--dark-tag-ink); --accent-text: var(--dark-accent-text); --overdue: var(--dark-overdue); --gold: var(--dark-gold);
     --shadow: var(--dark-shadow); --lift: var(--dark-lift);
     --hl: var(--dark-hl); --veil: var(--dark-veil);
     --heat-0: var(--dark-heat-0);
@@ -183,7 +196,7 @@
     font-size: 12px;
     letter-spacing: .14em;
     text-transform: uppercase;
-    color: var(--accent);
+    color: var(--accent-text);
   }
 
   h1 {
@@ -220,7 +233,7 @@
     letter-spacing: -.005em; text-wrap: balance;
   }
   h2 .kicker {
-    font-family: var(--mono); font-size: 13px; color: var(--accent);
+    font-family: var(--mono); font-size: 13px; color: var(--accent-text);
     letter-spacing: .1em; margin-right: 12px; vertical-align: 2px;
   }
 
@@ -243,8 +256,8 @@
     letter-spacing: .1em; text-transform: uppercase; color: var(--ink-3);
     display: flex; align-items: baseline; gap: 8px;
   }
-  .cap b { color: var(--accent); font-weight: 600; }
-  .cap em { font-style: normal; color: var(--accent); }
+  .cap b { color: var(--accent-text); font-weight: 600; }
+  .cap em { font-style: normal; color: var(--accent-text); }
 
   .grid {
     display: grid; grid-template-columns: repeat(auto-fit, minmax(248px, 1fr));
@@ -400,7 +413,7 @@
   .q.late .flag, .q.late .due { color: var(--overdue); }
   .q.fresh .due { color: var(--ink-2); }
   /* 三个旗标是现在唯一区分逾期/今天/新题的东西，颜色必须拉开 */
-  .q.fresh .flag { color: var(--accent); font-weight: 700; }
+  .q.fresh .flag { color: var(--accent-text); font-weight: 700; }
 
   /* 去掉左右横线，改左对齐小标签：5 个分区就是 5 条横线，噪音大且压不下去。
      大写字距 + Ink 3 同样能把它读成分区标题，还能再紧一档。
@@ -640,7 +653,7 @@
     color: var(--dark-ink-2); white-space: pre; overflow: hidden;
     min-width: 0;
   }
-  .promo .snip b { color: var(--accent); font-weight: 400; }
+  .promo .snip b { color: var(--accent-text); font-weight: 400; }
 
   .ladder {
     display: grid; grid-template-columns: repeat(3, 1fr);
@@ -651,7 +664,7 @@
     padding: 9px 0; border-radius: 9px;
     background: var(--dark-inset); justify-content: center;
   }
-  .ladder b { font-size: 19px; font-weight: 700; color: var(--accent); font-variant-numeric: tabular-nums; }
+  .ladder b { font-size: 19px; font-weight: 700; color: var(--accent-text); font-variant-numeric: tabular-nums; }
   .ladder span { font-size: 11px; color: var(--dark-ink-3); }
 
   .size {
@@ -787,7 +800,9 @@
   .leaf h3 .tlink:focus-visible { outline:2px solid var(--accent); outline-offset:2px; border-radius:var(--r1); }
   .leaf p + p { margin-top: var(--s2); }
   .leaf p.code { font-family: var(--mono); font-size: var(--t-body); line-height: 1.85; white-space: pre-wrap; }
-  mark { background: var(--hl); color: inherit; border-radius: 3px; padding: 0 2px; }
+  /* 高亮里的字用 ink-1 而不是继承正文的 ink-2：高亮本来就是强调，
+     而且琥珀底把可用对比压掉一截 —— 深色模式下 ink-2 压高亮只有 3.71:1。 */
+  mark { background: var(--hl); color: var(--ink); border-radius: 3px; padding: 0 2px; }
   /* 四层全部展开；只有超长的正文收起来，而不是整张卡藏起来。
      收的是「读不完」，不是「不给看」—— 所以收的单位是段落，不是卡片。 */
   .leaf .clampable { display:-webkit-box; -webkit-box-orient:vertical; -webkit-line-clamp:2; overflow:hidden; }
@@ -1012,7 +1027,7 @@
   .daily-summary { display:flex; gap:20px; padding:18px 0 22px; font-size:var(--t-meta); color:var(--ink-3); }.daily-summary > span { display:flex; align-items:center; gap:5px; }.daily-summary b { font-weight:500; color:var(--ink-2); }.difficulty-dot { height:5px; width:5px; border-radius:50%; }.difficulty-dot.easy { background:var(--ink-3); }.difficulty-dot.medium { background:var(--gold); }.difficulty-dot.hard { background:var(--overdue); }
   .daily-table-head { display:flex; justify-content:space-between; border-top:1px solid var(--rule); border-bottom:1px solid var(--rule); padding:9px 0 9px 23px; font-size:var(--t-meta); color:var(--ink-3); }
   .daily-questions { list-style:none; padding:0; margin:0; }.daily-questions li { display:flex; align-items:center; gap:9px; padding:13px 0; border-bottom:1px solid var(--rule); }.daily-questions li:last-child { border-bottom:0; }
-  .daily-check { color:var(--accent); font-size:var(--t-meta); flex:0 0 14px; }.daily-question { flex:1; min-width:0; }.daily-question > b { display:block; font-size:var(--t-meta); font-weight:600; line-height:1.6; overflow-wrap:anywhere; }.daily-question > span { display:flex; gap:9px; align-items:center; margin-top:3px; }.daily-result { font-size:var(--t-meta); color:var(--ink-3); }.daily-questions time { flex:0 0 48px; font-size:var(--t-meta); text-align:right; color:var(--ink-3); white-space:nowrap; }
+  .daily-check { color: var(--accent-text); font-size:var(--t-meta); flex:0 0 14px; }.daily-question { flex:1; min-width:0; }.daily-question > b { display:block; font-size:var(--t-meta); font-weight:600; line-height:1.6; overflow-wrap:anywhere; }.daily-question > span { display:flex; gap:9px; align-items:center; margin-top:3px; }.daily-result { font-size:var(--t-meta); color:var(--ink-3); }.daily-questions time { flex:0 0 48px; font-size:var(--t-meta); text-align:right; color:var(--ink-3); white-space:nowrap; }
   @media(max-width:480px) { .share-daily { width:100%; padding:24px 20px; }.daily-heading h3 { font-size:var(--t-title); }.daily-summary { gap:14px; } }
 
 
@@ -1095,7 +1110,7 @@
   .hash { font-size:var(--t-body); padding:var(--s3) var(--row-pad-x); }
   .share-daily { width:390px; max-width:100%; padding:var(--s5) var(--s4) var(--s4); border-radius:var(--r4); background:var(--ground); color:var(--ink); border:0; box-shadow:var(--shadow); }
   .share-daily { background:var(--card); }.daily-heading { margin-top:var(--s6); }.daily-heading h3 { font-size:var(--t-title); color:var(--ink); }.daily-total b { font-size:var(--t-display); color:var(--ink-2); }.daily-total>span { color:var(--ink-3); }.daily-summary { padding:var(--s5) 0; color:var(--ink-3); }.daily-summary b { color:var(--ink-2); }
-  .daily-table-head { border-color:var(--rule); color:var(--ink-3); font-size:var(--t-meta); }.daily-questions li { padding:var(--s4) 0; border-color:var(--rule); gap:var(--s2); }.daily-question>b { font-size:var(--t-body); line-height:1.6; font-weight:500; color:var(--ink); }.daily-question>span { margin-top:var(--s1); }.daily-questions time { color:var(--ink-3); flex-basis:44px; }.daily-result { color:var(--ink-3); }.daily-check { color:var(--accent); }.difficulty.easy { color:var(--ink-2); }.difficulty.medium { color:var(--gold); }.difficulty.hard { color:var(--overdue); }
+  .daily-table-head { border-color:var(--rule); color:var(--ink-3); font-size:var(--t-meta); }.daily-questions li { padding:var(--s4) 0; border-color:var(--rule); gap:var(--s2); }.daily-question>b { font-size:var(--t-body); line-height:1.6; font-weight:500; color:var(--ink); }.daily-question>span { margin-top:var(--s1); }.daily-questions time { color:var(--ink-3); flex-basis:44px; }.daily-result { color:var(--ink-3); }.daily-check { color: var(--accent-text); }.difficulty.easy { color:var(--ink-2); }.difficulty.medium { color:var(--gold); }.difficulty.hard { color:var(--overdue); }
   @media(max-width:480px) { .share-daily { width:100%; padding:20px 17px 17px; } }
 
 
@@ -1110,7 +1125,7 @@
   .daily-submissions tbody tr:nth-child(odd) { background:var(--card); }.daily-submissions tbody tr:nth-child(even) { background:var(--inset); }
   .daily-submissions .daily-time { color:var(--ink-3); font-size:var(--t-meta); white-space:nowrap; }
   .daily-submissions .daily-problem-cell { position:relative; padding-left:34px; }
-  .daily-submissions .daily-check { position:absolute; left:14px; top:50%; transform:translateY(-50%); color:var(--accent); font-size:var(--t-meta); }
+  .daily-submissions .daily-check { position:absolute; left:14px; top:50%; transform:translateY(-50%); color: var(--accent-text); font-size:var(--t-meta); }
   .daily-submissions .daily-question { min-width:0; }.daily-submissions .daily-question>b { font-size:var(--t-meta); line-height:1.55; font-weight:600; color:var(--ink); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
   .daily-submissions .difficulty { display:block; margin-top:2px; font-size:var(--t-meta); font-weight:400; line-height:1.4; }
   .daily-submissions .daily-accepted { color:var(--ink-3); font-size:var(--t-meta); }.daily-submissions .daily-attempts { color:var(--ink-3); white-space:nowrap; font-size:var(--t-meta); }
@@ -1182,9 +1197,9 @@
      （16/13/12/11/10）也对不上，会显得像放大了的手机界面。
      两套字阶：手机 26/17/14/11，面板 20/13/13/11。对应关系在下面成对写，别拆开。
      （唯一真正要共用的是 font-family —— 之前手机端正文漏写，继承成无衬线，
-     那才是真的"两种字体"，和字号无关。） */.auth-hi, .auth-content h3 { font-family:var(--serif); line-height:1.3; letter-spacing:-.5px; }.auth-content h3 { font-size:var(--t-display); }.auth-hi { font-size:var(--t-display); }.auth-content h3 { margin:30px 0 22px; color:var(--ios-ink); }.auth-content h3 em { color:var(--accent); font-style:normal; }.auth-hi-line, .auth-content>p { font-family:var(--serif); line-height:1.9; }.auth-content>p { font-size:var(--t-body); }.auth-hi-line { font-size:var(--t-body); }.auth-content>p { color:var(--ios-ink-2); margin-bottom:35px; }
-  .auth-options { display:flex; flex-direction:column; gap:17px; }.auth-entry { display:flex; align-items:center; gap:13px; width:100%; padding:17px; border:1px solid var(--rule); border-radius:16px; background:var(--ios-card); color:var(--ios-ink); text-align:left; }.auth-entry>span:nth-child(2) { flex:1; display:flex; flex-direction:column; gap:5px; }.auth-entry b { font-size:var(--t-title); line-height:1.4; font-weight:500; }.auth-entry small { font-size:var(--t-meta); line-height:1.4; color:var(--ios-ink-2); }.account-symbol { font:600 var(--t-meta) var(--mono); color:var(--accent); }.auth-github { border-color:var(--accent); }.auth-pbody .auth-options { gap:var(--s2); }.auth-pbody .auth-entry { padding:var(--s3); gap:var(--s3); border-radius:var(--r3); }.auth-pbody .auth-entry b { font-size:var(--t-body); font-weight:600; }.auth-pbody .auth-entry small { font-size:var(--t-meta); }.auth-pbody .account-symbol { font-size:var(--t-meta); }/* Chrome 的连接页。登录前标题栏只有 logo —— 还没连上账号，今天/本题/设置 都没有内容可去。 */.auth-pbody { gap:var(--s4); padding:var(--s6) var(--s5) var(--s5); }.auth-hi { margin:0; color:var(--ink); }.auth-hi em { color:var(--accent); font-style:normal; }.auth-hi-line { margin:0; color:var(--ink-2); }
-  #auth-device { padding:14px; border-radius:12px; border:1px solid var(--rule); background:var(--ios-card); }#auth-device strong { display:block; font:var(--t-title) var(--mono); letter-spacing:2px; margin:12px 0; }#auth-device a { color:var(--accent); font-size:var(--t-meta); }#auth-device small { display:block; color:var(--ios-ink-2); font-size:var(--t-meta); margin-top:10px; }.auth-device-label { font-size:var(--t-meta); color:var(--ios-ink-2); }
+     那才是真的"两种字体"，和字号无关。） */.auth-hi, .auth-content h3 { font-family:var(--serif); line-height:1.3; letter-spacing:-.5px; }.auth-content h3 { font-size:var(--t-display); }.auth-hi { font-size:var(--t-display); }.auth-content h3 { margin:30px 0 22px; color:var(--ios-ink); }.auth-content h3 em { color: var(--accent-text); font-style:normal; }.auth-hi-line, .auth-content>p { font-family:var(--serif); line-height:1.9; }.auth-content>p { font-size:var(--t-body); }.auth-hi-line { font-size:var(--t-body); }.auth-content>p { color:var(--ios-ink-2); margin-bottom:35px; }
+  .auth-options { display:flex; flex-direction:column; gap:17px; }.auth-entry { display:flex; align-items:center; gap:13px; width:100%; padding:17px; border:1px solid var(--rule); border-radius:16px; background:var(--ios-card); color:var(--ios-ink); text-align:left; }.auth-entry>span:nth-child(2) { flex:1; display:flex; flex-direction:column; gap:5px; }.auth-entry b { font-size:var(--t-title); line-height:1.4; font-weight:500; }.auth-entry small { font-size:var(--t-meta); line-height:1.4; color:var(--ios-ink-2); }.account-symbol { font:600 var(--t-meta) var(--mono); color: var(--accent-text); }.auth-github { border-color:var(--accent); }.auth-pbody .auth-options { gap:var(--s2); }.auth-pbody .auth-entry { padding:var(--s3); gap:var(--s3); border-radius:var(--r3); }.auth-pbody .auth-entry b { font-size:var(--t-body); font-weight:600; }.auth-pbody .auth-entry small { font-size:var(--t-meta); }.auth-pbody .account-symbol { font-size:var(--t-meta); }/* Chrome 的连接页。登录前标题栏只有 logo —— 还没连上账号，今天/本题/设置 都没有内容可去。 */.auth-pbody { gap:var(--s4); padding:var(--s6) var(--s5) var(--s5); }.auth-hi { margin:0; color:var(--ink); }.auth-hi em { color: var(--accent-text); font-style:normal; }.auth-hi-line { margin:0; color:var(--ink-2); }
+  #auth-device { padding:14px; border-radius:12px; border:1px solid var(--rule); background:var(--ios-card); }#auth-device strong { display:block; font:var(--t-title) var(--mono); letter-spacing:2px; margin:12px 0; }#auth-device a { color: var(--accent-text); font-size:var(--t-meta); }#auth-device small { display:block; color:var(--ios-ink-2); font-size:var(--t-meta); margin-top:10px; }.auth-device-label { font-size:var(--t-meta); color:var(--ios-ink-2); }
   /* 队列面板的正文区直接去掉纵向内距，而不是给每个列表挂负边距 —— 两个列表
      同时显示时（复习 + 新题），两份负边距会互相重叠 24px。零内距则两组都
      自然贴到面板上下边，中间留 .pbody 的 gap 当分隔。 */
@@ -1205,7 +1220,7 @@
      实心绿 + 白字：描边版在一排描边药丸里对比太弱，得盯着看才知道选了哪个。
      白字压 #30CF79 是 2.03:1，设定稿 §9 记录在案的「明知故犯」，别改回深色。 */
   .interval-preview button[aria-pressed="true"] { background:var(--accent); border-color:var(--accent); color:var(--accent-ink); font-weight:600; }
-  .auto-completion { display:flex; align-items:center; gap:12px; padding:17px; background:var(--accent-soft); border-radius:12px; }.auto-completion>span { color:var(--accent); font-size:var(--t-display); }.auto-completion div { display:flex; flex-direction:column; gap:6px; }.auto-completion b { font-size:var(--t-title); }.auto-completion small { color:var(--ink-2); font-size:var(--t-meta); }.completion-plan { display:flex; justify-content:space-between; font-size:var(--t-body); color:var(--ink-2); }.completion-plan b { color:var(--ink); font-weight:500; }
+  .auto-completion { display:flex; align-items:center; gap:12px; padding:17px; background:var(--accent-soft); border-radius:12px; }.auto-completion>span { color: var(--accent-text); font-size:var(--t-display); }.auto-completion div { display:flex; flex-direction:column; gap:6px; }.auto-completion b { font-size:var(--t-title); }.auto-completion small { color:var(--ink-2); font-size:var(--t-meta); }.completion-plan { display:flex; justify-content:space-between; font-size:var(--t-body); color:var(--ink-2); }.completion-plan b { color:var(--ink); font-weight:500; }
   /* ------------------------------------------------------------
      样稿的明暗开关。
 
@@ -1224,7 +1239,7 @@
     --ink: var(--light-ink-1);  --ink-2: var(--light-ink-2);
     --ink-3: var(--light-ink-3); --ink-4: var(--light-ink-4);
     --rule: var(--light-hair);  --chrome: var(--light-inset);
-    --tag-bg: var(--light-tag-bg); --tag-ink: var(--light-tag-ink);
+    --tag-bg: var(--light-tag-bg); --tag-ink: var(--light-tag-ink); --accent-text: var(--light-accent-text); --overdue: var(--light-overdue); --gold: var(--light-gold);
     --shadow: var(--light-shadow); --lift: var(--light-lift);
     --hl: var(--light-hl); --veil: var(--light-veil);
     --heat-0: var(--light-heat-0);
@@ -1243,7 +1258,7 @@
     --ink: var(--dark-ink-1);  --ink-2: var(--dark-ink-2);
     --ink-3: var(--dark-ink-3); --ink-4: var(--dark-ink-4);
     --rule: var(--dark-hair);  --chrome: var(--dark-inset);
-    --tag-bg: var(--dark-tag-bg); --tag-ink: var(--dark-tag-ink);
+    --tag-bg: var(--dark-tag-bg); --tag-ink: var(--dark-tag-ink); --accent-text: var(--dark-accent-text); --overdue: var(--dark-overdue); --gold: var(--dark-gold);
     --shadow: var(--dark-shadow); --lift: var(--dark-lift);
     --hl: var(--dark-hl); --veil: var(--dark-veil);
     --heat-0: var(--dark-heat-0);
