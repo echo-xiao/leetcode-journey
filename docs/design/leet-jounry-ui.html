@@ -1165,6 +1165,14 @@
 
 
   .document-toolbar { display:flex; align-items:center; justify-content:space-between; gap:16px; flex-wrap:wrap; }
+
+  /* 语言切换。两个版本是两份文件而不是一份带 i18n 的 —— 这是设计稿不是产品，
+     两份并排放着才能一眼看出同一个布局装中英文会差多少（卡片高度 121 → 148）。
+     外观用 button（改当前页），语言用 a（换一份文件），语义不一样别混。 */
+  .lang-options { display:flex; gap:2px; padding:3px; border:0; background:var(--inset); border-radius:var(--r3); font:12px var(--sans); }
+  .lang-options a { border-radius:var(--r2); color:var(--ink-3); padding:6px 10px; text-decoration:none; }
+  .lang-options a[aria-current="page"] { background:var(--card); box-shadow:var(--lift); color:var(--ink); font-weight:600; }
+  .document-toolbar .toolbar-right { display:flex; align-items:center; gap:var(--s2); flex-wrap:wrap; }
   .theme-options { display:flex; gap:2px; padding:3px; border:0; background:var(--inset); border-radius:var(--r3); font:12px var(--sans); }
   .theme-options button { border:0; border-radius:var(--r2); background:transparent; color:var(--ink-3); padding:6px 10px; }.theme-options button[aria-pressed="true"] { background:var(--card); box-shadow:var(--lift); color:var(--ink); font-weight:600; }
   .auth-phone { height:auto; min-height:650px; padding-bottom:0; }.auth-content { padding:22px 30px 28px; }/* wordmark 代替文字品牌名。写死高度不写宽度 —— 图是 3:1，让宽度自己算，换一版比例不同的 logo 也不会被拉变形。 *//* 登录页中文走衬线（--serif 的中文落到 Songti SC），和文档标题同一套字 *//* 两端共用字族和文案，不共用字号。
@@ -1402,7 +1410,7 @@
 <div class="wrap">
 
   <header class="masthead">
-    <div class="document-toolbar"><div class="eyebrow">LEET JOUNRY · UI 设计稿 · 修订版</div><div class="theme-options" role="group" aria-label="外观"><button data-theme-choice="system" aria-pressed="true">跟随系统</button><button data-theme-choice="light" aria-pressed="false">白天</button><button data-theme-choice="dark" aria-pressed="false">黑夜</button></div></div>
+    <div class="document-toolbar"><div class="eyebrow">LEET JOUNRY · UI 设计稿 · 修订版</div><div class="toolbar-right"><div class="lang-options" role="group" aria-label="语言"><a href="leet-jounry-ui.html" aria-current="page" hreflang="zh-Hans">中文</a><a href="leet-jounry-ui.en.html" hreflang="en">EN</a></div><div class="theme-options" role="group" aria-label="外观"><button data-theme-choice="system" aria-pressed="true">跟随系统</button><button data-theme-choice="light" aria-pressed="false">白天</button><button data-theme-choice="dark" aria-pressed="false">黑夜</button></div></div></div>
     <h1>执行在浏览器里，阅读在手机上</h1>
     <p class="standfirst">
       Chrome 扩展负责练习与自动记录，默认不推荐新题；iOS app 只读，负责总览、阅读和提醒。题单直接从 GitHub 仓库读取。
