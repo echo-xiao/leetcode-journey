@@ -1414,7 +1414,7 @@
 
   <header class="masthead">
     <div class="document-toolbar"><div class="eyebrow">KERNO · UI SPEC · REVISED</div><div class="toolbar-right"><div class="lang-options" role="group" aria-label="Language"><a href="leet-jounry-ui.html" hreflang="zh-Hans">中文</a><a href="leet-jounry-ui.en.html" aria-current="page" hreflang="en">EN</a></div><div class="theme-options" role="group" aria-label="Appearance"><button data-theme-choice="system" aria-pressed="true">System</button><button data-theme-choice="light" aria-pressed="false">Light</button><button data-theme-choice="dark" aria-pressed="false">Dark</button></div></div></div>
-    <h1>Practise in the browser, read on your phone</h1>
+    <h1>Practice in the browser, read on your phone</h1>
     <p class="standfirst">
       The Chrome extension handles practice and records it automatically; it does not push new problems at you by default.
       The iOS app is read-only and handles the overview, the reading and the reminders. The problem list is read straight from a GitHub repo.
@@ -1431,13 +1431,13 @@
   </header>
 
   <section id="onboarding">
-    <div class="sec-head"><h2><span class="kicker">START</span>Connect your practice and your notes</h2><p>First run offers exactly two doors. GitHub authorises access to your own repo; LeetCode reuses the login your browser already has.</p></div>
+    <div class="sec-head"><h2><span class="kicker">START</span>Connect your practice and your notes</h2><p>First run offers exactly two doors. GitHub authorizes access to your own repo; LeetCode reuses the login your browser already has.</p></div>
     <div class="rail"><div class="unit"><div class="cap"><b>Home</b> flomo-style · two doors</div>
       <div class="phone auth-phone"><div class="bar0"><span>9:41</span><span class="bar-mark" role="img" aria-label="Kerno"></span><span>●●● ⌁</span></div>
         <div class="auth-content"><h3>Hi, <em>Fellow.</em></h3><p>Revisit what you've solved.<br>Unpack the ideas.<br>Deepen your understanding.</p>
           <div class="auth-options"><button class="auth-entry auth-github" id="auth-github"><span class="account-symbol">GH</span><span><b>GitHub</b><small>Connect my data repo</small></span><span>↗</span></button>
           <button class="auth-entry" id="auth-leetcode"><span class="account-symbol">LC</span><span><b>LeetCode</b><small>Use my browser session</small></span><span>↗</span></button></div>
-          <div id="auth-device" hidden><span class="auth-device-label">GitHub Device Flow · illustrative</span><strong>WDJB-MJHT</strong><a href="https://github.com/login/device" target="_blank" rel="noopener noreferrer">Open the GitHub authorisation page ↗</a><small>Sample code from the spec. No real authorisation is requested.</small></div>
+          <div id="auth-device" hidden><span class="auth-device-label">GitHub Device Flow · illustrative</span><strong>WDJB-MJHT</strong><a href="https://github.com/login/device" target="_blank" rel="noopener noreferrer">Open the GitHub authorization page ↗</a><small>Sample code from the spec. No real authorization is requested.</small></div>
         </div>
       
 
@@ -1597,7 +1597,7 @@
       </div>
       <div>
         <h4>Degraded states get said out loud</h4>
-        <p>No network, expired token, LeetCode session dropped -- the status dot in the title bar changes colour and an actionable amber bar appears under the body. The data queues locally and is not lost, but you have to be able to see that it has not been pushed yet.</p>
+        <p>No network, expired token, LeetCode session dropped -- the status dot in the title bar changes color and an actionable amber bar appears under the body. The data queues locally and is not lost, but you have to be able to see that it has not been pushed yet.</p>
       </div>
     </div>
   </section>
@@ -1786,7 +1786,7 @@ for right in range(n):
       </div>
       <div>
         <h4>The heatmap talks to LeetCode directly</h4>
-        <p>It bypasses the repo and refetches every time the app comes to the foreground. Offline it draws the last result and labels it 'as of DD Mon' — it must never draw empty, because empty reads as 'you did not practise'.</p>
+        <p>It bypasses the repo and refetches every time the app comes to the foreground. Offline it draws the last result and labels it 'as of DD Mon' — it must never draw empty, because empty reads as 'you did not practice'.</p>
       </div>
       <div>
         <h4>No rating buttons</h4>
@@ -1884,7 +1884,7 @@ for right in range(n):
     <div class="grid">
       <div><h4>A span of days</h4><p>Three numbers laid out as EASY / MEDIUM / HARD. The numerator counts distinct problems accepted in the window, the denominator distinct problems attempted in it. Heatmap, dates and numbers all use the same window; lifetime totals never leak in.</p></div>
       <div><h4>Single-problem notes</h4><p>Number, title, difficulty, problem link and your own notes make one image. Code can ride along with the notes; long notes extend with the content rather than truncating the part that matters. The link in the image is text, and a clickable one can be attached alongside.</p></div>
-      <div><h4>Daily problem list</h4><p>The same four columns as the submissions table: last submission, problem and difficulty, last result, attempts. One row per problem with alternating row tints; long titles ellipsise and reveal in full on hover. The arrows here are image styling only.</p></div>
+      <div><h4>Daily problem list</h4><p>The same four columns as the submissions table: last submission, problem and difficulty, last result, attempts. One row per problem with alternating row tints; long titles ellipsize and reveal in full on hover. The arrows here are image styling only.</p></div>
     </div>
     <p class="note">Everything above is sample data from the spec. All three shares are user-initiated; this page shows styling only and is not wired to real submissions.</p>
   </section>
@@ -1902,7 +1902,7 @@ for right in range(n):
           <tr><td class="k">accent</td><td class="v">#30CF79</td><td class="w">Only ever means 'you are here'. Once per screen. The darkest heatmap cell is the single exception, and that one is atmosphere</td></tr>
           <tr><td class="k">Seven neutrals</td><td class="v">ink-1 … ink-4 / ground / card / inset</td><td class="w">Hue pulled toward the accent at ~148°, saturation 3–6%. Reads as grey, related to the green</td></tr>
           <tr><td class="k">Stat numbers</td><td class="v">34 semibold · ink-2</td><td class="w">Grey, not black. Three abreast with denominators, pull back to 30</td></tr>
-          <tr><td class="k">Dimension switcher</td><td class="v">inset groove + card chip + lift</td><td class="w">Navigation uses colour, dimensions use elevation — the green stays out of this one</td></tr>
+          <tr><td class="k">Dimension switcher</td><td class="v">inset groove + card chip + lift</td><td class="w">Navigation uses color, dimensions use elevation — the green stays out of this one</td></tr>
           <tr><td class="k">Body</td><td class="v">16 / leading +8</td><td class="w">Measured off the flomo screenshots. Do not touch</td></tr>
           <tr><td class="k">Title</td><td class="v">21 semibold</td><td class="w">Problem title on a bead card</td></tr>
           <tr><td class="k">meta</td><td class="v">13</td><td class="w">Difficulty, number, date</td></tr>
@@ -1911,7 +1911,7 @@ for right in range(n):
           <tr><td class="k">Counters</td><td class="v">34 bold / label 11</td><td class="w">The three large numbers at the top of the drawer</td></tr>
           <tr><td class="k">Four heatmap steps</td><td class="v">fill · .28 · .58 · 1.0</td><td class="w">Thresholds at 1 / 5 / 15 submissions; today's cell is outlined, not filled</td></tr>
           <tr><td class="k">review highlight</td><td class="v">amber 36%</td><td class="w">render <code>==marked==</code></td></tr>
-          <tr><td class="k">Overdue</td><td class="v">#D97757</td><td class="w">Extension only. A semantic colour, not the accent</td></tr>
+          <tr><td class="k">Overdue</td><td class="v">#D97757</td><td class="w">Extension only. A semantic color, not the accent</td></tr>
           <tr><td class="k">Drawer</td><td class="v">79% wide · .42s</td><td class="w">easing <code>cubic-bezier(.22,.61,.36,1)</code>, all three layers on one curve and one duration</td></tr>
         </tbody>
       </table>
